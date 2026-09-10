@@ -3,178 +3,35 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>IQIHLO ES TEH - Kasir</title>
-
+<title>IQIHLO ES TEH</title>
 <style>
 *{box-sizing:border-box}
-body{
-font-family:Arial,sans-serif;
-background:#f3f3f3;
-margin:0;
-padding:15px
-}
-.box{
-max-width:600px;
-margin:auto;
-background:white;
-padding:20px;
-border-radius:15px
-}
+body{font-family:Arial;background:#f3f3f3;margin:0;padding:15px}
+.box{max-width:600px;margin:auto;background:white;padding:20px;border-radius:15px}
 h1{text-align:center;margin:5px 0}
-h3{text-align:center;margin:0 0 20px}
-
-label{
-display:block;
-font-weight:bold;
-margin:15px 0 6px
-}
-
-input{
-width:100%;
-padding:12px;
-font-size:16px;
-border:1px solid #888;
-border-radius:8px
-}
-
-.kategori,.menu{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:8px
-}
-
-button{
-font-size:15px;
-font-weight:bold;
-padding:13px;
-border-radius:8px;
-border:1px solid #aaa
-}
-
-.kategori button{
-background:#eee
-}
-
-.kategori .aktif{
-background:#111;
-color:white
-}
-
-.menu button{
-background:#111;
-color:white;
-border:0;
-min-height:65px
-}
-
-.menu small{
-display:block;
-margin-top:5px;
-font-weight:normal
-}
-
-.pesanan{
-margin-top:20px;
-padding-top:10px;
-border-top:2px dashed #111
-}
-
-.item{
-display:flex;
-align-items:center;
-gap:8px;
-padding:10px 0;
-border-bottom:1px solid #ddd
-}
-
-.item .nama{
-flex:1
-}
-
-.jumlah{
-display:flex;
-align-items:center;
-gap:5px
-}
-
-.jumlah button{
-width:35px;
-padding:7px
-}
-
-.total{
-font-size:24px;
-font-weight:bold;
-text-align:right;
-margin:20px 0
-}
-
-.cetak{
-width:100%;
-background:#111;
-color:white;
-border:0;
-padding:15px
-}
-
-.kosong{
-width:100%;
-background:white;
-margin-top:8px
-}
-
-.harga{
-margin-top:20px;
-border-top:1px solid #ccc;
-padding-top:12px
-}
-
-.hargaItem{
-display:flex;
-align-items:center;
-gap:8px;
-margin:7px 0
-}
-
-.hargaItem span{
-flex:1;
-font-size:13px
-}
-
-.hargaItem input{
-width:120px;
-padding:8px
-}
-
-.struk{
-display:none
-}
-
+h3{text-align:center}
+label{display:block;font-weight:bold;margin:18px 0 7px}
+input{width:100%;padding:13px;font-size:16px;border:1px solid #888;border-radius:8px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+button{padding:13px;border-radius:8px;font-weight:bold;font-size:15px}
+.cat{background:#eee;border:1px solid #aaa}
+.cat.on{background:#111;color:white}
+.menu{background:#111;color:white;border:0;min-height:60px}
+.cart{margin-top:20px;border-top:2px dashed;padding-top:12px}
+.item{padding:9px 0;border-bottom:1px solid #ddd}
+.item button{padding:5px 10px}
+.total{text-align:right;font-size:24px;font-weight:bold;margin:20px 0}
+.print{width:100%;background:#111;color:white;border:0;font-size:17px}
+.clear{width:100%;background:white;margin-top:8px}
+.price{margin-top:20px;border-top:1px solid #ccc;padding-top:12px}
+.p{display:flex;gap:6px;margin:6px 0}
+.p span{flex:1;font-size:13px}
+.p input{width:110px;padding:7px}
+.receipt{display:none}
 @media print{
-body{
-background:white;
-padding:0
-}
-
-.box{
-display:none
-}
-
-.struk{
-display:block;
-width:58mm;
-font-family:monospace;
-font-size:12px
-}
-
-.tengah{
-text-align:center
-}
-
-.garis{
-border-top:1px dashed #000;
-margin:8px 0
-}
+body{padding:0;background:white}.box{display:none}
+.receipt{display:block;width:58mm;font:12px monospace}
+.center{text-align:center}.line{border-top:1px dashed;margin:7px 0}
 }
 </style>
 </head>
@@ -190,39 +47,217 @@ margin:8px 0
 <input id="nama" placeholder="Nama pelanggan">
 
 <label>Pilih Kategori</label>
-<div class="kategori" id="kategori"></div>
+<div class="grid" id="kategori"></div>
 
 <label>Pilih Menu</label>
-<div class="menu" id="menu"></div>
+<div class="grid" id="menu"></div>
 
-<div class="pesanan">
+<div class="cart">
 <b>DAFTAR PESANAN</b>
-<div id="daftar"></div>
+<div id="pesanan">Belum ada pesanan</div>
 </div>
 
-<div class="total">
-TOTAL: <span id="total">Rp0</span>
-</div>
+<div class="total">TOTAL: <span id="total">Rp0</span></div>
 
-<button class="cetak" onclick="cetak()">CETAK STRUK</button>
+<button class="print" onclick="cetak()">CETAK STRUK</button>
+<button class="clear" onclick="hapus()">KOSONGKAN PESANAN</button>
 
-<button class="kosong" onclick="kosongkan()">
-KOSONGKAN PESANAN
-</button>
-
-<details class="harga">
+<details class="price">
 <summary><b>ATUR HARGA MENU</b></summary>
-
-<p>Masukkan harga setiap menu.</p>
-
-<div id="daftarHarga"></div>
-
+<p>Masukkan harga masing-masing menu.</p>
+<div id="harga"></div>
 </details>
 
 </div>
 
+<div class="receipt">
+<div class="center">
+<b>IQIHLO ES TEH</b><br>
+SEGARNYA BEDA!<br>
+<b>STRUK PEMBELIAN</b>
+</div>
+<div class="line"></div>
+Nama: <span id="rnama"></span><br>
+Tanggal: <span id="rtgl"></span><br>
+Jam: <span id="rjam"></span>
+<div class="line"></div>
+<div id="ritem"></div>
+<div class="line"></div>
+<b>TOTAL: <span id="rtotal"></span></b>
+<div class="line"></div>
+<div class="center">
+TERIMA KASIH<br>
+SELAMAT MENIKMATI!<br><br>
+@iqihlo.esteh
+</div>
+</div>
 
-<div class="struk">
+<script>
 
-<div class="tengah">
-<b>IQIHLO ES TEH
+var data={
+"Es Teh":["Es Teh"],
+"Es Goodday":[
+"Goodday Freeze Hazelnut",
+"Goodday Freeze Cookies & Cream",
+"Goodday Biasa Moca",
+"Goodday Biasa Cappuccino",
+"Goodday Biasa Coolant"],
+"Es Coklat":[
+"Chocolatos Matcha",
+"Chocolatos Coklat",
+"Beng Beng Original"],
+"Es Susu":[
+"Frisian Flag Putih",
+"Frisian Flag Coklat"],
+"Es Nutrisari":[
+"Nutrisari Jeruk Peras",
+"Nutrisari Jeruk Nipis",
+"Nutrisari Jambu",
+"Nutrisari Mangga"],
+"Kopi":[
+"White Coffee Original",
+"Kopi Hitam Original"]
+};
+
+var hargaData=JSON.parse(localStorage.getItem("hargaIQ")||"{}");
+var pesanan={};
+var aktif="Es Teh";
+
+function rupiah(n){
+return "Rp"+Number(n||0).toLocaleString("id-ID");
+}
+
+function buatKategori(){
+var e=document.getElementById("kategori");
+e.innerHTML="";
+Object.keys(data).forEach(function(k){
+var b=document.createElement("button");
+b.className="cat"+(k==aktif?" on":"");
+b.textContent=k;
+b.onclick=function(){
+aktif=k;
+buatKategori();
+buatMenu();
+};
+e.appendChild(b);
+});
+}
+
+function buatMenu(){
+var e=document.getElementById("menu");
+e.innerHTML="";
+data[aktif].forEach(function(n){
+var b=document.createElement("button");
+b.className="menu";
+b.innerHTML=n+"<br><small>"+rupiah(hargaData[n])+"</small>";
+b.onclick=function(){
+pesanan[n]=(pesanan[n]||0)+1;
+tampil();
+};
+e.appendChild(b);
+});
+}
+
+function tampil(){
+var e=document.getElementById("pesanan");
+e.innerHTML="";
+var total=0;
+
+Object.keys(pesanan).forEach(function(n){
+var q=pesanan[n];
+var sub=q*(hargaData[n]||0);
+total+=sub;
+
+var d=document.createElement("div");
+d.className="item";
+d.innerHTML="<b>"+n+"</b><br>"+
+rupiah(hargaData[n])+" x "+q+
+" = "+rupiah(sub)+
+" &nbsp; <button onclick='ubah("+JSON.stringify(n)+",-1)'>−</button>"+
+" "+q+
+" <button onclick='ubah("+JSON.stringify(n)+",1)'>+</button>";
+
+e.appendChild(d);
+});
+
+if(!Object.keys(pesanan).length)
+e.innerHTML="Belum ada pesanan";
+
+document.getElementById("total").textContent=rupiah(total);
+}
+
+function ubah(n,x){
+pesanan[n]+=x;
+if(pesanan[n]<=0)delete pesanan[n];
+tampil();
+}
+
+function hapus(){
+pesanan={};
+tampil();
+}
+
+function buatHarga(){
+var e=document.getElementById("harga");
+e.innerHTML="";
+
+Object.values(data).flat().forEach(function(n){
+var d=document.createElement("div");
+d.className="p";
+
+d.innerHTML="<span>"+n+"</span>"+
+"<input type='number' placeholder='Harga' value='"+(hargaData[n]||"")+"'>";
+
+var inp=d.querySelector("input");
+
+inp.oninput=function(){
+hargaData[n]=Number(inp.value||0);
+localStorage.setItem("hargaIQ",JSON.stringify(hargaData));
+buatMenu();
+tampil();
+};
+
+e.appendChild(d);
+});
+}
+
+function cetak(){
+if(!Object.keys(pesanan).length){
+alert("Pilih menu dulu");
+return;
+}
+
+var d=new Date();
+var total=0;
+var isi="";
+
+document.getElementById("rnama").textContent=
+document.getElementById("nama").value||"-";
+
+document.getElementById("rtgl").textContent=
+d.toLocaleDateString("id-ID");
+
+document.getElementById("rjam").textContent=
+d.toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"});
+
+Object.keys(pesanan).forEach(function(n){
+var sub=pesanan[n]*(hargaData[n]||0);
+total+=sub;
+isi+=n+" x"+pesanan[n]+" "+rupiah(sub)+"<br>";
+});
+
+document.getElementById("ritem").innerHTML=isi;
+document.getElementById("rtotal").textContent=rupiah(total);
+
+window.print();
+}
+
+buatKategori();
+buatMenu();
+buatHarga();
+tampil();
+
+</script>
+
+</body>
+</html>
