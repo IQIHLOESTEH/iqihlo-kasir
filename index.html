@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>IQIHLO ES TEH - Kasir</title>
+<style>
+body{font-family:Arial,sans-serif;background:#f5f5f5;margin:0;padding:15px}
+.box{max-width:500px;margin:auto;background:white;padding:20px;border-radius:15px}
+h1{text-align:center;margin:5px 0}h3{text-align:center;margin-top:0}
+label{display:block;margin-top:12px;font-weight:bold}
+input,select,button{width:100%;padding:12px;margin-top:5px;box-sizing:border-box;font-size:16px}
+button{background:#111;color:white;border:0;border-radius:8px;margin-top:18px;font-weight:bold}
+.total{font-size:24px;font-weight:bold;text-align:right;margin-top:20px}
+.receipt{display:none}
+@media print{
+body{background:white;padding:0}.box{display:none}
+.receipt{display:block;width:58mm;font-family:monospace;font-size:12px}
+.center{text-align:center}.line{border-top:1px dashed #000;margin:8px 0}
+}
+</style>
+</head>
+<body>
+
+<div class="box">
+<h1>IQIHLO ES TEH</h1>
+<h3>SEGARNYA BEDA!</h3>
+
+<label>Nama Pelanggan</label>
+<input id="nama" placeholder="Nama pelanggan">
+
+<label>Pilih Menu</label>
+<select id="menu">
+<option>Goodday Freeze Hazelnut</option>
+<option>Goodday Freeze Cookies & Cream</option>
+<option>Goodday Biasa Moca</option>
+<option>Goodday Biasa Cappuccino</option>
+<option>Goodday Biasa Coolant</option>
+<option>Chocolatos Matcha</option>
+<option>Chocolatos Coklat</option>
+<option>Beng Beng Original</option>
+<option>Frisian Flag Putih</option>
+<option>Frisian Flag Coklat</option>
+<option>Nutrisari Jeruk Peras</option>
+<option>Nutrisari Jeruk Nipis</option>
+<option>Nutrisari Jambu</option>
+<option>Nutrisari Mangga</option>
+<option>White Coffee Original</option>
+<option>Kopi Hitam Original</option>
+</select>
+
+<label>Harga</label>
+<input id="harga" type="number" placeholder="Masukkan harga">
+
+<label>Jumlah</label>
+<input id="qty" type="number" value="1" min="1">
+
+<div class="total">TOTAL: <span id="total">Rp0</span></div>
+
+<button onclick="cetak()">CETAK STRUK</button>
+</div>
+
+<div class="receipt">
+<div class="center">
+<b>IQIHLO ES TEH</b><br>
+SEGARNYA BEDA!
+</div>
+<div class="line"></div>
+<div class="center"><b>STRUK PEMBELIAN</b></div>
+<div class="line"></div>
+Nama : <span id="rNama"></span><br>
+Tgl  : <span id="tgl"></span><br>
+Jam  : <span id="jam"></span>
+<div class="line"></div>
+<span id="rMenu"></span><br>
+<span id="rQty"></span> x <span id="rHarga"></span>
+<div class="line"></div>
+<b>TOTAL : <span id="rTotal"></span></b>
+<div class="line"></div>
+<div class="center">
+<b>TERIMA KASIH</b><br>
+SELAMAT MENIKMATI!<br><br>
+@iqihlo.esteh
+</div>
+</div>
+
+<script>
+const harga=document.getElementById("harga");
+const qty=document.getElementById("qty");
+const total=document.getElementById("total");
+
+function rupiah(n){
+return "Rp"+Number(n||0).toLocaleString("id-ID");
+}
+function hitung(){
+total.textContent=rupiah((harga.value||0)*(qty.value||1));
+}
+harga.oninput=hitung;
+qty.oninput=hitung;
+
+function cetak(){
+let now=new Date();
+let h=String(now.getHours()).padStart(2,"0");
+let m=String(now.getMinutes()).padStart(2,"0");
+let d=String(now.getDate()).padStart(2,"0");
+let mo=String(now.getMonth()+1).padStart(2,"0");
+let y=now.getFullYear();
+let t=(harga.value||0)*(qty.value||1);
+
+document.getElementById("rNama").textContent=document.getElementById("nama").value||"-";
+document.getElementById("rMenu").textContent=document.getElementById("menu").value;
+document.getElementById("rQty").textContent=qty.value;
+document.getElementById("rHarga").textContent=rupiah(harga.value);
+document.getElementById("rTotal").textContent=rupiah(t);
+document.getElementById("tgl").textContent=d+"-"+mo+"-"+y;
+document.getElementById("jam").textContent=h+":"+m;
+
+window.print();
+}
+</script>
+</body>
+</html>
