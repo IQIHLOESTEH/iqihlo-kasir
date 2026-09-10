@@ -79,8 +79,8 @@ jobs:
                   applicationId "com.iqihlo.esteh"
                   minSdk 23
                   targetSdk 35
-                  versionCode 1
-                  versionName "1.0"
+                  versionCode 2
+                  versionName "1.1"
               }
           }
           EOF
@@ -202,28 +202,31 @@ jobs:
                   @JavascriptInterface
                   public void print() {
 
-                      PrintManager manager =
-                          (PrintManager) getSystemService(PRINT_SERVICE);
+                      runOnUiThread(() -> {
 
-                      PrintAttributes.MediaSize size =
-                          new PrintAttributes.MediaSize(
-                              "IQIHLO_58MM",
-                              "IQIHLO 58mm",
-                              2283,
-                              6000
+                          PrintManager manager =
+                              (PrintManager) getSystemService(PRINT_SERVICE);
+
+                          PrintAttributes.MediaSize size =
+                              new PrintAttributes.MediaSize(
+                                  "IQIHLO_58MM",
+                                  "IQIHLO 58mm",
+                                  2283,
+                                  3150
+                              );
+
+                          PrintAttributes attributes =
+                              new PrintAttributes.Builder()
+                                  .setMediaSize(size)
+                                  .setMinMargins(PrintAttributes.Margins.NO_MARGINS)
+                                  .build();
+
+                          manager.print(
+                              "IQIHLO ES TEH - STRUK",
+                              webView.createPrintDocumentAdapter("IQIHLO_ES_TEH"),
+                              attributes
                           );
-
-                      PrintAttributes attributes =
-                          new PrintAttributes.Builder()
-                              .setMediaSize(size)
-                              .setMinMargins(PrintAttributes.Margins.NO_MARGINS)
-                              .build();
-
-                      manager.print(
-                          "IQIHLO ES TEH - STRUK",
-                          webView.createPrintDocumentAdapter("IQIHLO_ES_TEH"),
-                          attributes
-                      );
+                      });
                   }
               }
           }
