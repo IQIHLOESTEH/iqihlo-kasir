@@ -28,10 +28,222 @@ jobs:
           sdkmanager "platforms;android-35" "build-tools;35.0.0"
 
       - name: Buat proyek Android
+        shell: bash
         run: |
+          set -e
+
           mkdir -p android/app/src/main/java/com/iqihlo/esteh
           mkdir -p android/app/src/main/assets
           mkdir -p android/app/src/main/res/values
           mkdir -p android/app/src/main/res/drawable
 
-          cp index.html android/app/src/main
+          cp index.html android/app/src/main/assets/index.html
+
+          cat > android/settings.gradle <<'EOF'
+          pluginManagement {
+              repositories {
+                  google()
+                  mavenCentral()
+                  gradlePluginPortal()
+              }
+          }
+
+          dependencyResolutionManagement {
+              repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+              repositories {
+                  google()
+                  mavenCentral()
+              }
+          }
+
+          rootProject.name = "IQIHLOES_TEH"
+          include ":app"
+          EOF
+
+          cat > android/build.gradle <<'EOF'
+          plugins {
+              id "com.android.application" version "8.9.0" apply false
+          }
+          EOF
+
+          cat > android/app/build.gradle <<'EOF'
+          plugins {
+              id "com.android.application"
+          }
+
+          android {
+              namespace "com.iqihlo.esteh"
+              compileSdk 35
+
+              defaultConfig {
+                  applicationId "com.iqihlo.esteh"
+                  minSdk 23
+                  targetSdk 35
+                  versionCode 1
+                  versionName "1.0"
+              }
+          }
+          EOF
+
+          cat > android/app/src/main/res/values/styles.xml <<'EOF'
+          <resources>
+              <style name="AppTheme" parent="android:style/Theme.Material.Light.NoActionBar">
+                  <item name="android:fontFamily">sans</item>
+                  <item name="android:colorAccent">#000000</item>
+                  <item name="android:navigationBarColor">#000000</item>
+                  <item name="android:statusBarColor">#000000</item>
+              </style>
+          </resources>
+          EOF
+
+          cat > android/app/src/main/res/drawable/app_icon.xml <<'EOF'
+          <vector xmlns:android="http://schemas.android.com/apk/res/android"
+              android:width="108dp"
+              android:height="108dp"
+              android:viewportWidth="108"
+              android:viewportHeight="108">
+
+              <path
+                  android:fillColor="#FFD600"
+                  android:pathData="M0,0h108v108h-108z"/>
+
+              <path
+                  android:fillColor="#6D3B12"
+                  android:pathData="M24,34h52v42c0,8 -6,14 -14,14h-24c-8,0 -14,-6 -14,-14z"/>
+
+              <path
+                  android:fillColor="#FFF8E1"
+                  android:pathData="M31,43h38v30c0,5 -4,9 -9,9h-20c-5,0 -9,-4 -9,-9z"/>
+
+              <path
+                  android:fillColor="#8D4B1F"
+                  android:pathData="M76,45h7c9,0 9,18 0,18h-7v-7h5c2,0 2,-4 0,-4h-5z"/>
+
+              <path
+                  android:fillColor="#FFFFFF"
+                  android:pathData="M32,23h44v8h-44z"/>
+
+              <path
+                  android:fillColor="#8D4B1F"
+                  android:pathData="M36,16h36v7h-36z"/>
+          </vector>
+          EOF
+
+          cat > android/app/src/main/AndroidManifest.xml <<'EOF'
+          <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+              <application
+                  android:theme="@style/AppTheme"
+                  android:label="IQIHLO ES TEH"
+                  android:icon="@drawable/app_icon"
+                  android:allowBackup="true">
+
+                  <activity
+                      android:name=".MainActivity"
+                      android:screenOrientation="portrait"
+                      android:exported="true">
+
+                      <intent-filter>
+                          <action android:name="android.intent.action.MAIN"/>
+                          <category android:name="android.intent.category.LAUNCHER"/>
+                      </intent-filter>
+
+                  </activity>
+
+              </application>
+
+          </manifest>
+          EOF
+
+          cat > android/app/src/main/java/com/iqihlo/esteh/MainActivity.java <<'EOF'
+          package com.iqihlo.esteh;
+
+          import android.app.Activity;
+          import android.os.Bundle;
+          import android.print.PrintAttributes;
+          import android.print.PrintManager;
+          import android.webkit.JavascriptInterface;
+          import android.webkit.WebSettings;
+          import android.webkit.WebView;
+          import android.webkit.WebViewClient;
+
+          public class MainActivity extends Activity {
+
+              private WebView webView;
+
+              @Override
+              protected void onCreate(Bundle savedInstanceState) {
+                  super.onCreate(savedInstanceState);
+
+                  webView = new WebView(this);
+                  setContentView(webView);
+
+                  WebSettings settings = webView.getSettings();
+                  settings.setJavaScriptEnabled(true);
+                  settings.setDomStorageEnabled(true);
+
+                  webView.addJavascriptInterface(new PrintBridge(), "AndroidPrint");
+
+                  webView.setWebViewClient(new WebViewClient() {
+                      @Override
+                      public void onPageFinished(WebView view, String url) {
+                          view.evaluateJavascript(
+                              "window.print=function(){if(window.AndroidPrint){AndroidPrint.print();}};",
+                              null
+                          );
+                      }
+                  });
+
+                  webView.loadUrl("file:///android_asset/index.html");
+              }
+
+              private class PrintBridge {
+
+                  @JavascriptInterface
+                  public void print() {
+
+                      PrintManager manager =
+                          (PrintManager) getSystemService(PRINT_SERVICE);
+
+                      PrintAttributes.MediaSize size =
+                          new PrintAttributes.MediaSize(
+                              "IQIHLO_58MM",
+                              "IQIHLO 58mm",
+                              2283,
+                              6000
+                          );
+
+                      PrintAttributes attributes =
+                          new PrintAttributes.Builder()
+                              .setMediaSize(size)
+                              .setMinMargins(PrintAttributes.Margins.NO_MARGINS)
+                              .build();
+
+                      manager.print(
+                          "IQIHLO ES TEH - STRUK",
+                          webView.createPrintDocumentAdapter("IQIHLO_ES_TEH"),
+                          attributes
+                      );
+                  }
+              }
+          }
+          EOF
+
+      - name: Download Gradle
+        working-directory: android
+        run: |
+          curl -L --fail -o gradle.zip https://services.gradle.org/distributions/gradle-8.11.1-bin.zip
+          unzip -q gradle.zip
+          mv gradle-8.11.1 gradle-dist
+
+      - name: Buat APK
+        working-directory: android
+        run: |
+          ./gradle-dist/bin/gradle --no-daemon assembleDebug
+
+      - name: Simpan APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: IQIHLO-ES-TEH-APK
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
