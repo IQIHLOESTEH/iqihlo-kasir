@@ -4,41 +4,177 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>IQIHLO ES TEH - Kasir</title>
+
 <style>
 *{box-sizing:border-box}
-body{font-family:Arial,sans-serif;background:#f5f5f5;margin:0;padding:15px}
-.box{max-width:600px;margin:auto;background:#fff;padding:20px;border-radius:15px}
-h1{text-align:center;margin:5px 0;font-size:30px}
-h3{text-align:center;margin:0 0 18px}
-label{display:block;margin-top:12px;font-weight:bold}
-input{width:100%;padding:12px;margin-top:5px;border:1px solid #888;border-radius:7px;font-size:16px}
-.cats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:8px 0}
-.cat{background:#eee;color:#111;border:1px solid #bbb;border-radius:8px;padding:12px;font-weight:bold}
-.cat.active{background:#111;color:#fff}
-.menus{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-.menu{background:#111;color:#fff;border:0;border-radius:9px;padding:14px 8px;font-weight:bold;min-height:60px}
-.menu small{display:block;font-weight:normal;margin-top:5px}
-.cart{margin-top:20px;border-top:2px dashed #111;padding-top:10px}
-.row{display:flex;align-items:center;gap:6px;padding:8px 0;border-bottom:1px solid #ddd}
-.name{flex:1}
-.minus,.plus{width:36px;padding:7px;border:0;border-radius:6px;background:#ddd;font-size:18px}
-.total{font-size:24px;font-weight:bold;text-align:right;margin:18px 0}
-.print{width:100%;padding:14px;background:#111;color:#fff;border:0;border-radius:8px;font-weight:bold;font-size:16px}
-.clear{width:100%;padding:10px;margin-top:8px;background:#fff;border:1px solid #111;border-radius:8px}
-.settings{margin-top:20px;border-top:1px solid #ccc;padding-top:12px}
-.priceRow{display:flex;align-items:center;gap:8px;margin:7px 0}
-.priceRow span{flex:1;font-size:14px}
-.priceRow input{width:130px;margin:0;padding:8px}
+body{
+font-family:Arial,sans-serif;
+background:#f3f3f3;
+margin:0;
+padding:15px
+}
+.box{
+max-width:600px;
+margin:auto;
+background:white;
+padding:20px;
+border-radius:15px
+}
+h1{text-align:center;margin:5px 0}
+h3{text-align:center;margin:0 0 20px}
 
-.receipt{display:none}
+label{
+display:block;
+font-weight:bold;
+margin:15px 0 6px
+}
+
+input{
+width:100%;
+padding:12px;
+font-size:16px;
+border:1px solid #888;
+border-radius:8px
+}
+
+.kategori,.menu{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:8px
+}
+
+button{
+font-size:15px;
+font-weight:bold;
+padding:13px;
+border-radius:8px;
+border:1px solid #aaa
+}
+
+.kategori button{
+background:#eee
+}
+
+.kategori .aktif{
+background:#111;
+color:white
+}
+
+.menu button{
+background:#111;
+color:white;
+border:0;
+min-height:65px
+}
+
+.menu small{
+display:block;
+margin-top:5px;
+font-weight:normal
+}
+
+.pesanan{
+margin-top:20px;
+padding-top:10px;
+border-top:2px dashed #111
+}
+
+.item{
+display:flex;
+align-items:center;
+gap:8px;
+padding:10px 0;
+border-bottom:1px solid #ddd
+}
+
+.item .nama{
+flex:1
+}
+
+.jumlah{
+display:flex;
+align-items:center;
+gap:5px
+}
+
+.jumlah button{
+width:35px;
+padding:7px
+}
+
+.total{
+font-size:24px;
+font-weight:bold;
+text-align:right;
+margin:20px 0
+}
+
+.cetak{
+width:100%;
+background:#111;
+color:white;
+border:0;
+padding:15px
+}
+
+.kosong{
+width:100%;
+background:white;
+margin-top:8px
+}
+
+.harga{
+margin-top:20px;
+border-top:1px solid #ccc;
+padding-top:12px
+}
+
+.hargaItem{
+display:flex;
+align-items:center;
+gap:8px;
+margin:7px 0
+}
+
+.hargaItem span{
+flex:1;
+font-size:13px
+}
+
+.hargaItem input{
+width:120px;
+padding:8px
+}
+
+.struk{
+display:none
+}
 
 @media print{
-body{background:white;padding:0}
-.box{display:none}
-.receipt{display:block;width:58mm;font-family:monospace;font-size:12px}
-.center{text-align:center}
-.line{border-top:1px dashed #000;margin:8px 0}
-.rrow{display:flex;justify-content:space-between}
+body{
+background:white;
+padding:0
+}
+
+.box{
+display:none
+}
+
+.struk{
+display:block;
+width:58mm;
+font-family:monospace;
+font-size:12px
+}
+
+.tengah{
+text-align:center
+}
+
+.garis{
+border-top:1px dashed #000;
+margin:8px 0
+}
 }
 </style>
 </head>
@@ -54,23 +190,39 @@ body{background:white;padding:0}
 <input id="nama" placeholder="Nama pelanggan">
 
 <label>Pilih Kategori</label>
-<div class="cats" id="cats"></div>
+<div class="kategori" id="kategori"></div>
 
 <label>Pilih Menu</label>
-<div class="menus" id="menus"></div>
+<div class="menu" id="menu"></div>
 
-<div class="cart">
+<div class="pesanan">
 <b>DAFTAR PESANAN</b>
-<div id="cartList"></div>
+<div id="daftar"></div>
 </div>
 
 <div class="total">
 TOTAL: <span id="total">Rp0</span>
 </div>
 
-<button class="print" onclick="cetak()">CETAK STRUK</button>
-<button class="clear" onclick="resetPesanan()">KOSONGKAN PESANAN</button>
+<button class="cetak" onclick="cetak()">CETAK STRUK</button>
 
-<details class="settings">
+<button class="kosong" onclick="kosongkan()">
+KOSONGKAN PESANAN
+</button>
+
+<details class="harga">
 <summary><b>ATUR HARGA MENU</b></summary>
-<p style="font-size
+
+<p>Masukkan harga setiap menu.</p>
+
+<div id="daftarHarga"></div>
+
+</details>
+
+</div>
+
+
+<div class="struk">
+
+<div class="tengah">
+<b>IQIHLO ES TEH
