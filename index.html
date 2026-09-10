@@ -119,7 +119,10 @@ var data={
 "Kopi Hitam Original"]
 };
 
-var hargaData=JSON.parse(localStorage.getItem("hargaIQ")||"{}");
+var hargaData={"Es Teh":3000};
+Object.values(data).flat().forEach(function(n){
+if(n!="Es Teh") hargaData[n]=5000;
+});
 var pesanan={};
 var aktif="Es Teh";
 
