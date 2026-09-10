@@ -67,7 +67,10 @@ body{padding:0;background:white}.box{display:none}
 <p>Masukkan harga masing-masing menu.</p>
 <div id="harga"></div>
 </details>
-
+<details class="recap">
+<summary><b>REKAP PENJUALAN</b></summary>
+<div id="rekap">Belum ada penjualan</div>
+</details>
 </div>
 
 <div class="receipt">
@@ -125,7 +128,7 @@ if(n!="Es Teh") hargaData[n]=5000;
 });
 var pesanan={};
 var aktif="Es Teh";
-
+var rekapData=JSON.parse(localStorage.getItem("rekapIQ")||"{}");
 function rupiah(n){
 return "Rp"+Number(n||0).toLocaleString("id-ID");
 }
@@ -223,7 +226,23 @@ tampil();
 e.appendChild(d);
 });
 }
+function simpanRekap(){
+var tanggal=new Date().toLocaleDateString("id-ID");
 
+if(!rekapData[tanggal])
+rekapData[tanggal]={items:{},cups:0,omzet:0};
+
+Object.keys(pesanan).forEach(function(n){
+var q=pesanan[n];
+var total=q*hargaData[n];
+
+rekapData[tanggal].items[n]=(rekapData[tanggal].items[n]||0)+q;
+rekapData[tanggal].cups+=q;
+rekapData[tanggal].omzet+=total;
+});
+
+localStorage.setItem("rekapIQ",JSON.stringify(rekapData));
+}
 function cetak(){
 if(!Object.keys(pesanan).length){
 alert("Pilih menu dulu");
@@ -251,7 +270,7 @@ isi+=n+" x"+pesanan[n]+" "+rupiah(sub)+"<br>";
 
 document.getElementById("ritem").innerHTML=isi;
 document.getElementById("rtotal").textContent=rupiah(total);
-
+simpanRekap();
 window.print();
 }
 
