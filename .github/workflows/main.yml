@@ -21,8 +21,10 @@ jobs:
           java-version: '17'
 
       - name: Siapkan Android SDK
+        uses: android-actions/setup-android@v4
+
+      - name: Install Android SDK
         run: |
-          yes | sdkmanager --licenses || true
           sdkmanager "platforms;android-35" "build-tools;35.0.0"
 
       - name: Buat proyek Android
@@ -86,26 +88,19 @@ jobs:
 
           cat > android/app/src/main/AndroidManifest.xml <<'EOF'
           <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-
               <application
                   android:theme="@style/AppTheme"
-                  android:label="IQIHLO ES TEH"
-                  android:usesCleartextTraffic="true">
-
+                  android:label="IQIHLO ES TEH">
                   <activity
                       android:name=".MainActivity"
                       android:screenOrientation="portrait"
                       android:exported="true">
-
                       <intent-filter>
                           <action android:name="android.intent.action.MAIN"/>
                           <category android:name="android.intent.category.LAUNCHER"/>
                       </intent-filter>
-
                   </activity>
-
               </application>
-
           </manifest>
           EOF
 
@@ -128,13 +123,11 @@ jobs:
           import android.webkit.WebViewClient;
 
           public class MainActivity extends Activity {
-
               @Override
               protected void onCreate(Bundle savedInstanceState) {
                   super.onCreate(savedInstanceState);
 
                   WebView webView = new WebView(this);
-
                   webView.setWebViewClient(new WebViewClient());
 
                   WebSettings settings = webView.getSettings();
