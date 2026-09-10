@@ -248,7 +248,7 @@ jobs:
           }
           EOF
 
-          python3 - <<'PY'
+          
           from PIL import Image, ImageDraw, ImageFont
 
           sizes = {
