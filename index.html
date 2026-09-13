@@ -1,238 +1,53 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
+<meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>IQIHLO ES TEH</title>
 <style>
 *{box-sizing:border-box}
-
-body{
- margin:0;
- padding:14px;
- font-family:Arial,sans-serif;
- background:linear-gradient(135deg,#fff8d8,#fff,#fff1a8);
- color:#222
-}
-
-.box{
- max-width:700px;
- margin:auto;
- background:#fff;
- padding:18px;
- border-radius:22px;
- box-shadow:0 8px 30px #0002
-}
-
-h1{
- text-align:center;
- margin:4px 0;
- color:#8d5200;
- font-size:30px
-}
-
-h3{
- text-align:center;
- margin:4px 0 8px;
- color:#d38a00;
- letter-spacing:1px
-}
-
-.brand{
- text-align:center;
- font-size:12px;
- color:#777;
- margin-bottom:18px
-}
-
-label{
- display:block;
- font-weight:bold;
- margin:16px 0 7px
-}
-
-input{
- width:100%;
- padding:13px;
- font-size:16px;
- border:1px solid #aaa;
- border-radius:10px
-}
-
-.grid{
- display:grid;
- grid-template-columns:repeat(2,1fr);
- gap:8px
-}
-
-button{
- padding:13px;
- border-radius:11px;
- font-weight:bold;
- font-size:14px;
- cursor:pointer
-}
-
-.cat{
- background:#fff3bd;
- border:1px solid #d7ae35;
- color:#704300
-}
-
-.cat.on{
- background:#925500;
- color:white
-}
-
-.menu{
- background:white;
- border:2px solid #dfb52d;
- color:#583500;
- min-height:64px
-}
-
-.menu small{
- color:#a66700
-}
-
-.cart{
- margin-top:20px;
- border-top:2px dashed #b78919;
- padding-top:13px
-}
-
-.item{
- padding:10px 0;
- border-bottom:1px solid #eee;
- line-height:1.6
-}
-
-.item button{
- padding:4px 10px;
- background:#fff3bd;
- border:1px solid #c99719
-}
-
-.total{
- text-align:right;
- font-size:25px;
- font-weight:900;
- margin:20px 0;
- color:#8d5200
-}
-
-.print{
- width:100%;
- background:#925500;
- color:white;
- border:0;
- font-size:17px;
- padding:15px
-}
-
-.clear{
- width:100%;
- background:white;
- border:1px solid #aaa;
- margin-top:8px
-}
-
-.pay{
- display:grid;
- grid-template-columns:1fr 1fr;
- gap:8px
-}
-
-.pay button{
- background:#fff;
- border:2px solid #d5a923
-}
-
-.pay button.on{
- background:#925500;
- color:white
-}
-
-.contact{
- text-align:center;
- margin-top:18px;
- padding:13px;
- border-top:1px dashed #c9a03b;
- color:#76551f;
- font-size:13px;
- line-height:1.8
-}
-
-details{
- margin-top:14px;
- padding:10px;
- border:1px solid #ddd;
- border-radius:10px
-}
-
-.p{
- display:flex;
- gap:6px;
- margin:6px 0;
- align-items:center
-}
-
-.p span{
- flex:1;
- font-size:13px
-}
-
-.p input{
- width:110px;
- padding:7px
-}
-
-.receipt{
- display:none
-}
-
+body{margin:0;padding:14px;font-family:Arial,sans-serif;background:linear-gradient(135deg,#fff8d8,#fff,#fff1a8);color:#222}
+.box{max-width:700px;margin:auto;background:#fff;padding:18px;border-radius:22px;box-shadow:0 8px 30px #0002}
+h1{text-align:center;margin:4px 0;color:#8d5200;font-size:30px}
+h3{text-align:center;margin:4px 0 18px;color:#d38a00;letter-spacing:1px}
+label{display:block;font-weight:bold;margin:16px 0 7px}
+input{width:100%;padding:13px;font-size:16px;border:1px solid #aaa;border-radius:10px}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+button{padding:13px;border-radius:11px;font-weight:bold;font-size:14px;cursor:pointer}
+.cat{background:#fff3bd;border:1px solid #d7ae35;color:#704300}
+.cat.on{background:#925500;color:#fff}
+.menu{background:#fff;border:2px solid #dfb52d;color:#583500;min-height:64px}
+.menu small{display:block;color:#a66700;margin-top:4px}
+.cart{margin-top:20px;border-top:2px dashed #b78919;padding-top:13px}
+.item{padding:10px 0;border-bottom:1px solid #eee;line-height:1.6}
+.item button{padding:4px 10px;background:#fff3bd;border:1px solid #c99719}
+.total{text-align:right;font-size:25px;font-weight:900;margin:20px 0;color:#8d5200}
+.print{width:100%;background:#925500;color:#fff;border:0;font-size:17px;padding:15px}
+.clear{width:100%;background:#fff;border:1px solid #aaa;margin-top:8px}
+.pay{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.pay button{background:#fff;border:2px solid #d5a923}
+.pay button.on{background:#925500;color:#fff}
+.contact{text-align:center;margin-top:18px;padding:13px;border-top:1px dashed #c9a03b;color:#76551f;font-size:13px;line-height:1.8}
+details{margin-top:14px;padding:10px;border:1px solid #ddd;border-radius:10px}
+.p{display:flex;gap:6px;margin:6px 0;align-items:center}
+.p span{flex:1;font-size:13px}
+.p input{width:110px;padding:7px}
+.receipt{display:none}
 @media print{
- body{
-  padding:0;
-  background:white
- }
-
- .box{
-  display:none
- }
-
- .receipt{
-  display:block;
-  width:58mm;
-  font:11px monospace;
-  color:#000
- }
-
- .center{
-  text-align:center
- }
-
- .line{
-  border-top:1px dashed #000;
-  margin:6px 0
- }
-
- .rrow{
-  display:flex;
-  justify-content:space-between;
-  gap:4px
- }
+body{padding:0;background:#fff}
+.box{display:none}
+.receipt{display:block;width:58mm;font:11px monospace;color:#000}
+.center{text-align:center}
+.line{border-top:1px dashed #000;margin:6px 0}
+.rrow{display:flex;justify-content:space-between;gap:4px}
 }
 </style>
 </head>
-
 <body>
 
 <div class="box">
-
 <h1>IQIHLO ES TEH</h1>
 <h3>SEGARNYA BEDA!</h3>
-
 
 <label>Nama Pelanggan</label>
 <input id="nama" placeholder="Masukkan nama pelanggan">
@@ -278,11 +93,9 @@ Instagram: @iqihlo.esteh_id<br>
 TikTok: @iqihlo.es.teh<br>
 Gmail: iqihloesteh@gmail.com
 </div>
-
 </div>
 
 <div class="receipt">
-
 <div class="center">
 <b>IQIHLO ES TEH</b><br>
 SEGARNYA BEDA!<br>
@@ -297,9 +110,7 @@ Jam: <span id="rjam"></span><br>
 Bayar: <span id="rbayar"></span>
 
 <div class="line"></div>
-
 <div id="ritem"></div>
-
 <div class="line"></div>
 
 <b>TOTAL: <span id="rtotal"></span></b>
@@ -313,57 +124,220 @@ Instagram: @iqihlo.esteh_id<br>
 TikTok: @iqihlo.es.teh<br>
 Gmail: iqihloesteh@gmail.com
 </div>
-
 </div>
 
 <script>
-
 var data={
+'Es Teh':['Es Teh'],
+'Es Jeruk Peras':['Es Jeruk Peras'],
+'Goodday Biasa':['Mocacino','Vanilla Latte','Coolant','Chococino','Carebian Nut'],
+'Nutrisari':['Mangga','Jeruk Peras','Cincau','Milky Orange'],
+'Susu':['Putih','Coklat','Matcha','Milo'],
+'Teh Tarik Maxtea':['Teh Tarik Maxtea'],
+'Kopi Susu':['Tora Bika Creamy','Indocafe','White Coffee'],
+'Kopi Hitam':['Kopi Kapal Api','Kopi ABC'],
+'Chocolatos':['Matcha','Coklat','Creamy'],
+'Goodday Latte':['Butterscotch','Original'],
+'Air Putih Es/Panas':['Air Putih Es','Air Putih Panas']
+};
 
-"Es Teh":[
-"Es Teh"
-],
+var base={
+'Es Teh':3000,
+'Es Jeruk Peras':5000,
+'Mocacino':5000,
+'Vanilla Latte':5000,
+'Coolant':5000,
+'Chococino':5000,
+'Carebian Nut':5000,
+'Mangga':4000,
+'Jeruk Peras':4000,
+'Cincau':4000,
+'Milky Orange':4000,
+'Putih':5000,
+'Coklat':5000,
+'Matcha':5000,
+'Milo':5000,
+'Teh Tarik Maxtea':5000,
+'Tora Bika Creamy':5000,
+'Indocafe':5000,
+'White Coffee':5000,
+'Kopi Kapal Api':3000,
+'Kopi ABC':3000,
+'Creamy':5000,
+'Butterscotch':5000,
+'Original':5000,
+'Air Putih Es':2000,
+'Air Putih Panas':2000
+};
 
-"Es Jeruk Peras":[
-"Es Jeruk Peras"
-],
+var prices=JSON.parse(localStorage.getItem('iqihlo_prices')||'null')||base;
+var cart={};
+var cat='Es Teh';
+var pay='Cash';
 
-"Goodday Biasa":[
-"Mocacino",
-"Vanilla Latte",
-"Coolant",
-"Chococino",
-"Carebian Nut"
-],
+function $(id){
+return document.getElementById(id);
+}
 
-"Nutrisari":[
-"Mangga",
-"Jeruk Peras",
-"Cincau",
-"Milky Orange"
-],
+function rupiah(n){
+return 'Rp'+Number(n).toLocaleString('id-ID');
+}
 
-"Susu":[
-"Putih",
-"Coklat",
-"Matcha",
-"Milo"
-],
+function cats(){
+var h='';
+Object.keys(data).forEach(function(c){
+h+='<button class="cat '+(c===cat?'on':'')+'" onclick="pilihKat('+JSON.stringify(c)+')">'+c+'</button>';
+});
+$('kategori').innerHTML=h;
+}
 
-"Teh Tarik Maxtea":[
-"Teh Tarik Maxtea"
-],
+function pilihKat(c){
+cat=c;
+cats();
+menus();
+}
 
-"Kopi Susu":[
-"Tora Bika Creamy",
-"Indocafe",
-"White Coffee"
-],
+function menus(){
+var h='';
+data[cat].forEach(function(n){
+h+='<button class="menu" onclick="tambah('+JSON.stringify(n)+')">'+n+
+'<small>'+rupiah(prices[n])+'</small></button>';
+});
+$('menu').innerHTML=h;
+}
 
-"Kopi Hitam":[
-"Kopi Kapal Api",
-"Kopi ABC"
-],
+function tambah(n){
+cart[n]=(cart[n]||0)+1;
+render();
+}
 
-"Chocolatos":[
-"Match
+function kurang(n){
+if(!cart[n])return;
+cart[n]--;
+if(cart[n]<=0)delete cart[n];
+render();
+}
+
+function render(){
+var h='';
+var tot=0;
+
+Object.keys(cart).forEach(function(n){
+var q=cart[n];
+var sub=q*prices[n];
+tot+=sub;
+
+h+='<div class="item"><b>'+n+'</b><br>'+
+rupiah(prices[n])+' x '+q+' = '+rupiah(sub)+
+' &nbsp; <button onclick="kurang('+JSON.stringify(n)+')">−</button>'+
+' <button onclick="tambah('+JSON.stringify(n)+')">+</button></div>';
+});
+
+$('pesanan').innerHTML=h||'Belum ada pesanan';
+$('total').textContent=rupiah(tot);
+}
+
+function pilihBayar(p){
+pay=p;
+$('cash').className=p==='Cash'?'on':'';
+$('qris').className=p==='QRIS'?'on':'';
+}
+
+function hapus(){
+cart={};
+render();
+}
+
+function harga(){
+var h='';
+
+Object.keys(base).forEach(function(n){
+h+='<div class="p"><span>'+n+
+'</span><input type="number" value="'+prices[n]+
+'" onchange="ubahHarga('+JSON.stringify(n)+',this.value)"></div>';
+});
+
+$('harga').innerHTML=h;
+}
+
+function ubahHarga(n,v){
+v=Number(v);
+
+if(v>0){
+prices[n]=v;
+localStorage.setItem('iqihlo_prices',JSON.stringify(prices));
+menus();
+render();
+}
+}
+
+function rekap(){
+var r=JSON.parse(localStorage.getItem('iqihlo_rekap')||'[]');
+var h='';
+
+if(!r.length){
+$('rekap').innerHTML='Belum ada penjualan';
+return;
+}
+
+r.slice().reverse().forEach(function(x){
+h+='<div class="item">'+x.tgl+'<br>'+
+x.nama+' — '+x.bayar+' — <b>'+rupiah(x.total)+'</b></div>';
+});
+
+$('rekap').innerHTML=h;
+}
+
+function cetak(){
+var names=Object.keys(cart);
+
+if(!names.length){
+alert('Pilih menu dulu');
+return;
+}
+
+var now=new Date();
+var tot=0;
+var h='';
+
+names.forEach(function(n){
+var q=cart[n];
+var s=q*prices[n];
+tot+=s;
+
+h+='<div class="rrow"><span>'+n+' x'+q+
+'</span><span>'+rupiah(s)+'</span></div>';
+});
+
+$('rnama').textContent=$('nama').value||'-';
+$('rtgl').textContent=now.toLocaleDateString('id-ID');
+$('rjam').textContent=now.toLocaleTimeString('id-ID');
+$('rbayar').textContent=pay;
+$('ritem').innerHTML=h;
+$('rtotal').textContent=rupiah(tot);
+
+var r=JSON.parse(localStorage.getItem('iqihlo_rekap')||'[]');
+
+r.push({
+tgl:now.toLocaleString('id-ID'),
+nama:$('nama').value||'-',
+bayar:pay,
+total:tot
+});
+
+localStorage.setItem('iqihlo_rekap',JSON.stringify(r));
+
+rekap();
+window.print();
+}
+
+cats();
+menus();
+render();
+harga();
+rekap();
+pilihBayar('Cash');
+</script>
+
+</body>
+</html>
