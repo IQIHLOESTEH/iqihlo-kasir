@@ -3,35 +3,226 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>IQIHLO ES TEH</title>
+<title>IQIHLO ES TEH - Kasir Premium</title>
+
 <style>
 *{box-sizing:border-box}
-body{font-family:Arial;background:#f3f3f3;margin:0;padding:15px}
-.box{max-width:600px;margin:auto;background:white;padding:20px;border-radius:15px}
-h1{text-align:center;margin:5px 0}
-h3{text-align:center}
-label{display:block;font-weight:bold;margin:18px 0 7px}
-input{width:100%;padding:13px;font-size:16px;border:1px solid #888;border-radius:8px}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-button{padding:13px;border-radius:8px;font-weight:bold;font-size:15px}
-.cat{background:#eee;border:1px solid #aaa}
-.cat.on{background:#111;color:white}
-.menu{background:#111;color:white;border:0;min-height:60px}
-.cart{margin-top:20px;border-top:2px dashed;padding-top:12px}
-.item{padding:9px 0;border-bottom:1px solid #ddd}
-.item button{padding:5px 10px}
-.total{text-align:right;font-size:24px;font-weight:bold;margin:20px 0}
-.print{width:100%;background:#111;color:white;border:0;font-size:17px}
-.clear{width:100%;background:white;margin-top:8px}
-.price{margin-top:20px;border-top:1px solid #ccc;padding-top:12px}
-.p{display:flex;gap:6px;margin:6px 0}
-.p span{flex:1;font-size:13px}
-.p input{width:110px;padding:7px}
-.receipt{display:none}
+
+body{
+ margin:0;
+ padding:14px;
+ font-family:Arial,sans-serif;
+ background:linear-gradient(135deg,#fff8d8,#fff,#fff1a8);
+ color:#222
+}
+
+.box{
+ max-width:700px;
+ margin:auto;
+ background:#fff;
+ padding:18px;
+ border-radius:22px;
+ box-shadow:0 8px 30px #0002
+}
+
+h1{
+ text-align:center;
+ margin:4px 0;
+ color:#8d5200;
+ font-size:30px
+}
+
+h3{
+ text-align:center;
+ margin:4px 0 8px;
+ color:#d38a00;
+ letter-spacing:1px
+}
+
+.brand{
+ text-align:center;
+ font-size:12px;
+ color:#777;
+ margin-bottom:18px
+}
+
+label{
+ display:block;
+ font-weight:bold;
+ margin:16px 0 7px
+}
+
+input{
+ width:100%;
+ padding:13px;
+ font-size:16px;
+ border:1px solid #aaa;
+ border-radius:10px
+}
+
+.grid{
+ display:grid;
+ grid-template-columns:repeat(2,1fr);
+ gap:8px
+}
+
+button{
+ padding:13px;
+ border-radius:11px;
+ font-weight:bold;
+ font-size:14px;
+ cursor:pointer
+}
+
+.cat{
+ background:#fff3bd;
+ border:1px solid #d7ae35;
+ color:#704300
+}
+
+.cat.on{
+ background:#925500;
+ color:white
+}
+
+.menu{
+ background:white;
+ border:2px solid #dfb52d;
+ color:#583500;
+ min-height:64px
+}
+
+.menu small{
+ color:#a66700
+}
+
+.cart{
+ margin-top:20px;
+ border-top:2px dashed #b78919;
+ padding-top:13px
+}
+
+.item{
+ padding:10px 0;
+ border-bottom:1px solid #eee;
+ line-height:1.6
+}
+
+.item button{
+ padding:4px 10px;
+ background:#fff3bd;
+ border:1px solid #c99719
+}
+
+.total{
+ text-align:right;
+ font-size:25px;
+ font-weight:900;
+ margin:20px 0;
+ color:#8d5200
+}
+
+.print{
+ width:100%;
+ background:#925500;
+ color:white;
+ border:0;
+ font-size:17px;
+ padding:15px
+}
+
+.clear{
+ width:100%;
+ background:white;
+ border:1px solid #aaa;
+ margin-top:8px
+}
+
+.pay{
+ display:grid;
+ grid-template-columns:1fr 1fr;
+ gap:8px
+}
+
+.pay button{
+ background:#fff;
+ border:2px solid #d5a923
+}
+
+.pay button.on{
+ background:#925500;
+ color:white
+}
+
+.contact{
+ text-align:center;
+ margin-top:18px;
+ padding:13px;
+ border-top:1px dashed #c9a03b;
+ color:#76551f;
+ font-size:13px;
+ line-height:1.8
+}
+
+details{
+ margin-top:14px;
+ padding:10px;
+ border:1px solid #ddd;
+ border-radius:10px
+}
+
+.p{
+ display:flex;
+ gap:6px;
+ margin:6px 0;
+ align-items:center
+}
+
+.p span{
+ flex:1;
+ font-size:13px
+}
+
+.p input{
+ width:110px;
+ padding:7px
+}
+
+.receipt{
+ display:none
+}
+
 @media print{
-body{padding:0;background:white}.box{display:none}
-.receipt{display:block;width:58mm;font:12px monospace}
-.center{text-align:center}.line{border-top:1px dashed;margin:7px 0}
+ body{
+  padding:0;
+  background:white
+ }
+
+ .box{
+  display:none
+ }
+
+ .receipt{
+  display:block;
+  width:58mm;
+  font:11px monospace;
+  color:#000
+ }
+
+ .center{
+  text-align:center
+ }
+
+ .line{
+  border-top:1px dashed #000;
+  margin:6px 0
+ }
+
+ .rrow{
+  display:flex;
+  justify-content:space-between;
+  gap:4px
+ }
 }
 </style>
 </head>
@@ -42,9 +233,10 @@ body{padding:0;background:white}.box{display:none}
 
 <h1>IQIHLO ES TEH</h1>
 <h3>SEGARNYA BEDA!</h3>
+<div class="brand">KASIR PREMIUM • STRUK THERMAL 58MM</div>
 
 <label>Nama Pelanggan</label>
-<input id="nama" placeholder="Nama pelanggan">
+<input id="nama" placeholder="Masukkan nama pelanggan">
 
 <label>Pilih Kategori</label>
 <div class="grid" id="kategori"></div>
@@ -52,234 +244,127 @@ body{padding:0;background:white}.box{display:none}
 <label>Pilih Menu</label>
 <div class="grid" id="menu"></div>
 
+<label>Metode Pembayaran</label>
+<div class="pay">
+<button id="cash" onclick="pilihBayar('Cash')">CASH</button>
+<button id="qris" onclick="pilihBayar('QRIS')">QRIS</button>
+</div>
+
 <div class="cart">
 <b>DAFTAR PESANAN</b>
 <div id="pesanan">Belum ada pesanan</div>
 </div>
 
-<div class="total">TOTAL: <span id="total">Rp0</span></div>
+<div class="total">
+TOTAL: <span id="total">Rp0</span>
+</div>
 
 <button class="print" onclick="cetak()">CETAK STRUK</button>
 <button class="clear" onclick="hapus()">KOSONGKAN PESANAN</button>
 
-<details class="price">
+<details>
 <summary><b>ATUR HARGA MENU</b></summary>
-<p>Masukkan harga masing-masing menu.</p>
+<p>Harga tersimpan otomatis di perangkat.</p>
 <div id="harga"></div>
 </details>
-<details class="recap">
+
+<details>
 <summary><b>REKAP PENJUALAN</b></summary>
 <div id="rekap">Belum ada penjualan</div>
 </details>
+
+<div class="contact">
+<b>IQIHLO ES TEH</b><br>
+Instagram: @iqihlo.esteh_id<br>
+TikTok: @iqihlo.es.teh<br>
+Gmail: iqihloesteh@gmail.com
+</div>
+
 </div>
 
 <div class="receipt">
+
 <div class="center">
 <b>IQIHLO ES TEH</b><br>
 SEGARNYA BEDA!<br>
 <b>STRUK PEMBELIAN</b>
 </div>
+
 <div class="line"></div>
+
 Nama: <span id="rnama"></span><br>
 Tanggal: <span id="rtgl"></span><br>
-Jam: <span id="rjam"></span>
+Jam: <span id="rjam"></span><br>
+Bayar: <span id="rbayar"></span>
+
 <div class="line"></div>
+
 <div id="ritem"></div>
+
 <div class="line"></div>
+
 <b>TOTAL: <span id="rtotal"></span></b>
+
 <div class="line"></div>
+
 <div class="center">
 TERIMA KASIH<br>
 SELAMAT MENIKMATI!<br><br>
-@iqihlo.esteh
+Instagram: @iqihlo.esteh_id<br>
+TikTok: @iqihlo.es.teh<br>
+Gmail: iqihloesteh@gmail.com
 </div>
+
 </div>
 
 <script>
 
 var data={
-"Es Teh":["Es Teh"],
-"Es Goodday":[
-"Goodday Freeze Hazelnut",
-"Goodday Freeze Cookies & Cream",
-"Goodday Biasa Moca",
-"Goodday Biasa Cappuccino",
-"Goodday Biasa Coolant"],
-"Es Coklat":[
-"Chocolatos Matcha",
-"Chocolatos Coklat",
-"Beng Beng Original"],
-"Es Susu":[
-"Frisian Flag Putih",
-"Frisian Flag Coklat"],
-"Es Nutrisari":[
-"Nutrisari Jeruk Peras",
-"Nutrisari Jeruk Nipis",
-"Nutrisari Jambu",
-"Nutrisari Mangga"],
-"Kopi":[
-"White Coffee Original",
-"Kopi Hitam Original"]
-};
 
-var hargaData={"Es Teh":3000};
-Object.values(data).flat().forEach(function(n){
-if(n!="Es Teh") hargaData[n]=5000;
-});
-var pesanan={};
-var aktif="Es Teh";
-var rekapData=JSON.parse(localStorage.getItem("rekapIQ")||"{}");
-function rupiah(n){
-return "Rp"+Number(n||0).toLocaleString("id-ID");
-}
+"Es Teh":[
+"Es Teh"
+],
 
-function buatKategori(){
-var e=document.getElementById("kategori");
-e.innerHTML="";
-Object.keys(data).forEach(function(k){
-var b=document.createElement("button");
-b.className="cat"+(k==aktif?" on":"");
-b.textContent=k;
-b.onclick=function(){
-aktif=k;
-buatKategori();
-buatMenu();
-};
-e.appendChild(b);
-});
-}
+"Es Jeruk Peras":[
+"Es Jeruk Peras"
+],
 
-function buatMenu(){
-var e=document.getElementById("menu");
-e.innerHTML="";
-data[aktif].forEach(function(n){
-var b=document.createElement("button");
-b.className="menu";
-b.innerHTML=n+"<br><small>"+rupiah(hargaData[n])+"</small>";
-b.onclick=function(){
-pesanan[n]=(pesanan[n]||0)+1;
-tampil();
-};
-e.appendChild(b);
-});
-}
+"Goodday Biasa":[
+"Mocacino",
+"Vanilla Latte",
+"Coolant",
+"Chococino",
+"Carebian Nut"
+],
 
-function tampil(){
-var e=document.getElementById("pesanan");
-e.innerHTML="";
-var total=0;
+"Nutrisari":[
+"Mangga",
+"Jeruk Peras",
+"Cincau",
+"Milky Orange"
+],
 
-Object.keys(pesanan).forEach(function(n){
-var q=pesanan[n];
-var sub=q*(hargaData[n]||0);
-total+=sub;
+"Susu":[
+"Putih",
+"Coklat",
+"Matcha",
+"Milo"
+],
 
-var d=document.createElement("div");
-d.className="item";
-d.innerHTML="<b>"+n+"</b><br>"+
-rupiah(hargaData[n])+" x "+q+
-" = "+rupiah(sub)+
-" &nbsp; <button onclick='ubah("+JSON.stringify(n)+",-1)'>−</button>"+
-" "+q+
-" <button onclick='ubah("+JSON.stringify(n)+",1)'>+</button>";
+"Teh Tarik Maxtea":[
+"Teh Tarik Maxtea"
+],
 
-e.appendChild(d);
-});
+"Kopi Susu":[
+"Tora Bika Creamy",
+"Indocafe",
+"White Coffee"
+],
 
-if(!Object.keys(pesanan).length)
-e.innerHTML="Belum ada pesanan";
+"Kopi Hitam":[
+"Kopi Kapal Api",
+"Kopi ABC"
+],
 
-document.getElementById("total").textContent=rupiah(total);
-}
-
-function ubah(n,x){
-pesanan[n]+=x;
-if(pesanan[n]<=0)delete pesanan[n];
-tampil();
-}
-
-function hapus(){
-pesanan={};
-tampil();
-}
-
-function buatHarga(){
-var e=document.getElementById("harga");
-e.innerHTML="";
-
-Object.values(data).flat().forEach(function(n){
-var d=document.createElement("div");
-d.className="p";
-
-d.innerHTML="<span>"+n+"</span>"+
-"<input type='number' placeholder='Harga' value='"+(hargaData[n]||"")+"'>";
-
-var inp=d.querySelector("input");
-
-inp.oninput=function(){
-hargaData[n]=Number(inp.value||0);
-localStorage.setItem("hargaIQ",JSON.stringify(hargaData));
-buatMenu();
-tampil();
-};
-
-e.appendChild(d);
-});
-}
-function simpanRekap(){
-var tanggal=new Date().toLocaleDateString("id-ID");
-
-if(!rekapData[tanggal])
-rekapData[tanggal]={items:{},cups:0,omzet:0};
-
-Object.keys(pesanan).forEach(function(n){
-var q=pesanan[n];
-var total=q*hargaData[n];
-
-rekapData[tanggal].items[n]=(rekapData[tanggal].items[n]||0)+q;
-rekapData[tanggal].cups+=q;
-rekapData[tanggal].omzet+=total;
-});
-
-localStorage.setItem("rekapIQ",JSON.stringify(rekapData));
-}
-function cetak(){
-if(!Object.keys(pesanan).length){
-alert("Pilih menu dulu");
-return;
-}
-
-var d=new Date();
-var total=0;
-var isi="";
-
-document.getElementById("rnama").textContent=
-document.getElementById("nama").value||"-";
-
-document.getElementById("rtgl").textContent=
-d.toLocaleDateString("id-ID");
-
-document.getElementById("rjam").textContent=
-d.toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"});
-
-Object.keys(pesanan).forEach(function(n){
-var sub=pesanan[n]*(hargaData[n]||0);
-total+=sub;
-isi+=n+" x"+pesanan[n]+" "+rupiah(sub)+"<br>";
-});
-
-document.getElementById("ritem").innerHTML=isi;
-document.getElementById("rtotal").textContent=rupiah(total);
-simpanRekap();
-window.print();
-}
-
-buatKategori();
-buatMenu();
-buatHarga();
-tampil();
-
-</script>
-
-</body>
-</html>
+"Chocolatos":[
+"Match
