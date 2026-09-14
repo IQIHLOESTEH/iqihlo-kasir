@@ -1,4 +1,4 @@
-name: Buat APK IQIHLO ES TEH
+name: Buat APK IQIHLO ES TEH V1.3
 
 on:
   workflow_dispatch:
@@ -35,7 +35,6 @@ jobs:
           mkdir -p android/app/src/main/java/com/iqihlo/esteh
           mkdir -p android/app/src/main/assets
           mkdir -p android/app/src/main/res/values
-          mkdir -p android/app/src/main/res/drawable
 
           cp index.html android/app/src/main/assets/index.html
 
@@ -56,7 +55,7 @@ jobs:
               }
           }
 
-          rootProject.name = "IQIHLOES_TEH"
+          rootProject.name = "IQIHLO_ES_TEH"
           include ":app"
           EOF
 
@@ -79,54 +78,22 @@ jobs:
                   applicationId "com.iqihlo.esteh"
                   minSdk 23
                   targetSdk 35
-                  versionCode 3
-                  versionName "1.2"
+                  versionCode 4
+                  versionName "1.3"
               }
           }
           EOF
 
           cat > android/app/src/main/res/values/styles.xml <<'EOF'
           <resources>
-              <style name="AppTheme" parent="android:style/Theme.Material.Light.NoActionBar">
+              <style name="AppTheme"
+                  parent="android:style/Theme.Material.Light.NoActionBar">
                   <item name="android:fontFamily">sans</item>
-                  <item name="android:colorAccent">#000000</item>
+                  <item name="android:colorAccent">#925500</item>
                   <item name="android:navigationBarColor">#000000</item>
                   <item name="android:statusBarColor">#000000</item>
               </style>
           </resources>
-          EOF
-
-          cat > android/app/src/main/res/drawable/app_icon.xml <<'EOF'
-          <vector xmlns:android="http://schemas.android.com/apk/res/android"
-              android:width="108dp"
-              android:height="108dp"
-              android:viewportWidth="108"
-              android:viewportHeight="108">
-
-              <path
-                  android:fillColor="#FFD600"
-                  android:pathData="M0,0h108v108h-108z"/>
-
-              <path
-                  android:fillColor="#6D3B12"
-                  android:pathData="M24,34h52v42c0,8 -6,14 -14,14h-24c-8,0 -14,-6 -14,-14z"/>
-
-              <path
-                  android:fillColor="#FFF8E1"
-                  android:pathData="M31,43h38v30c0,5 -4,9 -9,9h-20c-5,0 -9,-4 -9,-9z"/>
-
-              <path
-                  android:fillColor="#8D4B1F"
-                  android:pathData="M76,45h7c9,0 9,18 0,18h-7v-7h5c2,0 2,-4 0,-4h-5z"/>
-
-              <path
-                  android:fillColor="#FFFFFF"
-                  android:pathData="M32,23h44v8h-44z"/>
-
-              <path
-                  android:fillColor="#8D4B1F"
-                  android:pathData="M36,16h36v7h-36z"/>
-          </vector>
           EOF
 
           cat > android/app/src/main/AndroidManifest.xml <<'EOF'
@@ -135,7 +102,6 @@ jobs:
               <application
                   android:theme="@style/AppTheme"
                   android:label="IQIHLO ES TEH"
-                  android:icon="@drawable/app_icon"
                   android:allowBackup="true">
 
                   <activity
@@ -183,11 +149,17 @@ jobs:
                   settings.setJavaScriptEnabled(true);
                   settings.setDomStorageEnabled(true);
 
-                  webView.addJavascriptInterface(new PrintBridge(), "AndroidPrint");
+                  webView.addJavascriptInterface(
+                      new PrintBridge(),
+                      "AndroidPrint"
+                  );
 
                   webView.setWebViewClient(new WebViewClient() {
                       @Override
-                      public void onPageFinished(WebView view, String url) {
+                      public void onPageFinished(
+                          WebView view,
+                          String url
+                      ) {
                           view.evaluateJavascript(
                               "window.print=function(){AndroidPrint.print();};",
                               null
@@ -195,7 +167,9 @@ jobs:
                       }
                   });
 
-                  webView.loadUrl("file:///android_asset/index.html");
+                  webView.loadUrl(
+                      "file:///android_asset/index.html"
+                  );
               }
 
               private class PrintBridge {
@@ -208,7 +182,8 @@ jobs:
                           try {
 
                               PrintManager manager =
-                                  (PrintManager) getSystemService(PRINT_SERVICE);
+                                  (PrintManager)
+                                  getSystemService(PRINT_SERVICE);
 
                               PrintAttributes.MediaSize size =
                                   new PrintAttributes.MediaSize(
@@ -224,6 +199,9 @@ jobs:
                                       .setMinMargins(
                                           PrintAttributes.Margins.NO_MARGINS
                                       )
+                                      .setColorMode(
+                                          PrintAttributes.COLOR_MODE_MONOCHROME
+                                      )
                                       .build();
 
                               manager.print(
@@ -238,7 +216,8 @@ jobs:
 
                               Toast.makeText(
                                   MainActivity.this,
-                                  "Gagal membuka cetak: " + e.getMessage(),
+                                  "Gagal membuka cetak: "
+                                  + e.getMessage(),
                                   Toast.LENGTH_LONG
                               ).show();
 
@@ -253,18 +232,23 @@ jobs:
       - name: Download Gradle
         working-directory: android
         run: |
-          curl -L --fail -o gradle.zip https://services.gradle.org/distributions/gradle-8.11.1-bin.zip
+          curl -L --fail \
+            -o gradle.zip \
+            https://services.gradle.org/distributions/gradle-8.11.1-bin.zip
+
           unzip -q gradle.zip
           mv gradle-8.11.1 gradle-dist
 
-      - name: Buat APK
+      - name: Build APK
         working-directory: android
         run: |
-          ./gradle-dist/bin/gradle --no-daemon assembleDebug
+          ./gradle-dist/bin/gradle \
+            --no-daemon \
+            assembleDebug
 
       - name: Simpan APK
         uses: actions/upload-artifact@v4
         with:
-          name: IQIHLO-ES-TEH-APK-V1.2
+          name: IQIHLO-ES-TEH-V1.3-APK
           path: android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
