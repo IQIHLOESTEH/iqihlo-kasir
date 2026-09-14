@@ -307,7 +307,7 @@ TERIMA KASIH<br>
 SELAMAT MENIKMATI!<br><br>
 Instagram: @iqihlo.esteh_id<br>
 TikTok: @iqihlo.es.teh<br>
-Gmail: iqihloesteh@gmail.com
+
 </div>
 
 </div>
@@ -754,7 +754,139 @@ harga();
 rekap();
 
 pilihBayar('Cash');
+(function(){
+  var style=document.createElement('style');
+  style.textContent='body,body *{font-weight:700!important}input::placeholder{font-weight:700!important}@media print{.receipt{font:700 11px monospace!important}.receipt *{font-weight:700!important}}.rekap-detail{margin-top:10px;padding:10px;border:1px solid #ddd;border-radius:10px}.rekap-detail button{margin-top:8px;background:#fff;border:1px solid #c00;color:#900;font-weight:700!important}';
+  document.head.appendChild(style);
 
+  function hapusGmail(){
+    document.querySelectorAll('.contact,.receipt').forEach(function(el){
+      el.innerHTML=el.innerHTML
+        .replace(/<br>\s*Gmail:\s*iqihloesteh@gmail\.com/gi,'')
+        .replace(/Gmail:\s*iqihloesteh@gmail\.com/gi,'');
+    });
+  }
+
+  window.hapusRekap=function(i){
+    if(!confirm('Hapus transaksi ini?')) return;
+    var r=JSON.parse(localStorage.getItem('iqihlo_rekap')||'[]');
+    if(i<0 || i>=r.length) return;
+    r.splice(i,1);
+    localStorage.setItem('iqihlo_rekap',JSON.stringify(r));
+    window.rekap();
+  };
+
+  window.rekap=function(){
+    var r=JSON.parse(localStorage.getItem('iqihlo_rekap')||'[]');
+    var h='';
+
+    if(!r.length){
+      $('rekap').innerHTML='Belum ada penjualan';
+      return;
+    }
+
+    r.slice().reverse().forEach(function(x,i){
+      var idx=r.length-1-i;
+
+      h+='<details class="rekap-detail">'+
+        '<summary>'+x.tgl+'<br>'+
+        x.nama+' — '+x.bayar+' — '+
+        '<b>'+rupiah(x.total)+'</b></summary>';
+
+      if(Array.isArray(x.items) && x.items.length){
+        x.items.forEach(function(it){
+          h+='<div class="item">'+
+            it.nama+' × '+it.q+' — '+
+            rupiah(it.subtotal)+
+            '</div>';
+        });
+      }else{
+        h+='<div class="item">'+
+          'Rincian tidak tersedia untuk transaksi lama.'+
+          '</div>';
+      }
+
+      h+='<button type="button" onclick="hapusRekap('+idx+')">'+
+        'HAPUS TRANSAKSI</button></details>';
+    });
+
+    $('rekap').innerHTML=h;
+  };
+
+  window.cetak=function(){
+    var names=Object.keys(cart);
+
+    if(!names.length){
+      alert('Pilih menu dulu');
+      return;
+    }
+
+    var now=new Date();
+    var tot=0;
+    var h='';
+
+    names.forEach(function(n){
+      var q=cart[n];
+      var s=q*prices[n];
+
+      tot+=s;
+
+      h+='<div class="rrow">'+
+        '<span>'+n+' x'+q+'</span>'+
+        '<span>'+rupiah(s)+'</span>'+
+        '</div>';
+    });
+
+    $('rnama').textContent=$('nama').value||'-';
+    $('rtgl').textContent=now.toLocaleDateString('id-ID');
+    $('rjam').textContent=now.toLocaleTimeString('id-ID');
+    $('rbayar').textContent=pay;
+    $('ritem').innerHTML=h;
+    $('rtotal').textContent=rupiah(tot);
+
+    var r=JSON.parse(
+      localStorage.getItem('iqihlo_rekap')||'[]'
+    );
+
+    r.push({
+      tgl:now.toLocaleString('id-ID'),
+      nama:$('nama').value||'-',
+      bayar:pay,
+      total:tot,
+
+      items:names.map(function(n){
+        return {
+          nama:n,
+          q:cart[n],
+          harga:prices[n],
+          subtotal:cart[n]*prices[n]
+        };
+      })
+    });
+
+    localStorage.setItem(
+      'iqihlo_rekap',
+      JSON.stringify(r)
+    );
+
+    window.rekap();
+
+    if(window.AndroidPrint &&
+       typeof window.AndroidPrint.print==='function'){
+
+      window.AndroidPrint.print();
+
+    }else{
+
+      window.print();
+
+    }
+  };
+
+  hapusGmail();
+  window.rekap();
+
+})();
 </script>
 
 </body>
