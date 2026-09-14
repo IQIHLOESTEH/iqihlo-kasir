@@ -1,0 +1,339 @@
+name: Buat APK IQIHLO ES TEH V1.5 FINAL
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Ambil kode
+        uses: actions/checkout@v4
+
+      - name: Siapkan Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Siapkan Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android SDK
+        run: |
+          sdkmanager "platforms;android-35" "build-tools;35.0.0"
+
+      - name: Buat proyek Android
+        shell: bash
+        run: |
+          set -e
+
+          mkdir -p android/app/src/main/java/com/iqihlo/esteh
+          mkdir -p android/app/src/main/assets
+          mkdir -p android/app/src/main/res/values
+          mkdir -p android/app/src/main/res/drawable
+
+          cat > android/app/src/main/res/drawable/ic_launcher.xml <<'EOF'
+          <vector xmlns:android="http://schemas.android.com/apk/res/android"
+              android:width="108dp"
+              android:height="108dp"
+              android:viewportWidth="108"
+              android:viewportHeight="108">
+              <path
+                  android:fillColor="#8D5200"
+                  android:pathData="M22,24 L76,24 L76,66 C76,78 66,86 54,86 C42,86 32,78 32,66 L32,34 L22,34 L22,24 Z" />
+              <path
+                  android:fillColor="#FFFFFF"
+                  android:pathData="M32,34 L66,34 L66,62 C66,70 61,76 54,76 C47,76 42,70 42,62 L42,42 L32,42 Z" />
+              <path
+                  android:fillColor="#D38A00"
+                  android:pathData="M76,40 L84,40 C91,40 96,45 96,52 C96,59 91,64 84,64 L76,64 L76,57 L83,57 C86,57 88,55 88,52 C88,49 86,47 83,47 L76,47 Z" />
+              <path
+                  android:fillColor="#D38A00"
+                  android:pathData="M42,24 L66,24 L62,16 L46,16 Z" />
+          </vector>
+          EOF
+
+          cp index.html android/app/src/main/assets/index.html
+
+          cat > android/settings.gradle <<'EOF'
+          pluginManagement {
+              repositories {
+                  google()
+                  mavenCentral()
+                  gradlePluginPortal()
+              }
+          }
+
+          dependencyResolutionManagement {
+              repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+              repositories {
+                  google()
+                  mavenCentral()
+              }
+          }
+
+          rootProject.name = "IQIHLO_ES_TEH"
+          include ":app"
+          EOF
+
+          cat > android/build.gradle <<'EOF'
+          plugins {
+              id 'com.android.application' version '8.9.0' apply false
+          }
+          EOF
+
+          cat > android/app/build.gradle <<'EOF'
+          plugins {
+              id 'com.android.application'
+          }
+
+          android {
+              namespace "com.iqihlo.esteh"
+              compileSdk 35
+
+              defaultConfig {
+                  applicationId "com.iqihlo.esteh"
+                  minSdk 23
+                  targetSdk 35
+                  versionCode 6
+                  versionName "1.5"
+              }
+          }
+          EOF
+
+          cat > android/app/src/main/res/values/strings.xml <<'EOF'
+          <resources>
+              <string name="app_name">IQIHLO ES TEH</string>
+          </resources>
+          EOF
+
+          cat > android/app/src/main/res/values/styles.xml <<'EOF'
+          <resources>
+              <style name="AppTheme" parent="android:style/Theme.Material.Light.NoActionBar">
+                  <item name="android:fontFamily">sans</item>
+                  <item name="android:colorAccent">#000000</item>
+                  <item name="android:windowActionModeOverlay">true</item>
+              </style>
+          </resources>
+          EOF
+
+          cat > android/app/src/main/AndroidManifest.xml <<'EOF'
+          <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+              <uses-permission android:name="android.permission.BLUETOOTH" />
+              <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+              <uses-permission android:name="android.permission.USE_BIOMETRIC" />
+
+              <application
+                  android:theme="@style/AppTheme"
+                  android:label="IQIHLO ES TEH"
+                  android:icon="@drawable/ic_launcher"
+                  android:usesCleartextTraffic="true"
+                  android:hardwareAccelerated="true">
+
+                  <activity
+                      android:name=".MainActivity"
+                      android:exported="true">
+
+                      <intent-filter>
+                          <action android:name="android.intent.action.MAIN" />
+                          <category android:name="android.intent.category.LAUNCHER" />
+                      </intent-filter>
+
+                  </activity>
+
+              </application>
+
+          </manifest>
+          EOF
+
+          cat > android/app/src/main/java/com/iqihlo/esteh/MainActivity.java <<'EOF'
+          package com.iqihlo.esteh;
+
+          import android.app.Activity;
+          import android.hardware.biometrics.BiometricManager;
+          import android.hardware.biometrics.BiometricPrompt;
+          import android.os.Build;
+          import android.os.Bundle;
+          import android.print.PrintAttributes;
+          import android.print.PrintManager;
+          import android.webkit.JavascriptInterface;
+          import android.webkit.WebView;
+          import android.webkit.WebViewClient;
+          import android.content.Context;
+
+          import java.util.concurrent.Executor;
+
+          public class MainActivity extends Activity {
+
+              private WebView webView;
+
+              @Override
+              protected void onCreate(Bundle savedInstanceState) {
+                  super.onCreate(savedInstanceState);
+
+                  webView = new WebView(this);
+
+                  webView.getSettings().setJavaScriptEnabled(true);
+                  webView.getSettings().setDomStorageEnabled(true);
+                  webView.getSettings().setAllowFileAccess(true);
+
+                  webView.setWebViewClient(new WebViewClient());
+
+                  webView.addJavascriptInterface(new Object() {
+                      @JavascriptInterface
+                      public void print() {
+                          runOnUiThread(() -> cetakStruk());
+                      }
+                  }, "AndroidPrint");
+
+                  webView.addJavascriptInterface(new Object() {
+                      @JavascriptInterface
+                      public void authenticateOwner() {
+                          runOnUiThread(() -> autentikasiOwner());
+                      }
+                  }, "AndroidBiometric");
+
+                  setContentView(webView);
+
+                  webView.loadUrl("file:///android_asset/index.html");
+              }
+
+              private void autentikasiOwner() {
+
+                  if (Build.VERSION.SDK_INT < 28) {
+                      webView.evaluateJavascript(
+                              "window.ownerBiometricFailed()", null);
+                      return;
+                  }
+
+                  Executor executor = command -> runOnUiThread(command);
+
+                  BiometricPrompt.AuthenticationCallback callback =
+                          new BiometricPrompt.AuthenticationCallback() {
+
+                              @Override
+                              public void onAuthenticationSucceeded(
+                                      BiometricPrompt.AuthenticationResult result) {
+
+                                  super.onAuthenticationSucceeded(result);
+
+                                  webView.evaluateJavascript(
+                                          "window.ownerBiometricSuccess()", null);
+                              }
+
+                              @Override
+                              public void onAuthenticationError(
+                                      int errorCode,
+                                      CharSequence errString) {
+
+                                  super.onAuthenticationError(
+                                          errorCode, errString);
+
+                                  webView.evaluateJavascript(
+                                          "window.ownerBiometricFailed()", null);
+                              }
+
+                              @Override
+                              public void onAuthenticationFailed() {
+                                  super.onAuthenticationFailed();
+                              }
+                          };
+
+                  BiometricPrompt.Builder builder =
+                          new BiometricPrompt.Builder(this)
+                                  .setTitle("AKSES OWNER")
+                                  .setSubtitle("Verifikasi wajah / sidik jari")
+                                  .setDescription(
+                                          "Gunakan biometrik Owner atau PIN perangkat.");
+
+                  if (Build.VERSION.SDK_INT >= 30) {
+
+                      builder.setAllowedAuthenticators(
+                              BiometricManager.Authenticators.BIOMETRIC_WEAK
+                              | BiometricManager.Authenticators.DEVICE_CREDENTIAL);
+
+                  } else if (Build.VERSION.SDK_INT >= 29) {
+
+                      builder.setDeviceCredentialAllowed(true);
+
+                  } else {
+
+                      builder.setNegativeButton(
+                              "BATAL",
+                              executor,
+                              (dialog, which) ->
+                                      webView.evaluateJavascript(
+                                              "window.ownerBiometricFailed()",
+                                              null));
+                  }
+
+                  builder.build().authenticate(executor, callback);
+              }
+
+              private void cetakStruk() {
+
+                  PrintManager printManager =
+                          (PrintManager) getSystemService(
+                                  Context.PRINT_SERVICE);
+
+                  PrintAttributes.MediaSize mediaSize =
+                          new PrintAttributes.MediaSize(
+                                  "IQIHLO_58MM",
+                                  "IQIHLO ES TEH 58mm",
+                                  2283,
+                                  3150);
+
+                  PrintAttributes attributes =
+                          new PrintAttributes.Builder()
+                                  .setMediaSize(mediaSize)
+                                  .setMinMargins(
+                                          PrintAttributes.Margins.NO_MARGINS)
+                                  .setColorMode(
+                                          PrintAttributes.COLOR_MODE_MONOCHROME)
+                                  .build();
+
+                  printManager.print(
+                          "IQIHLO ES TEH",
+                          webView.createPrintDocumentAdapter(
+                                  "IQIHLO ES TEH"),
+                          attributes);
+              }
+          }
+          EOF
+
+      - name: Siapkan Gradle
+        run: |
+          wget -q https://services.gradle.org/distributions/gradle-8.11.1-bin.zip
+          unzip -q gradle-8.11.1-bin.zip
+          echo "$PWD/gradle-8.11.1/bin" >> $GITHUB_PATH
+
+      - name: Build APK
+        run: |
+          cd android
+          gradle assembleDebug --no-daemon
+
+      - name: Simpan APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: IQIHLO-ES-TEH-V1.5-APK
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+
+      - name: Buat Release APK
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.5
+          name: IQIHLO ES TEH V1.5
+          body: |
+            APK IQIHLO ES TEH V1.5
+            Versi dengan owner lock dan verifikasi biometrik perangkat.
+          files: android/app/build/outputs/apk/debug/app-debug.apk
+          overwrite_files: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
