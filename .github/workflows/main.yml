@@ -6,6 +6,9 @@ on:
     branches:
       - main
 
+permissions:
+  contents: write
+
 jobs:
   build-apk:
     runs-on: ubuntu-latest
@@ -21,7 +24,7 @@ jobs:
           java-version: '17'
 
       - name: Siapkan Android SDK
-        uses: android-actions/setup-android@v4
+        uses: android-actions/setup-android@v3
 
       - name: Install Android SDK
         run: |
@@ -61,13 +64,13 @@ jobs:
 
           cat > android/build.gradle <<'EOF'
           plugins {
-              id "com.android.application" version "8.9.0" apply false
+              id 'com.android.application' version '8.9.0' apply false
           }
           EOF
 
           cat > android/app/build.gradle <<'EOF'
           plugins {
-              id "com.android.application"
+              id 'com.android.application'
           }
 
           android {
@@ -84,34 +87,31 @@ jobs:
           }
           EOF
 
-          cat > android/app/src/main/res/values/styles.xml <<'EOF'
+          cat > android/app/src/main/res/values/strings.xml <<'EOF'
           <resources>
-              <style name="AppTheme"
-                  parent="android:style/Theme.Material.Light.NoActionBar">
-                  <item name="android:fontFamily">sans</item>
-                  <item name="android:colorAccent">#925500</item>
-                  <item name="android:navigationBarColor">#000000</item>
-                  <item name="android:statusBarColor">#000000</item>
-              </style>
+              <string name="app_name">IQIHLO ES TEH</string>
           </resources>
           EOF
 
           cat > android/app/src/main/AndroidManifest.xml <<'EOF'
           <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+              <uses-permission android:name="android.permission.BLUETOOTH" />
+              <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+
               <application
                   android:theme="@style/AppTheme"
                   android:label="IQIHLO ES TEH"
-                  android:allowBackup="true">
+                  android:usesCleartextTraffic="true"
+                  android:hardwareAccelerated="true">
 
                   <activity
                       android:name=".MainActivity"
-                      android:screenOrientation="portrait"
                       android:exported="true">
 
                       <intent-filter>
-                          <action android:name="android.intent.action.MAIN"/>
-                          <category android:name="android.intent.category.LAUNCHER"/>
+                          <action android:name="android.intent.action.MAIN" />
+                          <category android:name="android.intent.category.LAUNCHER" />
                       </intent-filter>
 
                   </activity>
@@ -119,6 +119,16 @@ jobs:
               </application>
 
           </manifest>
+          EOF
+
+          cat > android/app/src/main/res/values/styles.xml <<'EOF'
+          <resources>
+              <style name="AppTheme" parent="android:style/Theme.Material.Light.NoActionBar">
+                  <item name="android:fontFamily">sans</item>
+                  <item name="android:colorAccent">#000000</item>
+                  <item name="android:windowActionModeOverlay">true</item>
+              </style>
+          </resources>
           EOF
 
           cat > android/app/src/main/java/com/iqihlo/esteh/MainActivity.java <<'EOF'
@@ -129,10 +139,9 @@ jobs:
           import android.print.PrintAttributes;
           import android.print.PrintManager;
           import android.webkit.JavascriptInterface;
-          import android.webkit.WebSettings;
           import android.webkit.WebView;
           import android.webkit.WebViewClient;
-          import android.widget.Toast;
+          import android.content.Context;
 
           public class MainActivity extends Activity {
 
@@ -143,108 +152,61 @@ jobs:
                   super.onCreate(savedInstanceState);
 
                   webView = new WebView(this);
+                  webView.getSettings().setJavaScriptEnabled(true);
+                  webView.getSettings().setDomStorageEnabled(true);
+                  webView.getSettings().setAllowFileAccess(true);
+                  webView.setWebViewClient(new WebViewClient());
+
+                  webView.addJavascriptInterface(new Object() {
+                      @JavascriptInterface
+                      public void print() {
+                          runOnUiThread(() -> cetakStruk());
+                      }
+                  }, "AndroidPrint");
+
                   setContentView(webView);
 
-                  WebSettings settings = webView.getSettings();
-                  settings.setJavaScriptEnabled(true);
-                  settings.setDomStorageEnabled(true);
-
-                  webView.addJavascriptInterface(
-                      new PrintBridge(),
-                      "AndroidPrint"
-                  );
-
-                  webView.setWebViewClient(new WebViewClient() {
-                      @Override
-                      public void onPageFinished(
-                          WebView view,
-                          String url
-                      ) {
-                          view.evaluateJavascript(
-                              "window.print=function(){AndroidPrint.print();};",
-                              null
-                          );
-                      }
-                  });
-
-                  webView.loadUrl(
-                      "file:///android_asset/index.html"
-                  );
+                  webView.loadUrl("file:///android_asset/index.html");
               }
 
-              private class PrintBridge {
+              private void cetakStruk() {
+                  PrintManager printManager =
+                          (PrintManager) getSystemService(Context.PRINT_SERVICE);
 
-                  @JavascriptInterface
-                  public void print() {
+                  PrintAttributes.MediaSize mediaSize =
+                          new PrintAttributes.MediaSize(
+                                  "IQIHLO_58MM",
+                                  "IQIHLO ES TEH 58mm",
+                                  2283,
+                                  3150
+                          );
 
-                      runOnUiThread(() -> {
+                  PrintAttributes attributes =
+                          new PrintAttributes.Builder()
+                                  .setMediaSize(mediaSize)
+                                  .setMinMargins(PrintAttributes.Margins.NO_MARGINS)
+                                  .setColorMode(PrintAttributes.COLOR_MODE_MONOCHROME)
+                                  .build();
 
-                          try {
-
-                              PrintManager manager =
-                                  (PrintManager)
-                                  getSystemService(PRINT_SERVICE);
-
-                              PrintAttributes.MediaSize size =
-                                  new PrintAttributes.MediaSize(
-                                      "IQIHLO_58MM",
-                                      "IQIHLO 58mm",
-                                      2283,
-                                      3150
-                                  );
-
-                              PrintAttributes attributes =
-                                  new PrintAttributes.Builder()
-                                      .setMediaSize(size)
-                                      .setMinMargins(
-                                          PrintAttributes.Margins.NO_MARGINS
-                                      )
-                                      .setColorMode(
-                                          PrintAttributes.COLOR_MODE_MONOCHROME
-                                      )
-                                      .build();
-
-                              manager.print(
-                                  "IQIHLO ES TEH - STRUK",
-                                  webView.createPrintDocumentAdapter(
-                                      "IQIHLO_ES_TEH"
-                                  ),
-                                  attributes
-                              );
-
-                          } catch (Exception e) {
-
-                              Toast.makeText(
-                                  MainActivity.this,
-                                  "Gagal membuka cetak: "
-                                  + e.getMessage(),
-                                  Toast.LENGTH_LONG
-                              ).show();
-
-                          }
-
-                      });
-                  }
+                  printManager.print(
+                          "IQIHLO ES TEH",
+                          webView.createPrintDocumentAdapter("IQIHLO ES TEH"),
+                          attributes
+                  );
               }
           }
           EOF
 
-      - name: Download Gradle
-        working-directory: android
+      - name: Siapkan Gradle
         run: |
-          curl -L --fail \
-            -o gradle.zip \
-            https://services.gradle.org/distributions/gradle-8.11.1-bin.zip
-
-          unzip -q gradle.zip
-          mv gradle-8.11.1 gradle-dist
+          wget -q https://services.gradle.org/distributions/gradle-8.11.1-bin.zip
+          unzip -q gradle-8.11.1-bin.zip
+          echo "$PWD/gradle-8.11.1/bin" >> $GITHUB_PATH
 
       - name: Build APK
-        working-directory: android
         run: |
-          ./gradle-dist/bin/gradle \
-            --no-daemon \
-            assembleDebug
+          cd android
+          gradle assembleDebug --no-daemon
 
       - name: Simpan APK
         uses: actions/upload-artifact@v4
@@ -252,3 +214,16 @@ jobs:
           name: IQIHLO-ES-TEH-V1.3-APK
           path: android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
+
+      - name: Buat Release APK
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.3
+          name: IQIHLO ES TEH V1.3
+          body: |
+            APK IQIHLO ES TEH V1.3
+            Versi dengan perbaikan fungsi cetak struk 58mm.
+          files: android/app/build/outputs/apk/debug/app-debug.apk
+          overwrite_files: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
