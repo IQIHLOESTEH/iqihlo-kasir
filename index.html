@@ -942,6 +942,10 @@ pilihBayar('Cash');
   };
 
   window.rekap();
+})();(function(){
+  var s=document.createElement('style');
+  s.textContent='@page{size:80mm auto;margin:0}@media print{html,body{width:80mm!important;min-width:80mm!important;max-width:80mm!important;margin:0!important;padding:0!important}.receipt{width:58mm!important;min-width:58mm!important;max-width:58mm!important;margin-left:auto!important;margin-right:auto!important;box-sizing:border-box!important}}';
+  document.head.appendChild(s);
 })();
 </script>
 
