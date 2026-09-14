@@ -1,151 +1,761 @@
-name: Buat APK IQIHLO ES TEH V1.3
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>IQIHLO ES TEH</title>
 
-on:
-  workflow_dispatch:
-  push:
-    branches:
-      - main
+<style>
+*{box-sizing:border-box}
 
-permissions:
-  contents: write
+body{
+margin:0;
+padding:14px;
+font-family:Arial,sans-serif;
+background:linear-gradient(135deg,#fff8d8,#fff,#fff1a8);
+color:#222
+}
 
-jobs:
-  build-apk:
-    runs-on: ubuntu-latest
+.box{
+max-width:700px;
+margin:auto;
+background:#fff;
+padding:18px;
+border-radius:22px;
+box-shadow:0 8px 30px #0002
+}
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+h1{
+text-align:center;
+margin:4px 0;
+color:#8d5200;
+font-size:30px
+}
 
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '17'
+h3{
+text-align:center;
+margin:4px 0 18px;
+color:#d38a00;
+letter-spacing:1px
+}
 
-      - name: Setup Android
-        uses: android-actions/setup-android@v3
+label{
+display:block;
+font-weight:bold;
+margin:16px 0 7px
+}
 
-      - name: Install Android SDK
-        run: |
-          sdkmanager "platforms;android-35" "build-tools;35.0.0"
+input{
+width:100%;
+padding:13px;
+font-size:16px;
+border:1px solid #aaa;
+border-radius:10px
+}
 
-      - name: Buat proyek Android
-        shell: bash
-        run: |
-          set -e
+.grid{
+display:grid;
+grid-template-columns:repeat(2,1fr);
+gap:8px
+}
 
-          mkdir -p android/app/src/main/java/com/iqihlo/esteh
-          mkdir -p android/app/src/main/assets
-          mkdir -p android/app/src/main/res/values
+button{
+padding:13px;
+border-radius:11px;
+font-weight:bold;
+font-size:14px;
+cursor:pointer
+}
 
-          cp index.html android/app/src/main/assets/index.html
+.cat{
+background:#fff3bd;
+border:1px solid #d7ae35;
+color:#704300
+}
 
-          cat > android/settings.gradle <<'EOF'
-          pluginManagement {
-              repositories {
-                  google()
-                  mavenCentral()
-                  gradlePluginPortal()
-              }
-          }
+.cat.on{
+background:#925500;
+color:#fff
+}
 
-          dependencyResolutionManagement {
-              repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
-              repositories {
-                  google()
-                  mavenCentral()
-              }
-          }
+.menu{
+background:#fff;
+border:2px solid #dfb52d;
+color:#583500;
+min-height:64px
+}
 
-          rootProject.name = "IQIHLO_ES_TEH"
-          include ":app"
-          EOF
+.menu small{
+display:block;
+color:#a66700;
+margin-top:4px
+}
 
-          cat > android/build.gradle <<'EOF'
-          plugins {
-              id "com.android.application" version "8.9.0" apply false
-          }
-          EOF
+.cart{
+margin-top:20px;
+border-top:2px dashed #b78919;
+padding-top:13px
+}
 
-          cat > android/app/build.gradle <<'EOF'
-          plugins {
-              id "com.android.application"
-          }
+.item{
+padding:10px 0;
+border-bottom:1px solid #eee;
+line-height:1.6
+}
 
-          android {
-              namespace "com.iqihlo.esteh"
-              compileSdk 35
+.item button{
+padding:4px 10px;
+background:#fff3bd;
+border:1px solid #c99719
+}
 
-              defaultConfig {
-                  applicationId "com.iqihlo.esteh"
-                  minSdk 23
-                  targetSdk 35
-                  versionCode 4
-                  versionName "1.3"
-              }
-          }
-          EOF
+.total{
+text-align:right;
+font-size:25px;
+font-weight:900;
+margin:20px 0;
+color:#8d5200
+}
 
-          cat > android/app/src/main/res/values/styles.xml <<'EOF'
-          <resources>
-              <style name="AppTheme"
-                  parent="android:style/Theme.Material.Light.NoActionBar">
-                  <item name="android:fontFamily">sans</item>
-                  <item name="android:colorAccent">#925500</item>
-                  <item name="android:navigationBarColor">#000000</item>
-                  <item name="android:statusBarColor">#000000</item>
-              </style>
-          </resources>
-          EOF
+.print{
+width:100%;
+background:#925500;
+color:#fff;
+border:0;
+font-size:17px;
+padding:15px
+}
 
-          cat > android/app/src/main/AndroidManifest.xml <<'EOF'
-          <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+.clear{
+width:100%;
+background:#fff;
+border:1px solid #aaa;
+margin-top:8px
+}
 
-              <application
-                  android:theme="@style/AppTheme"
-                  android:label="IQIHLO ES TEH"
-                  android:allowBackup="true">
+.pay{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:8px
+}
 
-                  <activity
-                      android:name=".MainActivity"
-                      android:screenOrientation="portrait"
-                      android:exported="true">
+.pay button{
+background:#fff;
+border:2px solid #d5a923
+}
 
-                      <intent-filter>
-                          <action android:name="android.intent.action.MAIN"/>
-                          <category android:name="android.intent.category.LAUNCHER"/>
-                      </intent-filter>
+.pay button.on{
+background:#925500;
+color:#fff
+}
 
-                  </activity>
+.contact{
+text-align:center;
+margin-top:18px;
+padding:13px;
+border-top:1px dashed #c9a03b;
+color:#76551f;
+font-size:13px;
+line-height:1.8
+}
 
-              </application>
+details{
+margin-top:14px;
+padding:10px;
+border:1px solid #ddd;
+border-radius:10px
+}
 
-          </manifest>
-          EOF
+.p{
+display:flex;
+gap:6px;
+margin:6px 0;
+align-items:center
+}
 
-          cat > android/app/src/main/java/com/iqihlo/esteh/MainActivity.java <<'EOF'
-          package com.iqihlo.esteh;
+.p span{
+flex:1;
+font-size:13px
+}
 
-          import android.app.Activity;
-          import android.os.Bundle;
-          import android.print.PrintAttributes;
-          import android.print.PrintManager;
-          import android.webkit.JavascriptInterface;
-          import android.webkit.WebSettings;
-          import android.webkit.WebView;
-          import android.webkit.WebViewClient;
-          import android.widget.Toast;
+.p input{
+width:110px;
+padding:7px
+}
 
-          public class MainActivity extends Activity {
+.receipt{
+display:none
+}
 
-              private WebView webView;
+@media print{
+body{
+padding:0;
+background:#fff
+}
 
-              @Override
-              protected void onCreate(Bundle savedInstanceState) {
-                  super.onCreate(savedInstanceState);
+.box{
+display:none
+}
 
-                  webView = new WebView(this);
-                  setContentView(webView);
+.receipt{
+display:block;
+width:58mm;
+font:11px monospace;
+color:#000
+}
 
-                 
+.center{
+text-align:center
+}
+
+.line{
+border-top:1px dashed #000;
+margin:6px 0
+}
+
+.rrow{
+display:flex;
+justify-content:space-between;
+gap:4px
+}
+}
+</style>
+</head>
+
+<body>
+
+<div class="box">
+
+<h1>IQIHLO ES TEH</h1>
+<h3>SEGARNYA BEDA!</h3>
+
+<label>Nama Pelanggan</label>
+<input id="nama" placeholder="Masukkan nama pelanggan">
+
+<label>Pilih Kategori</label>
+<div class="grid" id="kategori"></div>
+
+<label>Pilih Menu</label>
+<div class="grid" id="menu"></div>
+
+<label>Metode Pembayaran</label>
+<div class="pay">
+<button id="cash" onclick="pilihBayar('Cash')">CASH</button>
+<button id="qris" onclick="pilihBayar('QRIS')">QRIS</button>
+</div>
+
+<div class="cart">
+<b>DAFTAR PESANAN</b>
+<div id="pesanan">Belum ada pesanan</div>
+</div>
+
+<div class="total">
+TOTAL: <span id="total">Rp0</span>
+</div>
+
+<button class="print" onclick="cetak()">CETAK STRUK</button>
+<button class="clear" onclick="hapus()">KOSONGKAN PESANAN</button>
+
+<details>
+<summary><b>ATUR HARGA MENU</b></summary>
+<p>Harga tersimpan otomatis di perangkat.</p>
+<div id="harga"></div>
+</details>
+
+<details>
+<summary><b>REKAP PENJUALAN</b></summary>
+<div id="rekap">Belum ada penjualan</div>
+</details>
+
+<div class="contact">
+<b>IQIHLO ES TEH</b><br>
+Instagram: @iqihlo.esteh_id<br>
+TikTok: @iqihlo.es.teh<br>
+Gmail: iqihloesteh@gmail.com
+</div>
+
+</div>
+
+
+<div class="receipt">
+
+<div class="center">
+<b>IQIHLO ES TEH</b><br>
+SEGARNYA BEDA!<br>
+<b>STRUK PEMBELIAN</b>
+</div>
+
+<div class="line"></div>
+
+Nama: <span id="rnama"></span><br>
+Tanggal: <span id="rtgl"></span><br>
+Jam: <span id="rjam"></span><br>
+Bayar: <span id="rbayar"></span>
+
+<div class="line"></div>
+
+<div id="ritem"></div>
+
+<div class="line"></div>
+
+<b>TOTAL: <span id="rtotal"></span></b>
+
+<div class="line"></div>
+
+<div class="center">
+TERIMA KASIH<br>
+SELAMAT MENIKMATI!<br><br>
+Instagram: @iqihlo.esteh_id<br>
+TikTok: @iqihlo.es.teh<br>
+Gmail: iqihloesteh@gmail.com
+</div>
+
+</div>
+
+
+<script>
+
+var data={
+
+'Es Teh':['Es Teh'],
+
+'Es Jeruk Peras':['Es Jeruk Peras'],
+
+'Goodday Biasa':[
+'Mocacino',
+'Vanilla Latte',
+'Coolant',
+'Chococino',
+'Carebian Nut'
+],
+
+'Nutrisari':[
+'Mangga',
+'Jeruk Peras',
+'Cincau',
+'Milky Orange'
+],
+
+'Susu':[
+'Putih',
+'Coklat',
+'Matcha',
+'Milo'
+],
+
+'Teh Tarik Maxtea':[
+'Teh Tarik Maxtea'
+],
+
+'Kopi Susu':[
+'Tora Bika Creamy',
+'Indocafe',
+'White Coffee'
+],
+
+'Kopi Hitam':[
+'Kopi Kapal Api',
+'Kopi ABC'
+],
+
+'Chocolatos':[
+'Matcha',
+'Coklat',
+'Creamy'
+],
+
+'Goodday Latte':[
+'Butterscotch',
+'Original'
+],
+
+'Air Putih Es/Panas':[
+'Air Putih Es',
+'Air Putih Panas'
+]
+
+};
+
+
+var base={
+
+'Es Teh':3000,
+'Es Jeruk Peras':5000,
+
+'Mocacino':5000,
+'Vanilla Latte':5000,
+'Coolant':5000,
+'Chococino':5000,
+'Carebian Nut':5000,
+
+'Mangga':4000,
+'Jeruk Peras':4000,
+'Cincau':4000,
+'Milky Orange':4000,
+
+'Putih':5000,
+'Coklat':5000,
+'Matcha':5000,
+'Milo':5000,
+
+'Teh Tarik Maxtea':5000,
+
+'Tora Bika Creamy':5000,
+'Indocafe':5000,
+'White Coffee':5000,
+
+'Kopi Kapal Api':3000,
+'Kopi ABC':3000,
+
+'Creamy':5000,
+
+'Butterscotch':5000,
+'Original':5000,
+
+'Air Putih Es':2000,
+'Air Putih Panas':2000
+
+};
+
+
+var prices=
+JSON.parse(
+localStorage.getItem('iqihlo_prices')||'null'
+)||base;
+
+var cart={};
+
+var cat='Es Teh';
+
+var pay='Cash';
+
+
+function $(id){
+return document.getElementById(id);
+}
+
+
+function rupiah(n){
+return 'Rp'+Number(n).toLocaleString('id-ID');
+}
+
+
+/* KATEGORI */
+
+function cats(){
+
+var h='';
+
+Object.keys(data).forEach(function(c){
+
+h+='<button class="cat '+(c===cat?'on':'')+'" onclick=\'pilihKat('+JSON.stringify(c)+')\'>'+c+'</button>';
+
+});
+
+$('kategori').innerHTML=h;
+
+}
+
+
+/* PILIH KATEGORI */
+
+function pilihKat(c){
+
+cat=c;
+
+cats();
+
+menus();
+
+}
+
+
+/* MENU */
+
+function menus(){
+
+var h='';
+
+data[cat].forEach(function(n){
+
+h+='<button class="menu" onclick=\'tambah('+JSON.stringify(n)+')\'>'+n+
+'<small>'+rupiah(prices[n])+'</small></button>';
+
+});
+
+$('menu').innerHTML=h;
+
+}
+
+
+/* TAMBAH */
+
+function tambah(n){
+
+cart[n]=(cart[n]||0)+1;
+
+render();
+
+}
+
+
+/* KURANG */
+
+function kurang(n){
+
+if(!cart[n])return;
+
+cart[n]--;
+
+if(cart[n]<=0){
+delete cart[n];
+}
+
+render();
+
+}
+
+
+/* PESANAN */
+
+function render(){
+
+var h='';
+
+var tot=0;
+
+
+Object.keys(cart).forEach(function(n){
+
+var q=cart[n];
+
+var sub=q*prices[n];
+
+tot+=sub;
+
+
+h+='<div class="item"><b>'+n+'</b><br>'+
+rupiah(prices[n])+' x '+q+' = '+rupiah(sub)+
+' &nbsp; <button onclick=\'kurang('+JSON.stringify(n)+')\'>−</button>'+
+' <button onclick=\'tambah('+JSON.stringify(n)+')\'>+</button></div>';
+
+});
+
+
+$('pesanan').innerHTML=h||'Belum ada pesanan';
+
+$('total').textContent=rupiah(tot);
+
+}
+
+
+/* PEMBAYARAN */
+
+function pilihBayar(p){
+
+pay=p;
+
+$('cash').className=p==='Cash'?'on':'';
+
+$('qris').className=p==='QRIS'?'on':'';
+
+}
+
+
+/* HAPUS PESANAN */
+
+function hapus(){
+
+cart={};
+
+render();
+
+}
+
+
+/* ATUR HARGA */
+
+function harga(){
+
+var h='';
+
+
+Object.keys(base).forEach(function(n){
+
+h+='<div class="p"><span>'+n+
+'</span><input type="number" value="'+prices[n]+
+'" onchange=\'ubahHarga('+JSON.stringify(n)+',this.value)\'></div>';
+
+});
+
+
+$('harga').innerHTML=h;
+
+}
+
+
+/* UBAH HARGA */
+
+function ubahHarga(n,v){
+
+v=Number(v);
+
+
+if(v>0){
+
+prices[n]=v;
+
+localStorage.setItem(
+'iqihlo_prices',
+JSON.stringify(prices)
+);
+
+menus();
+
+render();
+
+}
+
+}
+
+
+/* REKAP */
+
+function rekap(){
+
+var r=
+JSON.parse(
+localStorage.getItem('iqihlo_rekap')||'[]'
+);
+
+var h='';
+
+
+if(!r.length){
+
+$('rekap').innerHTML='Belum ada penjualan';
+
+return;
+
+}
+
+
+r.slice().reverse().forEach(function(x){
+
+h+='<div class="item">'+
+x.tgl+'<br>'+
+x.nama+' — '+x.bayar+
+' — <b>'+rupiah(x.total)+'</b></div>';
+
+});
+
+
+$('rekap').innerHTML=h;
+
+}
+
+
+/* CETAK STRUK */
+
+function cetak(){
+
+var names=Object.keys(cart);
+
+
+if(!names.length){
+
+alert('Pilih menu dulu');
+
+return;
+
+}
+
+
+var now=new Date();
+
+var tot=0;
+
+var h='';
+
+
+names.forEach(function(n){
+
+var q=cart[n];
+
+var s=q*prices[n];
+
+tot+=s;
+
+
+h+='<div class="rrow"><span>'+n+' x'+q+
+'</span><span>'+rupiah(s)+'</span></div>';
+
+});
+
+
+$('rnama').textContent=
+$('nama').value||'-';
+
+$('rtgl').textContent=
+now.toLocaleDateString('id-ID');
+
+$('rjam').textContent=
+now.toLocaleTimeString('id-ID');
+
+$('rbayar').textContent=pay;
+
+$('ritem').innerHTML=h;
+
+$('rtotal').textContent=rupiah(tot);
+
+
+var r=
+JSON.parse(
+localStorage.getItem('iqihlo_rekap')||'[]'
+);
+
+
+r.push({
+
+tgl:now.toLocaleString('id-ID'),
+
+nama:$('nama').value||'-',
+
+bayar:pay,
+
+total:tot
+
+});
+
+
+localStorage.setItem(
+'iqihlo_rekap',
+JSON.stringify(r)
+);
+
+
+rekap();
+
+window.print();
+
+}
+
+
+/* MULAI */
+
+cats();
+
+menus();
+
+render();
+
+harga();
+
+rekap();
+
+pilihBayar('Cash');
+
+</script>
+
+</body>
+</html>
