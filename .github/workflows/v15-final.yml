@@ -273,7 +273,7 @@ jobs:
                                               null));
                   }
 
-                  builder.build().authenticate(executor, callback);
+                  builder.build().authenticate(null, executor, callback);
               }
 
               private void cetakStruk() {
