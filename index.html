@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#925500">
 <title>IQIHLO ES TEH</title>
-<!-- IQIHLO ES TEH V1.5 FINAL - BIOMETRIK OWNER -->
 
 <style>
 *{box-sizing:border-box}
@@ -15,7 +14,8 @@ body{
  padding:14px;
  font-family:Arial,sans-serif;
  background:linear-gradient(135deg,#fff8d8,#fff,#fff1a8);
- color:#222
+ color:#222;
+ font-weight:700
 }
 
 .box{
@@ -48,6 +48,7 @@ label{
 
 input{
  width:100%;
+ font-weight:700;
  padding:13px;
  font-size:16px;
  border:1px solid #aaa;
@@ -61,6 +62,13 @@ input{
 }
 
 button{
+ display:block;
+ position:relative;
+ z-index:5;
+ pointer-events:auto !important;
+ touch-action:manipulation;
+ -webkit-user-select:none;
+ user-select:none;
  padding:13px;
  border-radius:11px;
  font-weight:bold;
@@ -184,10 +192,6 @@ details{
  line-height:1.8
 }
 
-/* =========================
-   CETAK THERMAL 58 MM
-   ========================= */
-
 .receipt{
  display:none
 }
@@ -248,10 +252,20 @@ details{
  }
 
  .rrow{
-   display:flex;
-   justify-content:space-between;
+   display:grid;
+   grid-template-columns:minmax(0,1fr) auto;
    gap:4px;
    width:100%
+ }
+
+ .rrow span:first-child{
+   min-width:0;
+   overflow-wrap:anywhere;
+ }
+
+ .rrow span:last-child{
+   white-space:nowrap;
+   text-align:right;
  }
 
  *{
@@ -280,8 +294,8 @@ details{
 
 <label>Metode Pembayaran</label>
 <div class="pay">
-<button id="cash" onclick="pilihBayar('Cash')">CASH</button>
-<button id="qris" onclick="pilihBayar('QRIS')">QRIS</button>
+<button type="button" id="cash" onclick="pilihBayar('Cash')">CASH</button>
+<button type="button" id="qris" onclick="pilihBayar('QRIS')">QRIS</button>
 </div>
 
 <div class="cart">
@@ -293,8 +307,8 @@ details{
 TOTAL: <span id="total">Rp0</span>
 </div>
 
-<button class="print" onclick="cetak()">CETAK STRUK</button>
-<button class="clear" onclick="hapus()">KOSONGKAN PESANAN</button>
+<button type="button" class="print" onclick="cetak()">CETAK STRUK</button>
+<button type="button" class="clear" onclick="hapus()">KOSONGKAN PESANAN</button>
 
 <details>
 <summary><b>ATUR HARGA MENU</b></summary>
@@ -315,7 +329,6 @@ TikTok: @iqihlo.es.teh<br>
 
 </div>
 
-<!-- STRUK -->
 <div class="receipt">
 
 <div class="center">
@@ -412,8 +425,8 @@ function rupiah(n){
 function cats(){
  let h="";
  Object.keys(data).forEach(c=>{
-   h+=`<button class="cat ${c===cat?"on":""}"
-   onclick="pilihKat(${JSON.stringify(c)})">${c}</button>`;
+   h+=`<button type="button" class="cat ${c===cat?"on":""}"
+   onclick='pilihKat(${JSON.stringify(c)})'>${c}</button>`;
  });
  $("kategori").innerHTML=h;
 }
@@ -427,8 +440,8 @@ function pilihKat(c){
 function menus(){
  let h="";
  data[cat].forEach(n=>{
-   h+=`<button class="menu"
-   onclick="tambah(${JSON.stringify(n)})">
+   h+=`<button type="button" class="menu"
+   onclick='tambah(${JSON.stringify(n)})'>
    ${n}<small>${rupiah(prices[n])}</small>
    </button>`;
  });
@@ -460,8 +473,8 @@ function render(){
    <b>${n}</b><br>
    ${rupiah(prices[n])} x ${q} = ${rupiah(sub)}
    &nbsp;
-   <button onclick="kurang(${JSON.stringify(n)})">−</button>
-   <button onclick="tambah(${JSON.stringify(n)})">+</button>
+   <button type="button" onclick='kurang(${JSON.stringify(n)})'>−</button>
+   <button type="button" onclick='tambah(${JSON.stringify(n)})'>+</button>
    </div>`;
  });
 
@@ -488,7 +501,7 @@ function harga(){
    <span>${n}</span>
    <input type="number"
    value="${prices[n]}"
-   onchange="ubahHarga(${JSON.stringify(n)},this.value)">
+   onchange='ubahHarga(${JSON.stringify(n)},this.value)'>
    </div>`;
  });
 
@@ -512,9 +525,7 @@ function ubahHarga(n,v){
 }
 
 function rekap(){
- let r=JSON.parse(
-   localStorage.getItem("iqihlo_rekap")||"[]"
- );
+ let r=JSON.parse(localStorage.getItem("iqihlo_rekap")||"[]");
 
  if(!r.length){
    $("rekap").innerHTML="Belum ada penjualan";
@@ -523,18 +534,41 @@ function rekap(){
 
  let h="";
 
- r.slice().reverse().forEach(x=>{
-   h+=`<div class="item">
-   ${x.tgl}<br>
-   ${x.nama} — ${x.bayar} —
-   <b>${rupiah(x.total)}</b>
-   </div>`;
+ r.slice().reverse().forEach((x,revIndex)=>{
+   const realIndex=r.length-1-revIndex;
+   let dh="";
+
+   (x.items||[]).forEach(it=>{
+     dh+=`<div>${it.nama} x${it.qty} = <b>${rupiah(it.sub)}</b></div>`;
+   });
+
+   h+=`<details class="rekap-item">
+     <summary><b>${x.tgl} — ${x.nama} — ${x.bayar} — ${rupiah(x.total)}</b></summary>
+     <div style="padding:8px 0">${dh||"Detail transaksi tidak tersedia."}</div>
+     <button type="button" class="clear" onclick="hapusRekap(${realIndex})">HAPUS TRANSAKSI</button>
+   </details>`;
  });
 
  $("rekap").innerHTML=h;
 }
 
-/* CETAK STRUK */
+function hapusRekap(index){
+ let r=JSON.parse(localStorage.getItem("iqihlo_rekap")||"[]");
+
+ if(index<0 || index>=r.length)return;
+
+ if(!confirm("Hapus transaksi ini?"))return;
+
+ r.splice(index,1);
+
+ localStorage.setItem(
+   "iqihlo_rekap",
+   JSON.stringify(r)
+ );
+
+ rekap();
+}
+
 function cetak(){
 
  const names=Object.keys(cart);
@@ -577,7 +611,12 @@ function cetak(){
    tgl:now.toLocaleString("id-ID"),
    nama:$("nama").value||"-",
    bayar:pay,
-   total:tot
+   total:tot,
+   items:names.map(n=>({
+     nama:n,
+     qty:cart[n],
+     sub:cart[n]*prices[n]
+   }))
  });
 
  localStorage.setItem(
@@ -587,16 +626,16 @@ function cetak(){
 
  rekap();
 
- /*
-  * Tunggu layout struk benar-benar selesai
-  * sebelum membuka dialog printer Android.
-  */
  setTimeout(()=>{
-   window.print();
- },500);
+   if(window.AndroidPrint &&
+      typeof window.AndroidPrint.print==="function"){
+     window.AndroidPrint.print();
+   }else{
+     window.print();
+   }
+ },300);
 }
 
-/* MULAI */
 cats();
 menus();
 render();
@@ -606,74 +645,107 @@ pilihBayar("Cash");
 
 </script>
 
-
 <script>
-/* =========================
-   KUNCI OWNER: BIOMETRIK / SANDI
-   ========================= */
+
 (function(){
-  const OWNER_PASSWORD = "4826";
 
-  function cariRekap(){
-    const ds = document.querySelectorAll("details");
-    for(let i=0;i<ds.length;i++){
-      const d = ds[i];
-      const s = d.querySelector("summary");
-      if(s && /REKAP PENJUALAN/i.test(s.textContent)){
-        return d;
-      }
-    }
-    return null;
-  }
+ const OWNER_PASSWORD="4826";
 
-  function bukaDenganSandi(d){
-    const p = prompt("🔒 AKSES OWNER\nMasukkan sandi Owner:");
-    if(p === OWNER_PASSWORD){
-      d.setAttribute("open","");
-    }else if(p !== null){
-      alert("❌ Sandi Owner salah.");
-    }
-  }
+ function cariRekap(){
+   const ds=document.querySelectorAll("details");
 
-  function pasangKunci(){
-    const d = cariRekap();
-    if(!d || d.dataset.ownerLock === "1") return;
+   for(let i=0;i<ds.length;i++){
+     const d=ds[i];
+     const s=d.querySelector("summary");
 
-    const s = d.querySelector("summary");
-    d.dataset.ownerLock = "1";
-    d.removeAttribute("open");
-    s.innerHTML = "<b>🔒 REKAP PENJUALAN — OWNER</b>";
+     if(s && /REKAP PENJUALAN/i.test(s.textContent)){
+       return d;
+     }
+   }
 
-    s.addEventListener("click", function(e){
-      e.preventDefault();
-      d.removeAttribute("open");
+   return null;
+ }
 
-      if(window.AndroidBiometric &&
-         typeof window.AndroidBiometric.authenticateOwner === "function"){
-        window.AndroidBiometric.authenticateOwner();
-      }else{
-        bukaDenganSandi(d);
-      }
-      return false;
-    });
-  }
+ function bukaDenganSandi(d){
 
-  window.ownerBiometricSuccess = function(){
-    const d = cariRekap();
-    if(d){
-      d.setAttribute("open","");
-    }
-  };
+   const p=prompt(
+     "🔒 AKSES OWNER\nMasukkan sandi Owner:"
+   );
 
-  window.ownerBiometricFailed = function(){
-    const d = cariRekap();
-    if(d) d.removeAttribute("open");
-  };
+   if(p===OWNER_PASSWORD){
 
-  document.addEventListener("DOMContentLoaded", pasangKunci);
-  setTimeout(pasangKunci, 300);
-  setTimeout(pasangKunci, 1000);
+     d.setAttribute("open","");
+
+   }else if(p!==null){
+
+     alert("❌ Sandi Owner salah.");
+
+   }
+ }
+
+ function pasangKunci(){
+
+   const d=cariRekap();
+
+   if(!d || d.dataset.ownerLock==="1")return;
+
+   const s=d.querySelector("summary");
+
+   d.dataset.ownerLock="1";
+
+   d.removeAttribute("open");
+
+   s.innerHTML="<b>🔒 REKAP PENJUALAN — OWNER</b>";
+
+   s.addEventListener("click",function(e){
+
+     e.preventDefault();
+
+     d.removeAttribute("open");
+
+     if(window.AndroidBiometric &&
+        typeof window.AndroidBiometric.authenticateOwner==="function"){
+
+       window.AndroidBiometric.authenticateOwner();
+
+     }else{
+
+       bukaDenganSandi(d);
+
+     }
+
+     return false;
+   });
+ }
+
+ window.ownerBiometricSuccess=function(){
+
+   const d=cariRekap();
+
+   if(d){
+     d.setAttribute("open","");
+   }
+ };
+
+ window.ownerBiometricFailed=function(){
+
+   const d=cariRekap();
+
+   if(d){
+     d.removeAttribute("open");
+   }
+ };
+
+ document.addEventListener(
+   "DOMContentLoaded",
+   pasangKunci
+ );
+
+ setTimeout(pasangKunci,300);
+ setTimeout(pasangKunci,1000);
+
 })();
+
 </script>
 
 </body>
