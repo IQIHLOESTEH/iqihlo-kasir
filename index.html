@@ -886,6 +886,62 @@ pilihBayar('Cash');
   hapusGmail();
   window.rekap();
 
+})();(function(){
+  var s=document.createElement('style');
+  s.textContent='@page{size:58mm auto;margin:0}@media print{html,body{width:58mm!important;min-width:58mm!important;max-width:58mm!important;margin:0!important;padding:0!important;background:#fff!important}.box{display:none!important}.receipt{display:block!important;width:58mm!important;min-width:58mm!important;max-width:58mm!important;margin:0!important;padding:2mm!important;box-sizing:border-box!important;font-family:monospace!important;font-size:11px!important;line-height:1.35!important}.rrow{width:100%!important;display:flex!important;justify-content:space-between!important}.center{text-align:center!important}}';
+  document.head.appendChild(s);
+
+  window.hapusRekap=function(i){
+    var r=JSON.parse(localStorage.getItem('iqihlo_rekap')||'[]');
+    if(i<0 || i>=r.length) return;
+    r.splice(i,1);
+    localStorage.setItem('iqihlo_rekap',JSON.stringify(r));
+    window.rekap();
+  };
+
+  window.rekap=function(){
+    var r=JSON.parse(localStorage.getItem('iqihlo_rekap')||'[]');
+    var h='';
+
+    if(!r.length){
+      $('rekap').innerHTML='Belum ada penjualan';
+      return;
+    }
+
+    for(var i=r.length-1;i>=0;i--){
+      var x=r[i];
+
+      h+='<details class="rekap-detail">'+
+        '<summary>'+x.tgl+'<br>'+
+        x.nama+' — '+x.bayar+' — '+
+        '<b>'+rupiah(x.total)+'</b></summary>';
+
+      if(x.items && x.items.length){
+        x.items.forEach(function(it){
+          h+='<div class="item">'+
+            it.nama+' × '+it.q+' — '+
+            rupiah(it.subtotal)+
+            '</div>';
+        });
+      }else{
+        h+='<div class="item">Rincian tidak tersedia untuk transaksi lama.</div>';
+      }
+
+      h+='<button type="button" class="hapus-rekap" data-index="'+i+'">HAPUS TRANSAKSI</button></details>';
+    }
+
+    $('rekap').innerHTML=h;
+
+    document.querySelectorAll('.hapus-rekap').forEach(function(btn){
+      btn.addEventListener('click',function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        window.hapusRekap(Number(this.getAttribute('data-index')));
+      });
+    });
+  };
+
+  window.rekap();
 })();
 </script>
 
