@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#925500">
 <title>IQIHLO ES TEH</title>
+<!-- IQIHLO ES TEH V1.5 FINAL - BIOMETRIK OWNER -->
 
 <style>
 *{box-sizing:border-box}
@@ -225,10 +226,16 @@ details{
    padding:2mm !important;
    box-sizing:border-box !important;
    font-family:monospace !important;
-   font-size:11px !important;
+   font-size:12px !important;
    line-height:1.35 !important;
+   font-weight:900 !important;
    color:#000 !important;
    background:#fff !important;
+ }
+
+ .receipt,
+ .receipt *{
+   font-weight:900 !important;
  }
 
  .center{
@@ -304,7 +311,6 @@ TOTAL: <span id="total">Rp0</span>
 <b>IQIHLO ES TEH</b><br>
 Instagram: @iqihlo.esteh_id<br>
 TikTok: @iqihlo.es.teh<br>
-Gmail: iqihloesteh@gmail.com
 </div>
 
 </div>
@@ -340,7 +346,6 @@ TERIMA KASIH<br>
 SELAMAT MENIKMATI!<br><br>
 Instagram: @iqihlo.esteh_id<br>
 TikTok: @iqihlo.es.teh<br>
-Gmail: iqihloesteh@gmail.com
 </div>
 
 </div>
@@ -603,54 +608,71 @@ pilihBayar("Cash");
 
 
 <script>
-/* KUNCI OWNER + VERIFIKASI WAJAH/BIOMETRIK */
+/* =========================
+   KUNCI OWNER: BIOMETRIK / SANDI
+   ========================= */
 (function(){
-  var OWNER_PASSWORD="4826";
+  const OWNER_PASSWORD = "4826";
 
-  function pasangKunci(){
-    var ds=document.querySelectorAll("details");
-    for(var i=0;i<ds.length;i++){
-      var d=ds[i], s=d.querySelector("summary");
+  function cariRekap(){
+    const ds = document.querySelectorAll("details");
+    for(let i=0;i<ds.length;i++){
+      const d = ds[i];
+      const s = d.querySelector("summary");
       if(s && /REKAP PENJUALAN/i.test(s.textContent)){
-        if(d.getAttribute("data-owner-lock")==="1") return;
-        d.setAttribute("data-owner-lock","1");
-        d.removeAttribute("open");
-        s.innerHTML="<b>🔒 REKAP PENJUALAN — OWNER</b>";
-        s.onclick=function(ev){
-          ev.preventDefault();
-          this.parentNode.removeAttribute("open");
-          if(window.AndroidBiometric &&
-             typeof window.AndroidBiometric.authenticateOwner==="function"){
-            window.AndroidBiometric.authenticateOwner();
-          }else{
-            var p=prompt("🔒 AKSES OWNER\nMasukkan sandi Owner:");
-            if(p===OWNER_PASSWORD){
-              this.parentNode.setAttribute("open","");
-            }else if(p!==null){
-              alert("❌ Sandi Owner salah.");
-            }
-          }
-          return false;
-        };
-        return;
+        return d;
       }
+    }
+    return null;
+  }
+
+  function bukaDenganSandi(d){
+    const p = prompt("🔒 AKSES OWNER\nMasukkan sandi Owner:");
+    if(p === OWNER_PASSWORD){
+      d.setAttribute("open","");
+    }else if(p !== null){
+      alert("❌ Sandi Owner salah.");
     }
   }
 
-  window.ownerBiometricSuccess=function(){
-    var d=document.querySelector('details[data-owner-lock="1"]');
+  function pasangKunci(){
+    const d = cariRekap();
+    if(!d || d.dataset.ownerLock === "1") return;
+
+    const s = d.querySelector("summary");
+    d.dataset.ownerLock = "1";
+    d.removeAttribute("open");
+    s.innerHTML = "<b>🔒 REKAP PENJUALAN — OWNER</b>";
+
+    s.addEventListener("click", function(e){
+      e.preventDefault();
+      d.removeAttribute("open");
+
+      if(window.AndroidBiometric &&
+         typeof window.AndroidBiometric.authenticateOwner === "function"){
+        window.AndroidBiometric.authenticateOwner();
+      }else{
+        bukaDenganSandi(d);
+      }
+      return false;
+    });
+  }
+
+  window.ownerBiometricSuccess = function(){
+    const d = cariRekap();
     if(d){
       d.setAttribute("open","");
-      alert("✓ Verifikasi Owner berhasil.");
     }
   };
 
-  window.ownerBiometricFailed=function(){
-    alert("❌ Verifikasi Owner gagal.");
+  window.ownerBiometricFailed = function(){
+    const d = cariRekap();
+    if(d) d.removeAttribute("open");
   };
 
-  document.addEventListener("DOMContentLoaded",pasangKunci);
-  setTimeout(pasangKunci,500);
+  document.addEventListener("DOMContentLoaded", pasangKunci);
+  setTimeout(pasangKunci, 300);
+  setTimeout(pasangKunci, 1000);
 })();
 </script>
 
