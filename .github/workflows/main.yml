@@ -1,4 +1,4 @@
-name: name: Buat APK IQIHLO ES TEH V1.4
+name: Buat APK IQIHLO ES TEH V1.4
 
 on:
   workflow_dispatch:
