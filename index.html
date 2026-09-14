@@ -942,9 +942,10 @@ pilihBayar('Cash');
   };
 
   window.rekap();
-})();(function(){
+})();
+  (function(){
   var s=document.createElement('style');
-  s.textContent='@page{size:80mm auto;margin:0}@media print{html,body{width:80mm!important;min-width:80mm!important;max-width:80mm!important;margin:0!important;padding:0!important}.receipt{width:58mm!important;min-width:58mm!important;max-width:58mm!important;margin-left:auto!important;margin-right:auto!important;box-sizing:border-box!important}}';
+  s.textContent='@page{size:58mm auto;margin:0}@media print{html,body{width:58mm!important;margin:0!important;padding:0!important}.box{display:none!important}.receipt{display:block!important;width:58mm!important;margin:0!important;padding:2mm!important;box-sizing:border-box!important;font-family:monospace!important;font-size:12px!important;line-height:1.35!important}.receipt *{font-weight:700!important}.center{text-align:center!important}.rrow{display:flex!important;justify-content:space-between!important;width:100%!important}}';
   document.head.appendChild(s);
 })();
 </script>
