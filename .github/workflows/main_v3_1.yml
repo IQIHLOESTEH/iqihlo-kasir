@@ -1,154 +1,196 @@
-name: Buat APK IQIHLO ES TEH V3.1 PREMIUM
+name: Build APK IQIHLO ES TEH V4
 
 on:
   workflow_dispatch:
   push:
-    branches:
-      - main
+    branches: [main]
 
 permissions:
   contents: write
 
 jobs:
-  build-apk:
+  validate-and-build:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
-
+    timeout-minutes: 30
     steps:
-      - name: Ambil kode
-        uses: actions/checkout@v6
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - name: Siapkan Java 17
-        uses: actions/setup-java@v6
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
 
-      - name: Siapkan Android SDK
-        uses: android-actions/setup-android@v4
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
         with:
           packages: ''
           accept-android-sdk-licenses: true
-          log-accepted-android-sdk-licenses: false
 
       - name: Install Android SDK
         shell: bash
         run: |
-          set -e
-          yes | sdkmanager --licenses || true
+          set -euo pipefail
+          yes | sdkmanager --licenses >/dev/null || true
           sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
 
-      - name: Buat proyek Android PREMIUM
+      - name: Validate app source
         shell: bash
         run: |
-          set -e
+          set -euo pipefail
+          test -s index.html
+          ! grep -q "PREMIUM" index.html
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          s=Path("index.html").read_text(encoding="utf-8")
+          m=re.search(r"<script>(.*?)</script>",s,re.S)
+          assert m, "Blok JavaScript tidak ditemukan"
+          Path("/tmp/index.js").write_text(m.group(1),encoding="utf-8")
+          for required in ["loginSystem","cetak","simpanTransaksi","addEmployee","renderStock","startBarcodeCamera","backupData","exitApp","AndroidPrinter.printReceipt"]:
+              assert required in s, f"Fitur wajib hilang: {required}"
+          assert s.count("<script>")==1 and s.count("</script>")==1, "Jumlah script tidak valid"
+          print("Validasi HTML/fitur dasar OK")
+          PY
+          node --check /tmp/index.js
+
+      - name: Create Android project
+        shell: bash
+        run: |
+          set -euo pipefail
           mkdir -p android/app/src/main/java/com/iqihlo/esteh
           mkdir -p android/app/src/main/assets
           mkdir -p android/app/src/main/res/values
           mkdir -p android/app/src/main/res/drawable
 
-          cat > android/app/src/main/res/drawable/ic_launcher.xml <<'ICONEOF'
-          <vector xmlns:android="http://schemas.android.com/apk/res/android"
-              android:width="108dp"
-              android:height="108dp"
-              android:viewportWidth="108"
-              android:viewportHeight="108">
-              <path android:fillColor="#8D5200" android:pathData="M22,24 L76,24 L76,66 C76,78 66,86 54,86 C42,86 32,78 32,66 L32,34 L22,34 L22,24 Z" />
-              <path android:fillColor="#FFFFFF" android:pathData="M32,34 L66,34 L66,62 C66,70 61,76 54,76 C47,76 42,70 42,62 L42,42 L32,42 Z" />
-              <path android:fillColor="#D38A00" android:pathData="M76,40 L84,40 C91,40 96,45 96,52 C96,59 91,64 84,64 L76,64 L76,57 L83,57 C86,57 88,55 88,52 C88,49 86,47 83,47 L76,47 Z" />
-              <path android:fillColor="#D38A00" android:pathData="M42,24 L66,24 L62,16 L46,16 Z" />
-          </vector>
-          ICONEOF
-
           cp index.html android/app/src/main/assets/index.html
 
-          cat > android/settings.gradle <<'SEOF'
+          cat > android/settings.gradle <<'EOF'
           pluginManagement {
-              repositories {
-                  google()
-                  mavenCentral()
-                  gradlePluginPortal()
-              }
+              repositories { google(); mavenCentral(); gradlePluginPortal() }
           }
           dependencyResolutionManagement {
               repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
-              repositories {
-                  google()
-                  mavenCentral()
-              }
+              repositories { google(); mavenCentral() }
           }
           rootProject.name = "IQIHLO_ES_TEH"
-          include ":app"
-          SEOF
+          include(":app")
+          EOF
 
-          cat > android/build.gradle <<'BEOF'
+          cat > android/build.gradle <<'EOF'
           plugins {
-              id 'com.android.application' version '8.9.0' apply false
+              id "com.android.application" version "8.9.0" apply false
           }
-          BEOF
+          EOF
 
-          cat > android/app/build.gradle <<'ABEOF'
-          plugins {
-              id 'com.android.application'
-          }
+          cat > android/gradle.properties <<'EOF'
+          org.gradle.jvmargs=-Xmx2g -Dfile.encoding=UTF-8
+          android.useAndroidX=true
+          android.nonTransitiveRClass=true
+          EOF
+
+          cat > android/app/build.gradle <<'EOF'
+          plugins { id "com.android.application" }
+
           android {
               namespace "com.iqihlo.esteh"
               compileSdk 35
+
               defaultConfig {
                   applicationId "com.iqihlo.esteh"
                   minSdk 23
                   targetSdk 35
-                  versionCode 31
-                  versionName "3.1"
+                  versionCode 40
+                  versionName "4.0"
+              }
+
+              buildTypes {
+                  release {
+                      minifyEnabled true
+                      shrinkResources true
+                      signingConfig signingConfigs.debug
+                      proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
+                  }
               }
           }
-          ABEOF
+          EOF
 
-          cat > android/app/src/main/res/values/strings.xml <<'STEOF'
+          cat > android/app/proguard-rules.pro <<'EOF'
+          # JavaScript bridges are called by name from WebView.
+          -keepclassmembers class com.iqihlo.esteh.MainActivity$* {
+              @android.webkit.JavascriptInterface <methods>;
+          }
+          -keepattributes *Annotation*
+          -keep class com.iqihlo.esteh.MainActivity { *; }
+          -dontwarn org.json.**
+          EOF
+
+          cat > android/app/src/main/res/values/strings.xml <<'EOF'
           <resources>
               <string name="app_name">IQIHLO ES TEH</string>
           </resources>
-          STEOF
+          EOF
 
-          cat > android/app/src/main/res/values/styles.xml <<'SLEOF'
+          cat > android/app/src/main/res/values/styles.xml <<'EOF'
           <resources>
               <style name="AppTheme" parent="android:style/Theme.Material.Light.NoActionBar">
                   <item name="android:fontFamily">sans</item>
                   <item name="android:colorAccent">#8D5200</item>
-                  <item name="android:windowActionModeOverlay">true</item>
+                  <item name="android:windowLightStatusBar">true</item>
+                  <item name="android:navigationBarColor">#FFFFFF</item>
               </style>
           </resources>
-          SLEOF
+          EOF
 
-          cat > android/app/src/main/AndroidManifest.xml <<'MEOF'
+          cat > android/app/src/main/res/drawable/ic_launcher.xml <<'EOF'
+          <vector xmlns:android="http://schemas.android.com/apk/res/android"
+              android:width="108dp" android:height="108dp"
+              android:viewportWidth="108" android:viewportHeight="108">
+              <path android:fillColor="#8D5200" android:pathData="M22,24 L76,24 L76,66 C76,78 66,86 54,86 C42,86 32,78 32,66 L32,34 L22,34 Z"/>
+              <path android:fillColor="#FFFFFF" android:pathData="M32,34 L66,34 L66,62 C66,70 61,76 54,76 C47,76 42,70 42,62 L42,42 L32,42 Z"/>
+              <path android:fillColor="#D38A00" android:pathData="M76,40 L84,40 C91,40 96,45 96,52 C96,59 91,64 84,64 L76,64 L76,57 L83,57 C86,57 88,55 88,52 C88,49 86,47 83,47 L76,47 Z"/>
+              <path android:fillColor="#D38A00" android:pathData="M42,24 L66,24 L62,16 L46,16 Z"/>
+          </vector>
+          EOF
+
+          cat > android/app/src/main/AndroidManifest.xml <<'EOF'
           <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-              <uses-permission android:name="android.permission.BLUETOOTH" />
-              <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
-              <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
-              <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
-              <uses-permission android:name="android.permission.CAMERA" />
-              <uses-permission android:name="android.permission.USE_BIOMETRIC" />
+              <uses-permission android:name="android.permission.CAMERA"/>
+              <uses-permission android:name="android.permission.USE_BIOMETRIC"/>
+              <uses-permission android:name="android.permission.BLUETOOTH"/>
+              <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
+              <uses-permission android:name="android.permission.BLUETOOTH_CONNECT"/>
+              <uses-permission android:name="android.permission.BLUETOOTH_SCAN" android:usesPermissionFlags="neverForLocation"/>
+
               <application
                   android:theme="@style/AppTheme"
-                  android:label="IQIHLO ES TEH"
+                  android:label="@string/app_name"
                   android:icon="@drawable/ic_launcher"
-                  android:usesCleartextTraffic="true"
+                  android:allowBackup="false"
+                  android:usesCleartextTraffic="false"
                   android:hardwareAccelerated="true">
-                  <activity android:name=".MainActivity" android:exported="true">
+                  <activity
+                      android:name=".MainActivity"
+                      android:exported="true"
+                      android:screenOrientation="portrait">
                       <intent-filter>
-                          <action android:name="android.intent.action.MAIN" />
-                          <category android:name="android.intent.category.LAUNCHER" />
+                          <action android:name="android.intent.action.MAIN"/>
+                          <category android:name="android.intent.category.LAUNCHER"/>
                       </intent-filter>
                   </activity>
               </application>
           </manifest>
-          MEOF
+          EOF
 
-          cat > android/app/src/main/java/com/iqihlo/esteh/MainActivity.java <<'JEOF'
+          cat > android/app/src/main/java/com/iqihlo/esteh/MainActivity.java <<'EOF'
           package com.iqihlo.esteh;
 
           import android.Manifest;
           import android.app.Activity;
+          import android.bluetooth.BluetoothAdapter;
+          import android.bluetooth.BluetoothDevice;
+          import android.bluetooth.BluetoothSocket;
           import android.content.Context;
           import android.content.pm.PackageManager;
           import android.hardware.biometrics.BiometricPrompt;
@@ -164,41 +206,51 @@ jobs:
           import android.webkit.WebView;
           import android.webkit.WebViewClient;
           import android.widget.Toast;
+          import org.json.JSONArray;
+          import org.json.JSONObject;
+          import java.io.OutputStream;
+          import java.nio.charset.StandardCharsets;
+          import java.text.SimpleDateFormat;
+          import java.util.Date;
+          import java.util.Locale;
+          import java.util.Set;
+          import java.util.UUID;
           import java.util.concurrent.Executor;
           import java.util.concurrent.Executors;
 
           public class MainActivity extends Activity {
-              private static final int CAMERA_REQUEST = 9001;
+              private static final int CAMERA_REQUEST=9001;
+              private static final int BT_REQUEST=9002;
+              private static final UUID SPP_UUID=UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
               private WebView webView;
-              private final Executor executor = Executors.newSingleThreadExecutor();
+              private final Executor executor=Executors.newSingleThreadExecutor();
               private CancellationSignal biometricCancellation;
+              private BluetoothSocket printerSocket;
 
-              @Override
-              protected void onCreate(Bundle savedInstanceState) {
+              @Override protected void onCreate(Bundle savedInstanceState){
                   super.onCreate(savedInstanceState);
-                  webView = new WebView(this);
-                  WebSettings settings = webView.getSettings();
-                  settings.setJavaScriptEnabled(true);
-                  settings.setDomStorageEnabled(true);
-                  settings.setAllowFileAccess(true);
-                  settings.setAllowContentAccess(true);
-                  settings.setMediaPlaybackRequiresUserGesture(false);
-                  settings.setBuiltInZoomControls(false);
-                  settings.setDisplayZoomControls(false);
+                  webView=new WebView(this);
+                  WebSettings s=webView.getSettings();
+                  s.setJavaScriptEnabled(true);
+                  s.setDomStorageEnabled(true);
+                  s.setAllowFileAccess(true);
+                  s.setAllowContentAccess(false);
+                  s.setMediaPlaybackRequiresUserGesture(false);
+                  s.setBuiltInZoomControls(false);
+                  s.setDisplayZoomControls(false);
+                  s.setSupportZoom(false);
 
                   webView.setWebViewClient(new WebViewClient());
-                  webView.setWebChromeClient(new WebChromeClient() {
-                      @Override
-                      public void onPermissionRequest(final PermissionRequest request) {
-                          runOnUiThread(() -> {
-                              if (Build.VERSION.SDK_INT >= 23 && checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-                                  requestPermissions(new String[]{Manifest.permission.CAMERA}, CAMERA_REQUEST);
+                  webView.setWebChromeClient(new WebChromeClient(){
+                      @Override public void onPermissionRequest(final PermissionRequest request){
+                          runOnUiThread(()->{
+                              if(Build.VERSION.SDK_INT>=23 && checkSelfPermission(Manifest.permission.CAMERA)!=PackageManager.PERMISSION_GRANTED){
+                                  requestPermissions(new String[]{Manifest.permission.CAMERA},CAMERA_REQUEST);
                                   request.deny();
                                   return;
                               }
-                              String[] resources = request.getResources();
-                              for (String resource : resources) {
-                                  if (PermissionRequest.RESOURCE_VIDEO_CAPTURE.equals(resource)) {
+                              for(String r:request.getResources()){
+                                  if(PermissionRequest.RESOURCE_VIDEO_CAPTURE.equals(r)){
                                       request.grant(new String[]{PermissionRequest.RESOURCE_VIDEO_CAPTURE});
                                       return;
                                   }
@@ -208,138 +260,211 @@ jobs:
                       }
                   });
 
-                  webView.addJavascriptInterface(new AndroidPrintBridge(), "AndroidPrint");
-                  webView.addJavascriptInterface(new AndroidBiometricBridge(), "AndroidBiometric");
+                  webView.addJavascriptInterface(new PrintBridge(),"AndroidPrint");
+                  webView.addJavascriptInterface(new PrinterBridge(),"AndroidPrinter");
+                  webView.addJavascriptInterface(new BiometricBridge(),"AndroidBiometric");
+                  webView.addJavascriptInterface(new AppBridge(),"AndroidApp");
                   setContentView(webView);
                   webView.loadUrl("file:///android_asset/index.html");
               }
 
-              @Override
-              public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-                  super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-                  if (requestCode == CAMERA_REQUEST && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                      toast("Izin kamera aktif. Tekan SCAN KAMERA lagi.");
-                  } else if (requestCode == CAMERA_REQUEST) {
-                      toast("Izin kamera ditolak.");
+              @Override public void onRequestPermissionsResult(int code,String[] p,int[] r){
+                  super.onRequestPermissionsResult(code,p,r);
+                  if(code==CAMERA_REQUEST) toast(r.length>0&&r[0]==PackageManager.PERMISSION_GRANTED?"Izin kamera aktif.":"Izin kamera ditolak.");
+                  if(code==BT_REQUEST&&r.length>0&&r[0]==PackageManager.PERMISSION_GRANTED) listPairedPrinters();
+              }
+
+              private boolean btPermission(){
+                  return Build.VERSION.SDK_INT<31 || checkSelfPermission(Manifest.permission.BLUETOOTH_CONNECT)==PackageManager.PERMISSION_GRANTED;
+              }
+              private void ensureBtPermission(){
+                  if(Build.VERSION.SDK_INT>=31&&checkSelfPermission(Manifest.permission.BLUETOOTH_CONNECT)!=PackageManager.PERMISSION_GRANTED)
+                      requestPermissions(new String[]{Manifest.permission.BLUETOOTH_CONNECT},BT_REQUEST);
+              }
+              private void toast(String t){Toast.makeText(this,t,Toast.LENGTH_SHORT).show();}
+              private void js(String code){runOnUiThread(()->webView.evaluateJavascript(code,null));}
+
+              private void authenticate(String success,String failed,String title,String subtitle){
+                  if(Build.VERSION.SDK_INT<28){toast("Sidik jari tidak tersedia.");js(failed);return;}
+                  BiometricPrompt prompt=new BiometricPrompt.Builder(this)
+                      .setTitle(title).setSubtitle(subtitle)
+                      .setDescription("Verifikasi keamanan IQIHLO ES TEH")
+                      .setNegativeButton("BATAL",executor,(d,w)->js(failed)).build();
+                  biometricCancellation=new CancellationSignal();
+                  prompt.authenticate(biometricCancellation,executor,new BiometricPrompt.AuthenticationCallback(){
+                      @Override public void onAuthenticationSucceeded(BiometricPrompt.AuthenticationResult result){js(success);}
+                      @Override public void onAuthenticationError(int code,CharSequence msg){js(failed);}
+                      @Override public void onAuthenticationFailed(){}
+                  });
+              }
+
+              private class BiometricBridge{
+                  @JavascriptInterface public void authenticateLogin(){authenticate("window.ownerBiometricSuccess()","window.ownerBiometricFailed()","Verifikasi OWNER","Akses sistem");}
+                  @JavascriptInterface public void authenticateAttendance(String nama,String tipe){
+                      authenticate("window.attendanceBiometricSuccess()","window.attendanceBiometricFailed()","Verifikasi Sidik Jari",
+                          (nama==null?"Karyawan":nama)+" • "+(tipe==null?"ABSEN":tipe));
                   }
               }
-
-              private void toast(String text) {
-                  Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
+              private class AppBridge{@JavascriptInterface public void exitApp(){runOnUiThread(()->finishAndRemoveTask());}}
+              private class PrintBridge{@JavascriptInterface public void print(){runOnUiThread(()->fallbackPrint());}}
+              private class PrinterBridge{
+                  @JavascriptInterface public void listPairedPrinters(){MainActivity.this.listPairedPrinters();}
+                  @JavascriptInterface public void connectPrinter(String address){MainActivity.this.connectPrinter(address);}
+                  @JavascriptInterface public void printReceipt(String json){MainActivity.this.printReceipt(json);}
               }
 
-              private void sendJs(final String js) {
-                  runOnUiThread(() -> webView.evaluateJavascript(js, null));
+              private void listPairedPrinters(){
+                  if(!btPermission()){ensureBtPermission();return;}
+                  BluetoothAdapter a=BluetoothAdapter.getDefaultAdapter();
+                  if(a==null){js("window.printerListResult('[]')");return;}
+                  if(!a.isEnabled()){toast("Nyalakan Bluetooth terlebih dahulu.");js("window.printerListResult('[]')");return;}
+                  try{
+                      Set<BluetoothDevice> ds=a.getBondedDevices();
+                      JSONArray out=new JSONArray();
+                      for(BluetoothDevice d:ds){
+                          JSONObject o=new JSONObject();
+                          o.put("name",d.getName()==null?"Bluetooth Printer":d.getName());
+                          o.put("address",d.getAddress());
+                          out.put(o);
+                      }
+                      js("window.printerListResult("+JSONObject.quote(out.toString())+")");
+                  }catch(Exception e){js("window.printerListResult('[]')");toast("Gagal membaca perangkat Bluetooth.");}
               }
 
-              private void authenticate(String successJs, String failedJs, String title, String subtitle) {
-                  if (Build.VERSION.SDK_INT < 28) {
-                      toast("Sidik jari tidak tersedia pada versi Android ini.");
-                      sendJs(failedJs);
-                      return;
-                  }
-                  BiometricPrompt prompt = new BiometricPrompt.Builder(this)
-                          .setTitle(title)
-                          .setSubtitle(subtitle)
-                          .setDescription("Verifikasi sidik jari untuk keamanan IQIHLO ES TEH")
-                          .setNegativeButton("BATAL", executor, (dialog, which) -> sendJs(failedJs))
-                          .build();
-                  biometricCancellation = new CancellationSignal();
-                  prompt.authenticate(biometricCancellation, executor, new BiometricPrompt.AuthenticationCallback() {
-                      @Override public void onAuthenticationSucceeded(BiometricPrompt.AuthenticationResult result) {
-                          sendJs(successJs);
-                      }
-                      @Override public void onAuthenticationError(int errorCode, CharSequence errString) {
-                          sendJs(failedJs);
-                      }
-                      @Override public void onAuthenticationFailed() {
-                          // BiometricPrompt tetap menunggu percobaan berikutnya.
+              private void connectPrinter(String address){
+                  if(!btPermission()){ensureBtPermission();return;}
+                  executor.execute(()->{
+                      try{
+                          BluetoothAdapter a=BluetoothAdapter.getDefaultAdapter();
+                          BluetoothDevice d=a.getRemoteDevice(address);
+                          if(printerSocket!=null)try{printerSocket.close();}catch(Exception ignored){}
+                          BluetoothSocket s=d.createRfcommSocketToServiceRecord(SPP_UUID);
+                          a.cancelDiscovery();
+                          s.connect();
+                          printerSocket=s;
+                          js("window.printerConnected(true,"+JSONObject.quote(d.getName()==null?address:d.getName())+")");
+                      }catch(Exception e){
+                          printerSocket=null;
+                          js("window.printerConnected(false,"+JSONObject.quote(e.getMessage()==null?"Tidak dapat terhubung":e.getMessage())+")");
                       }
                   });
               }
 
-              private class AndroidBiometricBridge {
-                  @JavascriptInterface
-                  public void authenticateOwner() {
-                      authenticate("window.ownerBiometricSuccess()", "window.ownerBiometricFailed()", "Verifikasi OWNER", "Akses Rekap Penjualan");
-                  }
-                  @JavascriptInterface
-                  public void authenticateAttendance(String nama, String tipe) {
-                      String safeNama = nama == null ? "Karyawan" : nama.replace("'", "\\'");
-                      String safeTipe = tipe == null ? "ABSEN" : tipe.replace("'", "\\'");
-                      authenticate("window.attendanceBiometricSuccess()", "window.attendanceBiometricFailed()", "Verifikasi Sidik Jari", safeNama + " • " + safeTipe);
-                  }
+              private static String clean(String s){
+                  if(s==null)return "";
+                  return s.replaceAll("[^\\x20-\\x7E]","?");
+              }
+              private static String rupiah(long n){
+                  return "Rp"+String.format(Locale.US,"%,d",n).replace(',','.');
+              }
+              private static String cut(String s,int max){
+                  s=clean(s);
+                  return s.length()<=max?s:s.substring(0,Math.max(0,max-1))+"?";
+              }
+              private static String row(String name,long price){
+                  int width=32,priceW=12,nameW=width-priceW;
+                  return String.format(Locale.US,"%-"+nameW+"s%"+priceW+"s\n",cut(name,nameW),rupiah(price));
               }
 
-              private class AndroidPrintBridge {
-                  @JavascriptInterface
-                  public void print() {
-                      runOnUiThread(() -> cetakStruk());
-                  }
+              private void printReceipt(String json){
+                  executor.execute(()->{
+                      try{
+                          if(printerSocket==null||!printerSocket.isConnected()){
+                              js("window.printerConnected(false,'Printer belum terhubung')");
+                              return;
+                          }
+                          JSONObject o=new JSONObject(json);
+                          long total=o.optLong("total",0),cash=o.optLong("cash",0),change=o.optLong("change",0);
+                          String payment=o.optString("payment","Cash"),customer=o.optString("customer","Umum");
+                          JSONArray items=o.optJSONArray("items");
+                          StringBuilder b=new StringBuilder();
+                          b.append("\u001B@\u001Ba\u0001\u001BE\u0001IQIHLO ES TEH\u001BE\u0000\n");
+                          b.append("SEGARNYA BEDA!\n");
+                          b.append(new SimpleDateFormat("dd/MM/yyyy HH:mm",Locale.US).format(new Date())).append("\n");
+                          b.append("\u001Ba\u0000--------------------------------\n");
+                          b.append("Pelanggan: ").append(cut(customer,22)).append("\n");
+                          b.append("--------------------------------\n");
+                          if(items!=null)for(int i=0;i<items.length();i++){
+                              JSONObject it=items.getJSONObject(i);
+                              String n=it.optString("n","Item");
+                              int q=it.optInt("q",1);
+                              long p=it.optLong("p",0);
+                              b.append(row(n+" x"+q,p*q));
+                          }
+                          b.append("--------------------------------\n").append(row("TOTAL",total));
+                          if("Cash".equalsIgnoreCase(payment)){
+                              b.append(row("TUNAI",cash)).append(row("KEMBALI",change));
+                          }else b.append(row("BAYAR QRIS",total));
+                          b.append("--------------------------------\n\u001Ba\u0001Terima kasih\n\n\n\\u001DV\u0001");
+                          OutputStream out=printerSocket.getOutputStream();
+                          out.write(b.toString().getBytes(StandardCharsets.UTF_8));
+                          out.flush();
+                          js("window.printerConnected(true,'Struk berhasil dikirim ke printer')");
+                      }catch(Exception e){
+                          try{if(printerSocket!=null)printerSocket.close();}catch(Exception ignored){}
+                          printerSocket=null;
+                          js("window.printerConnected(false,"+JSONObject.quote("Cetak gagal: "+(e.getMessage()==null?"koneksi terputus":e.getMessage()))+")");
+                      }
+                  });
               }
 
-              private void cetakStruk() {
-                  try {
-                      PrintManager printManager = (PrintManager) getSystemService(Context.PRINT_SERVICE);
-                      PrintAttributes.MediaSize mediaSize = new PrintAttributes.MediaSize("IQIHLO_58MM", "IQIHLO ES TEH 58mm", 2283, 3150);
-                      PrintAttributes attributes = new PrintAttributes.Builder()
-                              .setMediaSize(mediaSize)
-                              .setMinMargins(PrintAttributes.Margins.NO_MARGINS)
-                              .setColorMode(PrintAttributes.COLOR_MODE_MONOCHROME)
-                              .build();
-                      printManager.print("IQIHLO ES TEH", webView.createPrintDocumentAdapter("IQIHLO ES TEH"), attributes);
-                  } catch (Exception e) {
-                      Toast.makeText(this, "Gagal membuka cetak: " + e.getMessage(), Toast.LENGTH_LONG).show();
-                  }
+              private void fallbackPrint(){
+                  try{
+                      PrintManager pm=(PrintManager)getSystemService(Context.PRINT_SERVICE);
+                      PrintAttributes.MediaSize size=new PrintAttributes.MediaSize("IQIHLO_58MM","58mm",2283,3150);
+                      PrintAttributes attrs=new PrintAttributes.Builder().setMediaSize(size).setMinMargins(PrintAttributes.Margins.NO_MARGINS).setColorMode(PrintAttributes.COLOR_MODE_MONOCHROME).build();
+                      pm.print("IQIHLO ES TEH",webView.createPrintDocumentAdapter("IQIHLO ES TEH"),attrs);
+                  }catch(Exception e){toast("Cetak tidak tersedia: "+e.getMessage());}
               }
 
-              @Override
-              protected void onDestroy() {
-                  if (biometricCancellation != null) biometricCancellation.cancel();
-                  if (webView != null) webView.destroy();
+              @Override protected void onDestroy(){
+                  if(biometricCancellation!=null)biometricCancellation.cancel();
+                  try{if(printerSocket!=null)printerSocket.close();}catch(Exception ignored){}
+                  if(webView!=null)webView.destroy();
                   super.onDestroy();
               }
           }
-          JEOF
+          EOF
 
-      - name: Siapkan Gradle
+      - name: Install Gradle
         shell: bash
         run: |
-          set -e
+          set -euo pipefail
           wget -q https://services.gradle.org/distributions/gradle-8.11.1-bin.zip
           unzip -q gradle-8.11.1-bin.zip
           echo "$PWD/gradle-8.11.1/bin" >> "$GITHUB_PATH"
 
-      - name: Cek lingkungan build
+      - name: Build release APK
         shell: bash
         run: |
-          java -version
-          sdkmanager --version
-          gradle --version
-
-      - name: Build APK
-        shell: bash
-        run: |
-          set -e
+          set -euo pipefail
           cd android
-          gradle assembleDebug --no-daemon --stacktrace
+          gradle assembleRelease --no-daemon --stacktrace
 
-      - name: Simpan APK
+      - name: Verify APK
+        shell: bash
+        run: |
+          set -euo pipefail
+          APK=android/app/build/outputs/apk/release/app-release.apk
+          test -s "$APK"
+          ls -lh "$APK"
+
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: IQIHLO-ES-TEH-V3.1-PREMIUM-APK
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          name: IQIHLO-ES-TEH-V4.0-APK
+          path: android/app/build/outputs/apk/release/app-release.apk
           if-no-files-found: error
 
-      - name: Buat Release APK
+      - name: Create GitHub Release
         if: github.event_name == 'workflow_dispatch'
-        uses: softprops/action-gh-release@v3
+        uses: softprops/action-gh-release@v2
         with:
-          tag_name: v3.1.${{ github.run_number }}
-          name: IQIHLO ES TEH V3.1 PREMIUM
+          tag_name: v4.0.${{ github.run_number }}
+          name: IQIHLO ES TEH v4.0
           body: |
-            IQIHLO ES TEH V3.1 PREMIUM
-            Perbaikan login role, scanner kamera, sidik jari native, dan struk 58mm.
-          files: android/app/build/outputs/apk/debug/app-debug.apk
+            IQIHLO ES TEH v4.0
+            Build release dengan R8, printer Bluetooth ESC/POS, kamera barcode, biometrik, backup/restore, stok, absensi, marketplace manual, dan laporan.
+          files: android/app/build/outputs/apk/release/app-release.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
