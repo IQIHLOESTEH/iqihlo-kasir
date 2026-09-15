@@ -76,78 +76,868 @@
 
 <script>
 'use strict';
+
 const CATS=['Es Teh','Es Jeruk Peras','Goodday Biasa','Nutrisari','Susu','Teh Tarik Maxtea','Kopi Susu','Kopi Hitam','Chocolatos','Goodday Latte','Air Putih'];
 const MENU=[
-['Es Teh',3000],['Es Jeruk Peras',5000],['Mocacino',5000],['Vanilla Latte',5000],['Coolant',5000],['Chococino',5000],['Carebian Nut',5000],
-['Mangga',4000],['Jeruk Peras',4000],['Cincau',4000],['Milky Orange',4000],['Putih',5000],['Coklat',5000],['Matcha',5000],['Milo',5000],['Teh Tarik Maxtea',5000],['Tora Bika Creamy',5000],['Indocafe',5000],['White Coffee',5000],['Kopi Kapal Api',3000],['Kopi ABC',3000],['Creamy',5000],['Butterscotch',5000],['Original',5000],['Air Putih Es',2000],['Air Putih Panas',2000]
+['Es Teh',3000],['Es Jeruk Peras',5000],['Mocacino',5000],['Vanilla Latte',5000],
+['Coolant',5000],['Chococino',5000],['Carebian Nut',5000],['Mangga',4000],
+['Jeruk Peras',4000],['Cincau',4000],['Milky Orange',4000],['Putih',5000],
+['Coklat',5000],['Matcha',5000],['Milo',5000],['Teh Tarik Maxtea',5000],
+['Tora Bika Creamy',5000],['Indocafe',5000],['White Coffee',5000],
+['Kopi Kapal Api',3000],['Kopi ABC',3000],['Creamy',5000],
+['Butterscotch',5000],['Original',5000],['Air Putih Es',2000],['Air Putih Panas',2000]
 ];
-const DEFAULT_ACCOUNTS=[
-{u:'owner',p:'4826',r:'OWNER'},{u:'admin',p:'6842',r:'ADMIN'},{u:'kasir',p:'7391',r:'KASIR'}
-];
-const K={accounts:'iq_accounts_v4',menus:'iq_menus_v4',tx:'iq_tx_v4',employees:'iq_employees_v4',att:'iq_att_v4',stock:'iq_stock_v4',barcodes:'iq_barcodes_v4',market:'iq_market_v4',printer:'iq_printer_v4'};
-let accounts=[],menus=[],tx=[],employees=[],att=[],stock=[],barcodes={},market=[],cart=[],category=CATS[0],payment='Cash',session=null,selectedPrinter=null,reportMode='today';
 
-function load(k,d){try{const x=localStorage.getItem(k);return x?JSON.parse(x):d}catch(e){return d}}
-function save(k,v){localStorage.setItem(k,JSON.stringify(v))}
-function rupiah(n){return 'Rp'+Number(n||0).toLocaleString('id-ID')}
-function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
-function init(){accounts=load(K.accounts,DEFAULT_ACCOUNTS);menus=load(K.menus,MENU.map(x=>({n:x[0],p:x[1],c:guessCat(x[0])})));tx=load(K.tx,[]);employees=load(K.employees,[]);att=load(K.att,[]);barcodes=load(K.barcodes,{});market=load(K.market,[]);stock=load(K.stock,menus.map(m=>({n:m.n,q:100})));selectedPrinter=load(K.printer,null);renderCats();renderMenus();renderManagers();renderBarcode();renderMarket();renderReport();renderStock();renderEmployees();renderAccounts();applySession();if(selectedPrinter)document.getElementById('printerStatus').textContent='Printer: '+selectedPrinter.name}
-function guessCat(n){if(n==='Es Teh')return'Es Teh';if(n==='Es Jeruk Peras')return'Es Jeruk Peras';if(n==='Air Putih Es'||n==='Air Putih Panas')return'Air Putih';if(n.includes('Jeruk')||n==='Mangga'||n==='Cincau'||n==='Milky Orange')return'Nutrisari';if(n.includes('Kopi')&&n!=='Kopi ABC'&&n!=='Kopi Kapal Api')return'Kopi Susu';if(n.includes('Kopi'))return'Kopi Hitam';if(n.includes('Milo')||n==='Putih')return'Susu';if(n.includes('Choc')||n==='Coklat')return'Chocolatos';if(n.includes('Latte')||n==='Mocacino'||n==='Creamy'||n==='Butterscotch')return'Goodday Latte';if(n.includes('Teh Tarik'))return'Teh Tarik Maxtea';return'Goodday Biasa'}
-function renderCats(){const el=document.getElementById('kategori');el.innerHTML=CATS.map(c=>`<button class="cat ${c===category?'on':''}" onclick="setCat('${esc(c)}')">${esc(c)}</button>`).join('');document.getElementById('newMenuCat').innerHTML=CATS.map(c=>`<option>${esc(c)}</option>`).join('')}
-function setCat(c){category=c;renderCats();renderMenus()}
-function renderMenus(){const el=document.getElementById('menu');const list=menus.filter(m=>m.c===category);el.innerHTML=list.map(m=>`<button class="menu" onclick="addCart('${esc(m.n)}')">${esc(m.n)}<small>${rupiah(m.p)}</small></button>`).join('')||'<div class="panel">Belum ada menu di kategori ini.</div>'}
-function addCart(n){const m=menus.find(x=>x.n===n);if(!m)return;const x=cart.find(i=>i.n===n);if(x)x.q++;else cart.push({n:m.n,p:m.p,q:1});renderCart()}
-function renderCart(){const el=document.getElementById('pesanan');if(!cart.length){el.textContent='Belum ada pesanan';document.getElementById('total').textContent='Rp0';return}el.innerHTML=cart.map((x,i)=>`<div class="item"><b>${esc(x.n)}</b> × ${x.q} — ${rupiah(x.p*x.q)}<br><button onclick="chg(${i},-1)">−</button> <button onclick="chg(${i},1)">+</button> <button onclick="chg(${i},-999)">HAPUS</button></div>`).join('');document.getElementById('total').textContent=rupiah(cart.reduce((s,x)=>s+x.p*x.q,0))}
-function chg(i,d){if(d===-999)cart.splice(i,1);else{cart[i].q+=d;if(cart[i].q<=0)cart.splice(i,1)}renderCart()}
-function pilihBayar(p){payment=p;cash.classList.toggle('on',p==='Cash');qris.classList.toggle('on',p==='QRIS')}
-function hapus(){cart=[];renderCart();cashReceived.value=''}
-function totalCart(){return cart.reduce((s,x)=>s+x.p*x.q,0)}
-function cetak(){if(!cart.length){alert('Pesanan masih kosong.');return}const total=totalCart(),cash=Number(cashReceived.value||0),change=payment==='Cash'?Math.max(0,cash-total):0;document.getElementById('receipt').innerHTML=`<div class="center"><b>IQIHLO ES TEH</b><br>SEGARNYA BEDA!<br>${new Date().toLocaleString('id-ID')}</div><div class="line"></div>${cart.map(x=>`<div class="rrow"><span>${esc(x.n)} x${x.q}</span><span class="rprice">${rupiah(x.p*x.q)}</span></div>`).join('')}<div class="line"></div><div class="rrow"><b>TOTAL</b><b class="rprice">${rupiah(total)}</b></div><div>Bayar: ${esc(payment)}</div>${payment==='Cash'?`<div class="rrow"><span>Tunai</span><span class="rprice">${rupiah(cash)}</span></div><div class="rrow"><span>Kembali</span><span class="rprice">${rupiah(change)}</span></div>`:''}<div class="line"></div><div class="center">Terima kasih</div>`;if(window.AndroidPrinter&&AndroidPrinter.printReceipt){
-  AndroidPrinter.printReceipt(JSON.stringify({customer:document.getElementById('nama').value||'',payment,total,cash,change,items:cart}));
-}else if(window.AndroidPrint&&AndroidPrint.print){
+const DEFAULT_ACCOUNTS=[
+{u:'owner',p:'4826',r:'OWNER'},
+{u:'admin',p:'6842',r:'ADMIN'},
+{u:'kasir',p:'7391',r:'KASIR'}
+];
+
+const K={
+accounts:'iq_accounts_v4',menus:'iq_menus_v4',tx:'iq_tx_v4',
+employees:'iq_employees_v4',att:'iq_att_v4',stock:'iq_stock_v4',
+barcodes:'iq_barcodes_v4',market:'iq_market_v4',printer:'iq_printer_v4'
+};
+
+let accounts=[],menus=[],tx=[],employees=[],att=[],stock=[],barcodes={},market=[];
+let cart=[],category=CATS[0],payment='Cash',session=null,selectedPrinter=null,reportMode='today';
+
+function load(k,d){
+ try{
+  const x=localStorage.getItem(k);
+  return x?JSON.parse(x):d;
+ }catch(e){return d}
+}
+
+function save(k,v){
+ localStorage.setItem(k,JSON.stringify(v));
+}
+
+function rupiah(n){
+ return 'Rp'+Number(n||0).toLocaleString('id-ID');
+}
+
+function esc(s){
+ return String(s??'').replace(/[&<>"']/g,m=>({
+  '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+ }[m]));
+}
+
+function init(){
+ accounts=load(K.accounts,DEFAULT_ACCOUNTS);
+ menus=load(K.menus,MENU.map(x=>({n:x[0],p:x[1],c:guessCat(x[0])})));
+ tx=load(K.tx,[]);
+ employees=load(K.employees,[]);
+ att=load(K.att,[]);
+ barcodes=load(K.barcodes,{});
+ market=load(K.market,[]);
+ stock=load(K.stock,menus.map(m=>({n:m.n,q:100})));
+ selectedPrinter=load(K.printer,null);
+
+ renderCats();
+ renderMenus();
+ renderManagers();
+ renderBarcode();
+ renderMarket();
+ renderReport();
+ renderStock();
+ renderEmployees();
+ renderAccounts();
+ applySession();
+
+ if(selectedPrinter){
+  printerStatus.textContent='Printer tersimpan: '+selectedPrinter.name;
+  setTimeout(autoConnectPrinter,700);
+ }
+}
+
+function guessCat(n){
+ if(n==='Es Teh')return'Es Teh';
+ if(n==='Es Jeruk Peras')return'Es Jeruk Peras';
+ if(n==='Air Putih Es'||n==='Air Putih Panas')return'Air Putih';
+ if(n.includes('Jeruk')||n==='Mangga'||n==='Cincau'||n==='Milky Orange')return'Nutrisari';
+ if(n.includes('Kopi')&&n!=='Kopi ABC'&&n!=='Kopi Kapal Api')return'Kopi Susu';
+ if(n.includes('Kopi'))return'Kopi Hitam';
+ if(n.includes('Milo')||n==='Putih')return'Susu';
+ if(n.includes('Choc')||n==='Coklat')return'Chocolatos';
+ if(n.includes('Latte')||n==='Mocacino'||n==='Creamy'||n==='Butterscotch')return'Goodday Latte';
+ if(n.includes('Teh Tarik'))return'Teh Tarik Maxtea';
+ return'Goodday Biasa';
+}
+
+function renderCats(){
+ kategori.innerHTML=CATS.map(c=>
+  `<button class="cat ${c===category?'on':''}" onclick="setCat('${esc(c)}')">${esc(c)}</button>`
+ ).join('');
+ newMenuCat.innerHTML=CATS.map(c=>`<option>${esc(c)}</option>`).join('');
+}
+
+function setCat(c){
+ category=c;
+ renderCats();
+ renderMenus();
+}
+
+function renderMenus(){
+ const list=menus.filter(m=>m.c===category);
+ menu.innerHTML=list.map(m=>
+  `<button class="menu" onclick="addCart('${esc(m.n)}')">${esc(m.n)}<small>${rupiah(m.p)}</small></button>`
+ ).join('')||'<div class="panel">Belum ada menu di kategori ini.</div>';
+}
+
+function addCart(n){
+ const m=menus.find(x=>x.n===n);
+ if(!m)return;
+ const x=cart.find(i=>i.n===n);
+ if(x)x.q++;
+ else cart.push({n:m.n,p:Number(m.p),q:1});
+ renderCart();
+}
+
+function renderCart(){
+ if(!cart.length){
+  pesanan.textContent='Belum ada pesanan';
+  total.textContent='Rp0';
+  return;
+ }
+
+ pesanan.innerHTML=cart.map((x,i)=>{
+  const sub=Number(x.p)*Number(x.q);
+  return `<div class="item">
+   <b>${esc(x.n)}</b> × ${x.q} — ${rupiah(sub)}<br>
+   <button onclick="chg(${i},-1)">−</button>
+   <button onclick="chg(${i},1)">+</button>
+   <button onclick="chg(${i},-999)">HAPUS</button>
+  </div>`;
+ }).join('');
+
+ total.textContent=rupiah(totalCart());
+}
+
+function chg(i,d){
+ if(d===-999)cart.splice(i,1);
+ else{
+  cart[i].q+=d;
+  if(cart[i].q<=0)cart.splice(i,1);
+ }
+ renderCart();
+}
+
+function pilihBayar(p){
+ payment=p;
+ cash.classList.toggle('on',p==='Cash');
+ qris.classList.toggle('on',p==='QRIS');
+}
+
+function hapus(){
+ cart=[];
+ renderCart();
+ cashReceived.value='';
+}
+
+function totalCart(){
+ return cart.reduce((s,x)=>s+(Number(x.p)||0)*(Number(x.q)||0),0);
+}
+
+/* CETAK STRUK */
+
+function makePrintData(){
+ const total=totalCart();
+ const cash=Number(cashReceived.value||0);
+ const change=payment==='Cash'?Math.max(0,cash-total):0;
+
+ return {
+  id:Date.now().toString(),
+  date:new Date().toISOString(),
+  time:new Date().toLocaleString('id-ID'),
+  user:session?.u||'-',
+  customer:nama.value.trim()||'Umum',
+  payment:payment,
+  total:total,
+  cash:cash,
+  change:change,
+  items:cart.map(x=>({
+   n:String(x.n),
+   p:Number(x.p)||0,
+   q:Number(x.q)||1,
+   subtotal:(Number(x.p)||0)*(Number(x.q)||1)
+  }))
+ };
+}
+
+function cetak(){
+ if(!cart.length){
+  alert('Pesanan masih kosong.');
+  return;
+ }
+
+ const r=makePrintData();
+
+ receipt.innerHTML=
+ `<div class="center">
+ <b>IQIHLO ES TEH</b><br>
+ SEGARNYA BEDA!<br>
+ ${esc(r.time)}<br>
+ Kasir: ${esc(r.user)}<br>
+ Pelanggan: ${esc(r.customer)}
+ </div>
+ <div class="line"></div>`+
+ r.items.map(x=>
+ `<div class="rrow">
+  <span>${esc(x.n)} x${x.q}</span>
+  <span class="rprice">${rupiah(x.subtotal)}</span>
+ </div>`
+ ).join('')+
+ `<div class="line"></div>
+ <div class="rrow">
+  <b>TOTAL</b>
+  <b class="rprice">${rupiah(r.total)}</b>
+ </div>
+ <div>Pembayaran: ${esc(r.payment)}</div>`+
+ (r.payment==='Cash'?
+ `<div class="rrow"><span>Tunai</span><span class="rprice">${rupiah(r.cash)}</span></div>
+  <div class="rrow"><span>Kembali</span><span class="rprice">${rupiah(r.change)}</span></div>`:
+ `<div class="rrow"><span>QRIS</span><span class="rprice">${rupiah(r.total)}</span></div>`) +
+ `<div class="line"></div>
+ <div class="center"><b>TERIMA KASIH</b><br>SELAMAT MENIKMATI!</div>`;
+
+ if(window.AndroidPrinter&&AndroidPrinter.printReceipt){
+  AndroidPrinter.printReceipt(JSON.stringify(r));
+  printerStatus.textContent='Mengirim struk ke printer...';
+ }else if(window.AndroidPrint&&AndroidPrint.print){
   AndroidPrint.print();
-}else window.print()}
-function simpanTransaksi(){if(!cart.length){alert('Pesanan masih kosong.');return}const total=totalCart(),cash=Number(cashReceived.value||0);if(payment==='Cash'&&cash<total){alert('Uang diterima kurang.');return}const rec={id:Date.now().toString(),time:new Date().toISOString(),customer:document.getElementById('nama').value||'Umum',user:session.u,payment,total,cash,change:payment==='Cash'?cash-total:0,items:cart.map(x=>({...x}))};tx.unshift(rec);save(K.tx,tx);cart.forEach(x=>{const s=stock.find(a=>a.n===x.n);if(s)s.q=Math.max(0,s.q-x.q)});save(K.stock,stock);renderStock();renderReport();alert('Transaksi tersimpan.');}
-function tambahMenuBaru(){const n=document.getElementById('newMenuName').value.trim(),p=Number(document.getElementById('newMenuPrice').value),c=document.getElementById('newMenuCat').value;if(!n||p<=0)return alert('Nama dan harga wajib diisi.');if(menus.some(x=>x.n.toLowerCase()===n.toLowerCase()))return alert('Menu sudah ada.');menus.push({n,p,c});save(K.menus,menus);if(!stock.find(x=>x.n===n))stock.push({n,q:100});save(K.stock,stock);document.getElementById('newMenuName').value='';document.getElementById('newMenuPrice').value='';renderMenus();renderManagers();renderStock()}
-function renderManagers(){document.getElementById('harga').innerHTML=menus.map((m,i)=>`<div class="item"><span>${esc(m.n)}</span> <input style="width:110px;padding:6px" type="number" value="${m.p}" onchange="changePrice(${i},this.value)"> <button onclick="deleteMenu(${i})">HAPUS</button></div>`).join('');document.getElementById('menuTambahanList').innerHTML=''}
-function changePrice(i,v){const p=Number(v);if(p>0){menus[i].p=p;save(K.menus,menus);renderMenus();renderManagers()}}
-function deleteMenu(i){if(!confirm('Hapus menu ini?'))return;const n=menus[i].n;menus.splice(i,1);save(K.menus,menus);stock=stock.filter(x=>x.n!==n);save(K.stock,stock);renderMenus();renderManagers();renderStock()}
-function addEmployee(){const n=employeeName.value.trim(),r=employeeRole.value.trim()||'Karyawan';if(!n)return alert('Nama wajib diisi.');employees.push({id:Date.now().toString(),n,r});save(K.employees,employees);employeeName.value='';employeeRole.value='';renderEmployees()}
-function renderEmployees(){employeeList.innerHTML=employees.map(e=>`<div class="item"><b>${esc(e.n)}</b> — ${esc(e.r)}<br><button onclick="absen('${esc(e.id)}','MASUK')">ABSEN MASUK</button> <button onclick="absen('${esc(e.id)}','PULANG')">ABSEN PULANG</button></div>`).join('')||'Belum ada karyawan.';attendanceHistory.innerHTML='<h4>RIWAYAT ABSEN</h4>'+att.slice(0,50).map(a=>`<div>${esc(a.time)} — ${esc(a.n)} — ${esc(a.type)} — ${esc(a.user)}</div>`).join('')||'Belum ada data.'}
-function absen(id,type){const e=employees.find(x=>x.id===id);if(!e)return;if(window.AndroidBiometric&&AndroidBiometric.authenticateAttendance){window.pendingAttendance={id,type};AndroidBiometric.authenticateAttendance(e.n,type)}else attendanceBiometricSuccess()}
-function attendanceBiometricSuccess(){const p=window.pendingAttendance;if(!p)return;const e=employees.find(x=>x.id===p.id);if(!e)return;att.unshift({time:new Date().toLocaleString('id-ID'),n:e.n,type:p.type,user:session.u});save(K.att,att);renderEmployees();window.pendingAttendance=null}
-function attendanceBiometricFailed(){window.pendingAttendance=null}
-function renderStock(){stockList.innerHTML=stock.map((s,i)=>`<div class="item"><b>${esc(s.n)}</b> — Stok: <span class="${s.q<=10?'low':''}">${s.q}</span><br><button onclick="stockAdj(${i},-1)">−</button> <button onclick="stockAdj(${i},1)">+</button> <input style="width:90px;padding:6px" type="number" value="${s.q}" onchange="setStock(${i},this.value)"></div>`).join('')}
-function stockAdj(i,d){stock[i].q=Math.max(0,stock[i].q+d);save(K.stock,stock);renderStock()}function setStock(i,v){stock[i].q=Math.max(0,Number(v));save(K.stock,stock);renderStock()}
-function saveBarcode(){const m=barcodeMenu.value,v=barcodeValue.value.trim();if(!m||!v)return alert('Menu dan barcode wajib.');barcodes[v]=m;save(K.barcodes,barcodes);barcodeValue.value='';renderBarcode()}
-function renderBarcode(){barcodeMenu.innerHTML=menus.map(m=>`<option>${esc(m.n)}</option>`).join('');barcodeList.innerHTML=Object.entries(barcodes).map(([b,n])=>`<div class="item">${esc(b)} → ${esc(n)} <button onclick="deleteBarcode('${esc(b)}')">HAPUS</button></div>`).join('')||'Belum ada barcode.'}
-function deleteBarcode(b){delete barcodes[b];save(K.barcodes,barcodes);renderBarcode()}
-function findBarcode(){const v=barcodeInput.value.trim(),n=barcodes[v];if(!n)return barcodeStatus.textContent='Barcode tidak ditemukan.';addCart(n);barcodeStatus.textContent='Ditambahkan: '+n;barcodeInput.value=''}
-async function startBarcodeCamera(){if(!navigator.mediaDevices?.getUserMedia)return alert('Kamera tidak tersedia.');try{const video=document.getElementById('barcodeVideo');video.style.display='block';const stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}}});video.srcObject=stream;await video.play();if(!('BarcodeDetector'in window))return alert('Scanner otomatis tidak tersedia di WebView ini. Gunakan input barcode.');const detector=new BarcodeDetector();const scan=async()=>{if(video.style.display==='none')return;try{const codes=await detector.detect(video);if(codes.length){barcodeInput.value=codes[0].rawValue;findBarcode();stopBarcodeCamera();return}}catch(e){}requestAnimationFrame(scan)};scan()}catch(e){alert('Kamera tidak bisa dibuka: '+e.message)}}
-function stopBarcodeCamera(){const v=barcodeVideo;if(v.srcObject){v.srcObject.getTracks().forEach(t=>t.stop());v.srcObject=null}v.style.display='none'}
-function saveMarketOrder(){const o={id:Date.now().toString(),source:marketSource.value,order:marketOrderId.value,customer:marketCustomer.value,items:marketItems.value,total:Number(marketTotal.value||0),time:new Date().toLocaleString('id-ID')};if(!o.order)return alert('Nomor order wajib.');market.unshift(o);save(K.market,market);marketOrderId.value='';marketCustomer.value='';marketItems.value='';marketTotal.value='';renderMarket()}
-function renderMarket(){marketList.innerHTML=market.slice(0,50).map(o=>`<div class="item"><b>${esc(o.source)} #${esc(o.order)}</b><br>${esc(o.customer)} — ${esc(o.items)} — ${rupiah(o.total)}<br>${esc(o.time)}</div>`).join('')||'Belum ada pesanan marketplace.'}
-function inRange(iso,mode){const d=new Date(iso),now=new Date();if(mode==='today')return d.toDateString()===now.toDateString();if(mode==='week'){const n=new Date(now);n.setDate(now.getDate()-6);return d>=new Date(n.toDateString())}return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear()}
-function setReport(m,btn){reportMode=m;document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('on'));if(btn)btn.classList.add('on');renderReport()}
-function renderReport(){const a=tx.filter(x=>inRange(x.time,reportMode)),total=a.reduce((s,x)=>s+x.total,0);report.innerHTML=`<h3>REKAP ${reportMode.toUpperCase()}</h3><p>Transaksi: ${a.length}</p><p>Omzet: <b>${rupiah(total)}</b></p>`+a.slice(0,50).map(x=>`<div class="item">${esc(x.customer)} — ${rupiah(x.total)} — ${esc(x.payment)} — ${esc(x.user)}<br>${new Date(x.time).toLocaleString('id-ID')}</div>`).join('')}
-function saveAccount(){const u=newUser.value.trim(),p=newPass.value.trim(),r=newRole.value;if(!u||!p)return alert('Username dan password wajib.');if(accounts.some(a=>a.u===u))return alert('Username sudah ada.');accounts.push({u,p,r});save(K.accounts,accounts);newUser.value='';newPass.value='';renderAccounts()}
-function renderAccounts(){accountList.innerHTML=accounts.map((a,i)=>`<div class="item"><b>${esc(a.u)}</b> — ${esc(a.r)} ${a.u==='owner'?'':'<button onclick="deleteAccount('+i+')">HAPUS</button>'}</div>`).join('')}
-function deleteAccount(i){if(!confirm('Hapus akun?'))return;accounts.splice(i,1);save(K.accounts,accounts);renderAccounts()}
-function backupData(){const data={version:4,at:new Date().toISOString(),accounts,menus,tx,employees,att,stock,barcodes,market};const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));a.download='IQIHLO-ES-TEH-backup.json';a.click();URL.revokeObjectURL(a.href)}
-function restoreData(file){if(!file)return;const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);if(d.version!==4)throw Error('Versi backup tidak cocok');if(Array.isArray(d.accounts))accounts=d.accounts;if(Array.isArray(d.menus))menus=d.menus;if(Array.isArray(d.tx))tx=d.tx;if(Array.isArray(d.employees))employees=d.employees;if(Array.isArray(d.att))att=d.att;if(Array.isArray(d.stock))stock=d.stock;if(d.barcodes&&typeof d.barcodes==='object')barcodes=d.barcodes;if(Array.isArray(d.market))market=d.market;Object.entries({accounts,menus,tx,employees,att,stock,barcodes,market}).forEach(([k,v])=>save(K[k],v));renderCats();renderMenus();renderManagers();renderBarcode();renderMarket();renderReport();renderStock();renderEmployees();renderAccounts();alert('Backup berhasil dipulihkan.')}catch(e){alert('Backup gagal: '+e.message)}};r.readAsText(file)}
-function resetLocalData(){if(!confirm('Hapus semua data lokal?'))return;Object.values(K).forEach(k=>localStorage.removeItem(k));location.reload()}
-async function biometricLogin(){if(window.AndroidBiometric&&AndroidBiometric.authenticateLogin)AndroidBiometric.authenticateLogin();else loginMsg.textContent='Sidik jari tersedia setelah APK Android terpasang.'}
-function ownerBiometricSuccess(){const a=accounts.find(x=>x.r==='OWNER');if(a){session=a;applySession();}}
-function ownerBiometricFailed(){loginMsg.textContent='Verifikasi sidik jari gagal.'}
-function loginSystem(){const u=loginUser.value.trim(),p=loginPass.value;const a=accounts.find(x=>x.u===u&&x.p===p);if(!a){loginMsg.textContent='Username atau password salah.';return}session=a;applySession()}
-function applySession(){if(!session){document.getElementById('app').style.display='none';document.getElementById('loginScreen').style.display='flex';return}document.getElementById('loginScreen').style.display='none';document.getElementById('app').style.display='block';currentUser.textContent=session.u;currentRole.textContent=session.r;document.querySelectorAll('.admin-only').forEach(e=>e.style.display=(session.r==='OWNER'||session.r==='ADMIN')?'block':'none');document.querySelectorAll('.owner-only').forEach(e=>e.style.display=session.r==='OWNER'?'block':'none')}
-function lockApp(){session=null;applySession();loginPass.value='';loginUser.value=''}
-function exitApp(){if(confirm('Keluar dari aplikasi?')){if(window.AndroidApp&&AndroidApp.exitApp)AndroidApp.exitApp();else lockApp()}}
-function listPrinters(){if(window.AndroidPrinter&&AndroidPrinter.listPairedPrinters)AndroidPrinter.listPairedPrinters();else printerList.innerHTML='<div class="panel">Fitur printer tersedia di APK Android.</div>'}
-function printerListResult(json){try{const a=JSON.parse(json);printerList.innerHTML=a.map((x,i)=>`<button class="full" style="margin:5px 0" onclick="connectPrinter(${i})">${esc(x.name)}<br><small>${esc(x.address)}</small></button>`).join('')||'Tidak ada printer Bluetooth yang sudah dipasangkan.';window._printers=a}catch(e){printerList.textContent='Gagal membaca printer.'}}
-function connectPrinter(i){const p=window._printers[i];selectedPrinter=p;save(K.printer,p);if(window.AndroidPrinter&&AndroidPrinter.connectPrinter)AndroidPrinter.connectPrinter(p.address);printerStatus.textContent='Menghubungkan: '+p.name}
-function printerConnected(ok,msg){printerStatus.textContent=ok?'Terhubung: '+msg:'Gagal: '+msg}
+ }else{
+  window.print();
+ }
+}
+
+function cetakData(id){
+ const r=tx.find(x=>String(x.id)===String(id));
+ if(!r)return;
+
+ if(window.AndroidPrinter&&AndroidPrinter.printReceipt){
+  AndroidPrinter.printReceipt(JSON.stringify(r));
+ }else{
+  window.print();
+ }
+}
+
+/* TRANSAKSI */
+
+function simpanTransaksi(){
+ if(!cart.length){
+  alert('Pesanan masih kosong.');
+  return;
+ }
+
+ const t=totalCart();
+ const cash=Number(cashReceived.value||0);
+
+ if(payment==='Cash'&&cash<t){
+  alert('Uang diterima kurang.');
+  return;
+ }
+
+ const rec={
+  id:Date.now().toString(),
+  time:new Date().toISOString(),
+  customer:nama.value||'Umum',
+  user:session?.u||'-',
+  payment:payment,
+  total:t,
+  cash:cash,
+  change:payment==='Cash'?cash-t:0,
+  items:cart.map(x=>({
+   n:String(x.n),
+   p:Number(x.p)||0,
+   q:Number(x.q)||1,
+   subtotal:(Number(x.p)||0)*(Number(x.q)||1)
+  }))
+ };
+
+ tx.unshift(rec);
+ save(K.tx,tx);
+
+ cart.forEach(x=>{
+  const s=stock.find(a=>a.n===x.n);
+  if(s)s.q=Math.max(0,s.q-x.q);
+ });
+
+ save(K.stock,stock);
+ renderStock();
+ renderReport();
+
+ alert('Transaksi tersimpan.');
+}
+
+function tambahMenuBaru(){
+ const n=newMenuName.value.trim();
+ const p=Number(newMenuPrice.value);
+ const c=newMenuCat.value;
+
+ if(!n||p<=0)return alert('Nama dan harga wajib diisi.');
+ if(menus.some(x=>x.n.toLowerCase()===n.toLowerCase()))
+  return alert('Menu sudah ada.');
+
+ menus.push({n,p,c});
+ save(K.menus,menus);
+
+ if(!stock.find(x=>x.n===n))stock.push({n,q:100});
+ save(K.stock,stock);
+
+ newMenuName.value='';
+ newMenuPrice.value='';
+
+ renderMenus();
+ renderManagers();
+ renderStock();
+}
+
+function renderManagers(){
+ harga.innerHTML=menus.map((m,i)=>
+ `<div class="item">
+  ${esc(m.n)}
+  <input style="width:110px;padding:6px" type="number"
+  value="${m.p}" onchange="changePrice(${i},this.value)">
+  <button onclick="deleteMenu(${i})">HAPUS</button>
+ </div>`
+ ).join('');
+
+ if(window.menuTambahanList)menuTambahanList.innerHTML='';
+}
+
+function changePrice(i,v){
+ const p=Number(v);
+ if(p>0){
+  menus[i].p=p;
+  save(K.menus,menus);
+  renderMenus();
+  renderManagers();
+ }
+}
+
+function deleteMenu(i){
+ if(!confirm('Hapus menu ini?'))return;
+ const n=menus[i].n;
+ menus.splice(i,1);
+ save(K.menus,menus);
+ stock=stock.filter(x=>x.n!==n);
+ save(K.stock,stock);
+ renderMenus();
+ renderManagers();
+ renderStock();
+}
+
+/* KARYAWAN */
+
+function addEmployee(){
+ const n=employeeName.value.trim();
+ const r=employeeRole.value.trim()||'Karyawan';
+
+ if(!n)return alert('Nama wajib diisi.');
+
+ employees.push({id:Date.now().toString(),n,r});
+ save(K.employees,employees);
+
+ employeeName.value='';
+ employeeRole.value='';
+ renderEmployees();
+}
+
+function renderEmployees(){
+ employeeList.innerHTML=employees.map(e=>
+ `<div class="item">
+ <b>${esc(e.n)}</b> — ${esc(e.r)}<br>
+ <button onclick="absen('${esc(e.id)}','MASUK')">ABSEN MASUK</button>
+ <button onclick="absen('${esc(e.id)}','PULANG')">ABSEN PULANG</button>
+ </div>`
+ ).join('')||'Belum ada karyawan.';
+
+ attendanceHistory.innerHTML=
+ '<h4>RIWAYAT ABSEN</h4>'+
+ att.slice(0,50).map(a=>
+ `<div>${esc(a.time)} — ${esc(a.n)} — ${esc(a.type)} — ${esc(a.user)}</div>`
+ ).join('')||'Belum ada data.';
+}
+
+function absen(id,type){
+ const e=employees.find(x=>x.id===id);
+ if(!e)return;
+
+ if(window.AndroidBiometric&&AndroidBiometric.authenticateAttendance){
+  window.pendingAttendance={id,type};
+  AndroidBiometric.authenticateAttendance(e.n,type);
+ }else attendanceBiometricSuccess();
+}
+
+function attendanceBiometricSuccess(){
+ const p=window.pendingAttendance;
+ if(!p)return;
+
+ const e=employees.find(x=>x.id===p.id);
+ if(!e)return;
+
+ att.unshift({
+  time:new Date().toLocaleString('id-ID'),
+  n:e.n,
+  type:p.type,
+  user:session?.u||'-'
+ });
+
+ save(K.att,att);
+ renderEmployees();
+ window.pendingAttendance=null;
+}
+
+function attendanceBiometricFailed(){
+ window.pendingAttendance=null;
+}
+
+/* STOK */
+
+function renderStock(){
+ stockList.innerHTML=stock.map((s,i)=>
+ `<div class="item">
+ <b>${esc(s.n)}</b> — Stok:
+ <span class="${s.q<=10?'low':''}">${s.q}</span><br>
+ <button onclick="stockAdj(${i},-1)">−</button>
+ <button onclick="stockAdj(${i},1)">+</button>
+ <input style="width:90px;padding:6px" type="number"
+ value="${s.q}" onchange="setStock(${i},this.value)">
+ </div>`
+ ).join('');
+}
+
+function stockAdj(i,d){
+ stock[i].q=Math.max(0,stock[i].q+d);
+ save(K.stock,stock);
+ renderStock();
+}
+
+function setStock(i,v){
+ stock[i].q=Math.max(0,Number(v));
+ save(K.stock,stock);
+ renderStock();
+}
+
+/* BARCODE */
+
+function saveBarcode(){
+ const m=barcodeMenu.value;
+ const v=barcodeValue.value.trim();
+
+ if(!m||!v)return alert('Menu dan barcode wajib.');
+
+ barcodes[v]=m;
+ save(K.barcodes,barcodes);
+
+ barcodeValue.value='';
+ renderBarcode();
+}
+
+function renderBarcode(){
+ barcodeMenu.innerHTML=menus.map(m=>
+  `<option>${esc(m.n)}</option>`
+ ).join('');
+
+ barcodeList.innerHTML=
+ Object.entries(barcodes).map(([b,n])=>
+ `<div class="item">${esc(b)} → ${esc(n)}
+ <button onclick="deleteBarcode('${esc(b)}')">HAPUS</button></div>`
+ ).join('')||'Belum ada barcode.';
+}
+
+function deleteBarcode(b){
+ delete barcodes[b];
+ save(K.barcodes,barcodes);
+ renderBarcode();
+}
+
+function findBarcode(){
+ const v=barcodeInput.value.trim();
+ const n=barcodes[v];
+
+ if(!n){
+  barcodeStatus.textContent='Barcode tidak ditemukan.';
+  return;
+ }
+
+ addCart(n);
+ barcodeStatus.textContent='Ditambahkan: '+n;
+ barcodeInput.value='';
+}
+
+async function startBarcodeCamera(){
+ if(!navigator.mediaDevices?.getUserMedia)
+  return alert('Kamera tidak tersedia.');
+
+ try{
+  const video=barcodeVideo;
+  video.style.display='block';
+
+  const stream=await navigator.mediaDevices.getUserMedia({
+   video:{facingMode:{ideal:'environment'}}
+  });
+
+  video.srcObject=stream;
+  await video.play();
+
+  if(!('BarcodeDetector'in window))
+   return alert('Scanner otomatis tidak tersedia di WebView ini. Gunakan input barcode.');
+
+  const detector=new BarcodeDetector();
+
+  const scan=async()=>{
+   if(video.style.display==='none')return;
+
+   try{
+    const codes=await detector.detect(video);
+    if(codes.length){
+     barcodeInput.value=codes[0].rawValue;
+     findBarcode();
+     stopBarcodeCamera();
+     return;
+    }
+   }catch(e){}
+
+   requestAnimationFrame(scan);
+  };
+
+  scan();
+ }catch(e){
+  alert('Kamera tidak bisa dibuka: '+e.message);
+ }
+}
+
+function stopBarcodeCamera(){
+ if(barcodeVideo.srcObject){
+  barcodeVideo.srcObject.getTracks().forEach(t=>t.stop());
+  barcodeVideo.srcObject=null;
+ }
+ barcodeVideo.style.display='none';
+}
+
+/* MARKETPLACE */
+
+function saveMarketOrder(){
+ const o={
+  id:Date.now().toString(),
+  source:marketSource.value,
+  order:marketOrderId.value,
+  customer:marketCustomer.value,
+  items:marketItems.value,
+  total:Number(marketTotal.value||0),
+  time:new Date().toLocaleString('id-ID')
+ };
+
+ if(!o.order)return alert('Nomor order wajib.');
+
+ market.unshift(o);
+ save(K.market,market);
+
+ marketOrderId.value='';
+ marketCustomer.value='';
+ marketItems.value='';
+ marketTotal.value='';
+
+ renderMarket();
+}
+
+function renderMarket(){
+ marketList.innerHTML=market.slice(0,50).map(o=>
+ `<div class="item">
+ <b>${esc(o.source)} #${esc(o.order)}</b><br>
+ ${esc(o.customer)} — ${esc(o.items)} — ${rupiah(o.total)}<br>
+ ${esc(o.time)}
+ </div>`
+ ).join('')||'Belum ada pesanan marketplace.';
+}
+
+/* LAPORAN */
+
+function inRange(iso,mode){
+ const d=new Date(iso),now=new Date();
+
+ if(mode==='today')return d.toDateString()===now.toDateString();
+
+ if(mode==='week'){
+  const n=new Date(now);
+  n.setDate(now.getDate()-6);
+  return d>=new Date(n.toDateString());
+ }
+
+ return d.getMonth()===now.getMonth()&&
+        d.getFullYear()===now.getFullYear();
+}
+
+function setReport(m,btn){
+ reportMode=m;
+ document.querySelectorAll('.tabs button')
+  .forEach(x=>x.classList.remove('on'));
+ if(btn)btn.classList.add('on');
+ renderReport();
+}
+
+function renderReport(){
+ const a=tx.filter(x=>inRange(x.time,reportMode));
+ const t=a.reduce((s,x)=>s+Number(x.total||0),0);
+
+ report.innerHTML=
+ `<h3>REKAP ${reportMode.toUpperCase()}</h3>
+ <p>Transaksi: ${a.length}</p>
+ <p>Omzet: <b>${rupiah(t)}</b></p>`+
+ a.slice(0,50).map(x=>
+ `<div class="item">
+ ${esc(x.customer)} — ${rupiah(x.total)} — ${esc(x.payment)} — ${esc(x.user)}<br>
+ ${new Date(x.time).toLocaleString('id-ID')}
+ </div>`
+ ).join('');
+}
+
+/* AKUN & BACKUP */
+
+function saveAccount(){
+ const u=newUser.value.trim();
+ const p=newPass.value.trim();
+ const r=newRole.value;
+
+ if(!u||!p)return alert('Username dan password wajib.');
+ if(accounts.some(a=>a.u===u))return alert('Username sudah ada.');
+
+ accounts.push({u,p,r});
+ save(K.accounts,accounts);
+
+ newUser.value='';
+ newPass.value='';
+ renderAccounts();
+}
+
+function renderAccounts(){
+ accountList.innerHTML=accounts.map((a,i)=>
+ `<div class="item"><b>${esc(a.u)}</b> — ${esc(a.r)}
+ ${a.u==='owner'?'':'<button onclick="deleteAccount('+i+')">HAPUS</button>'}
+ </div>`
+ ).join('');
+}
+
+function deleteAccount(i){
+ if(!confirm('Hapus akun?'))return;
+ accounts.splice(i,1);
+ save(K.accounts,accounts);
+ renderAccounts();
+}
+
+function backupData(){
+ const data={
+  version:4,
+  at:new Date().toISOString(),
+  accounts,menus,tx,employees,att,stock,barcodes,market
+ };
+
+ const a=document.createElement('a');
+ a.href=URL.createObjectURL(
+  new Blob([JSON.stringify(data,null,2)],
+  {type:'application/json'})
+ );
+ a.download='IQIHLO-ES-TEH-backup.json';
+ a.click();
+}
+
+function restoreData(file){
+ if(!file)return;
+
+ const r=new FileReader();
+
+ r.onload=()=>{
+  try{
+   const d=JSON.parse(r.result);
+
+   if(d.version!==4)throw Error('Versi backup tidak cocok');
+
+   if(Array.isArray(d.accounts))accounts=d.accounts;
+   if(Array.isArray(d.menus))menus=d.menus;
+   if(Array.isArray(d.tx))tx=d.tx;
+   if(Array.isArray(d.employees))employees=d.employees;
+   if(Array.isArray(d.att))att=d.att;
+   if(Array.isArray(d.stock))stock=d.stock;
+   if(d.barcodes&&typeof d.barcodes==='object')barcodes=d.barcodes;
+   if(Array.isArray(d.market))market=d.market;
+
+   Object.entries({accounts,menus,tx,employees,att,stock,barcodes,market})
+   .forEach(([k,v])=>save(K[k],v));
+
+   renderCats();
+   renderMenus();
+   renderManagers();
+   renderBarcode();
+   renderMarket();
+   renderReport();
+   renderStock();
+   renderEmployees();
+   renderAccounts();
+
+   alert('Backup berhasil dipulihkan.');
+  }catch(e){
+   alert('Backup gagal: '+e.message);
+  }
+ };
+
+ r.readAsText(file);
+}
+
+function resetLocalData(){
+ if(!confirm('Hapus semua data lokal?'))return;
+ Object.values(K).forEach(k=>localStorage.removeItem(k));
+ location.reload();
+}
+
+/* LOGIN */
+
+async function biometricLogin(){
+ if(window.AndroidBiometric&&AndroidBiometric.authenticateLogin)
+  AndroidBiometric.authenticateLogin();
+ else
+  loginMsg.textContent='Sidik jari tersedia setelah APK Android terpasang.';
+}
+
+function ownerBiometricSuccess(){
+ const a=accounts.find(x=>x.r==='OWNER');
+ if(a){
+  session=a;
+  applySession();
+ }
+}
+
+function ownerBiometricFailed(){
+ loginMsg.textContent='Verifikasi sidik jari gagal.';
+}
+
+function loginSystem(){
+ const u=loginUser.value.trim();
+ const p=loginPass.value;
+ const a=accounts.find(x=>x.u===u&&x.p===p);
+
+ if(!a){
+  loginMsg.textContent='Username atau password salah.';
+  return;
+ }
+
+ session=a;
+ applySession();
+}
+
+function applySession(){
+ if(!session){
+  app.style.display='none';
+  loginScreen.style.display='flex';
+  return;
+ }
+
+ loginScreen.style.display='none';
+ app.style.display='block';
+
+ currentUser.textContent=session.u;
+ currentRole.textContent=session.r;
+
+ document.querySelectorAll('.admin-only').forEach(e=>
+  e.style.display=(session.r==='OWNER'||session.r==='ADMIN')?'block':'none'
+ );
+
+ document.querySelectorAll('.owner-only').forEach(e=>
+  e.style.display=session.r==='OWNER'?'block':'none'
+ );
+}
+
+function lockApp(){
+ session=null;
+ applySession();
+ loginPass.value='';
+ loginUser.value='';
+}
+
+function exitApp(){
+ if(confirm('Keluar dari aplikasi?')){
+  if(window.AndroidApp&&AndroidApp.exitApp)
+   AndroidApp.exitApp();
+  else
+   lockApp();
+ }
+}
+
+/* PRINTER BLUETOOTH */
+
+function listPrinters(){
+ if(window.AndroidPrinter&&AndroidPrinter.listPairedPrinters){
+  printerStatus.textContent='Membaca printer Bluetooth...';
+  AndroidPrinter.listPairedPrinters();
+ }else{
+  printerList.innerHTML='<div class="panel">Fitur printer tersedia di APK Android.</div>';
+ }
+}
+
+function printerListResult(json){
+ try{
+  const a=JSON.parse(json);
+  window._printers=a;
+
+  printerList.innerHTML=a.map((x,i)=>
+   `<button class="full" style="margin:5px 0"
+   onclick="connectPrinter(${i})">
+   🖨️ ${esc(x.name)}<br>
+   <small>${esc(x.address)}</small>
+   </button>`
+  ).join('')||'Tidak ada printer Bluetooth yang sudah dipasangkan.';
+
+ }catch(e){
+  printerList.textContent='Gagal membaca printer.';
+ }
+}
+
+function connectPrinter(i){
+ const p=window._printers?.[i];
+
+ if(!p){
+  printerStatus.textContent='Printer tidak ditemukan.';
+  return;
+ }
+
+ selectedPrinter={
+  name:p.name,
+  address:p.address
+ };
+
+ save(K.printer,selectedPrinter);
+
+ printerStatus.textContent='Menghubungkan: '+p.name;
+
+ if(window.AndroidPrinter&&AndroidPrinter.connectPrinter)
+  AndroidPrinter.connectPrinter(p.address);
+}
+
+function autoConnectPrinter(){
+ if(!selectedPrinter?.address)return;
+
+ if(window.AndroidPrinter&&AndroidPrinter.connectPrinter){
+  printerStatus.textContent=
+   'Menghubungkan otomatis: '+selectedPrinter.name;
+
+  AndroidPrinter.connectPrinter(selectedPrinter.address);
+ }
+}
+
+function printerConnected(ok,msg){
+ printerStatus.textContent=
+  ok?'✓ Terhubung: '+msg:'✗ Gagal: '+msg;
+}
+
 document.addEventListener('DOMContentLoaded',init);
-window.attendanceBiometricSuccess=attendanceBiometricSuccess;window.attendanceBiometricFailed=attendanceBiometricFailed;window.ownerBiometricSuccess=ownerBiometricSuccess;window.ownerBiometricFailed=ownerBiometricFailed;window.printerListResult=printerListResult;window.printerConnected=printerConnected;
-</script>
+
+window.attendanceBiometricSuccess=attendanceBiometricSuccess;
+window.attendanceBiometricFailed=attendanceBiometricFailed;
+window.ownerBiometricSuccess=ownerBiometricSuccess;
+window.ownerBiometricFailed=ownerBiometricFailed;
+window.printerListResult=printerListResult;
+window.printerConnected=printerConnected;
+             </script>
 </body></html>
