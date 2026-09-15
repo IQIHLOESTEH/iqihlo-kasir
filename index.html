@@ -252,21 +252,25 @@ details{
  }
 
  .rrow{
-   display:grid;
-   grid-template-columns:minmax(0,1fr) auto;
-   gap:4px;
-   width:100%
- }
+ display:flex;
+ justify-content:space-between;
+ align-items:flex-start;
+ gap:6px;
+ width:100%
+}
 
- .rrow span:first-child{
-   min-width:0;
-   overflow-wrap:anywhere;
- }
+.rrow span:first-child{
+ flex:1 1 auto;
+ min-width:0;
+ overflow-wrap:anywhere;
+}
 
- .rrow span:last-child{
-   white-space:nowrap;
-   text-align:right;
- }
+.rrow span:last-child{
+ flex:0 0 auto;
+ min-width:18mm;
+ white-space:nowrap;
+ text-align:right;
+}
 
  *{
    color:#000 !important;
@@ -557,7 +561,7 @@ function hapusRekap(index){
 
  if(index<0 || index>=r.length)return;
 
- if(!confirm("Hapus transaksi ini?"))return;
+ 
 
  r.splice(index,1);
 
