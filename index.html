@@ -252,25 +252,12 @@ details{
  }
 
  .rrow{
- display:flex;
- justify-content:space-between;
- align-items:flex-start;
- gap:6px;
- width:100%
-}
-
-.rrow span:first-child{
- flex:1 1 auto;
- min-width:0;
+ display:block;
+ width:100%;
+ margin:0 0 2px 0;
+ white-space:normal;
  overflow-wrap:anywhere;
-}
-
-.rrow span:last-child{
- flex:0 0 auto;
- min-width:18mm;
- white-space:nowrap;
- text-align:right;
-}
+ }
 
  *{
    color:#000 !important;
@@ -593,11 +580,10 @@ function cetak(){
 
    tot+=sub;
 
-   h+=`
-   <div class="rrow">
-     <span>${n} x${q}</span>
-     <span>${rupiah(sub)}</span>
-   </div>`;
+   const qtyText=q>1?` x${q}`:"";
+
+h+=`
+<div class="rrow">${n}${qtyText} Rp. ${Number(sub).toLocaleString("id-ID")}</div>`;
  });
 
  $("rnama").textContent=$("nama").value||"-";
