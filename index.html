@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#925500">
-<title>IQIHLO ES TEH - KASIR V3.0</title>
+<title>IQIHLO ES TEH - KASIR PREMIUM</title>
 
 <style>
 *{box-sizing:border-box}
@@ -19,7 +19,7 @@ body{
 }
 
 .box{
- max-width:760px;
+ max-width:700px;
  margin:auto;
  background:#fff;
  padding:18px;
@@ -40,41 +40,40 @@ h3{
  color:#d38a00
 }
 
-h4{
- color:#8d5200
-}
-
 label{
  display:block;
- margin:12px 0 7px
+ font-weight:bold;
+ margin:16px 0 7px
 }
 
-input,select{
+input{
  width:100%;
+ font-weight:700;
  padding:13px;
  font-size:16px;
- font-weight:700;
  border:1px solid #aaa;
  border-radius:10px
-}
-
-button{
- display:block;
- position:relative;
- z-index:5;
- pointer-events:auto!important;
- touch-action:manipulation;
- padding:13px;
- border-radius:11px;
- font-weight:bold;
- font-size:14px;
- cursor:pointer
 }
 
 .grid{
  display:grid;
  grid-template-columns:repeat(2,1fr);
  gap:8px
+}
+
+button{
+ display:block;
+ position:relative;
+ z-index:5;
+ pointer-events:auto !important;
+ touch-action:manipulation;
+ -webkit-user-select:none;
+ user-select:none;
+ padding:13px;
+ border-radius:11px;
+ font-weight:bold;
+ font-size:14px;
+ cursor:pointer
 }
 
 .cat{
@@ -114,7 +113,6 @@ button{
 }
 
 .item button{
- display:inline-block;
  padding:4px 10px;
  background:#fff3bd;
  border:1px solid #c99719
@@ -123,6 +121,7 @@ button{
 .total{
  text-align:right;
  font-size:25px;
+ font-weight:900;
  margin:20px 0;
  color:#8d5200
 }
@@ -132,7 +131,8 @@ button{
  background:#925500;
  color:#fff;
  border:0;
- font-size:17px
+ font-size:17px;
+ padding:15px
 }
 
 .clear{
@@ -140,12 +140,6 @@ button{
  background:#fff;
  border:1px solid #aaa;
  margin-top:8px
-}
-
-.danger{
- background:#fff;
- color:#a00000;
- border:1px solid #a00000
 }
 
 .pay{
@@ -171,11 +165,6 @@ details{
  border-radius:10px
 }
 
-details summary{
- cursor:pointer;
- padding:4px
-}
-
 .p{
  display:flex;
  gap:6px;
@@ -193,170 +182,6 @@ details summary{
  padding:7px
 }
 
-.box-section{
- margin-top:14px;
- padding:13px;
- border:2px solid #dfb52d;
- border-radius:14px;
- background:#fffdf4
-}
-
-.btn{
- width:100%;
- background:#925500;
- color:#fff;
- border:0
-}
-
-.btn2{
- width:100%;
- background:#fff3bd;
- color:#704300;
- border:1px solid #c99719
-}
-
-.menu-row{
- display:flex;
- gap:7px;
- align-items:center;
- padding:8px 0;
- border-bottom:1px solid #eee
-}
-
-.menu-row .mn{
- flex:1;
- font-size:13px
-}
-
-.menu-row small{
- display:block;
- color:#8d5200
-}
-
-.employee-card{
- padding:10px 0;
- border-bottom:1px solid #eee
-}
-
-.employee-actions{
- display:grid;
- grid-template-columns:1fr 1fr;
- gap:6px;
- margin-top:7px
-}
-
-.att-status{
- font-size:12px;
- color:#76551f;
- margin-top:3px
-}
-
-.att-table{
- width:100%;
- border-collapse:collapse;
- font-size:12px;
- margin-top:10px
-}
-
-.att-table th,
-.att-table td{
- border:1px solid #ddd;
- padding:7px;
- text-align:left;
- vertical-align:top
-}
-
-.att-table th{
- background:#fff3bd
-}
-
-.stock-row{
- display:grid;
- grid-template-columns:1fr 100px 80px;
- gap:6px;
- align-items:center;
- padding:8px 0;
- border-bottom:1px solid #eee
-}
-
-.stock-low{
- color:#a00000;
- font-weight:900
-}
-
-.stock-ok{
- color:#176b25;
- font-weight:900
-}
-
-.barcode-box{
- padding:12px;
- border:2px dashed #c99b20;
- border-radius:12px;
- margin-top:10px
-}
-
-.barcode-result{
- margin-top:8px;
- padding:10px;
- border-radius:10px;
- background:#fff3bd
-}
-
-.order-card{
- padding:10px;
- margin:7px 0;
- border:1px solid #ddd;
- border-radius:10px;
- background:#fff
-}
-
-.order-status{
- display:inline-block;
- padding:5px 8px;
- border-radius:7px;
- background:#fff3bd;
- font-size:12px
-}
-
-.login-overlay{
- position:fixed;
- inset:0;
- background:#fff8d8;
- z-index:99999;
- display:flex;
- align-items:center;
- justify-content:center;
- padding:20px
-}
-
-.login-card{
- width:100%;
- max-width:420px;
- background:#fff;
- padding:24px;
- border-radius:20px;
- box-shadow:0 10px 40px #0003
-}
-
-.login-card h1{
- font-size:26px
-}
-
-.role-info{
- text-align:center;
- margin:8px 0 15px;
- color:#8d5200
-}
-
-.hidden{
- display:none!important
-}
-
-.receipt{
- display:none
-}
-
 .contact{
  text-align:center;
  margin-top:18px;
@@ -367,714 +192,306 @@ details summary{
  line-height:1.8
 }
 
-.user-bar{
- display:flex;
- justify-content:space-between;
- align-items:center;
- gap:8px;
- padding:9px;
- margin-bottom:10px;
- background:#fff3bd;
- border-radius:10px;
- font-size:13px
-}
 
-.user-bar button{
- padding:7px 10px;
- background:#fff;
- border:1px solid #c99719
-}
+.menu-manager{margin-top:14px;padding:12px;border:2px solid #dfb52d;border-radius:14px;background:#fffdf4}
+.menu-manager h4{margin:0 0 10px;color:#8d5200}
+.mm-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.mm-grid .full{grid-column:1/-1}
+.mm-btn{background:#925500;color:#fff;border:0;width:100%;padding:12px;border-radius:10px;font-weight:900}
+.menu-row{display:flex;gap:7px;align-items:center;padding:8px 0;border-bottom:1px solid #eee}
+.menu-row .mn{flex:1;font-size:13px}
+.menu-row small{display:block;color:#8d5200}
+.menu-row button{padding:7px 9px;background:#fff3bd;border:1px solid #c99719}
+@media(max-width:480px){.mm-grid{grid-template-columns:1fr}.mm-grid .full{grid-column:auto}}
 
-.camera-area{
- margin-top:10px;
- border:2px solid #d4a728;
- border-radius:12px;
- padding:10px;
- background:#111
-}
+/* =========================
+   CETAK THERMAL 58 MM
+   ========================= */
 
-#barcodeVideo{
- width:100%;
- max-height:280px;
- border-radius:8px;
- background:#000
+.receipt{
+ display:none
 }
 
 @page{
  size:58mm auto;
- margin:0
+ margin:0;
 }
 
 @media print{
 
- html,body{
-  width:58mm!important;
-  min-width:58mm!important;
-  max-width:58mm!important;
-  margin:0!important;
-  padding:0!important;
-  background:#fff!important
+ html,
+ body{
+   width:58mm !important;
+   min-width:58mm !important;
+   max-width:58mm !important;
+   margin:0 !important;
+   padding:0 !important;
+   background:#fff !important;
  }
 
- .box,
- .login-overlay{
-  display:none!important
+ body{
+   overflow:visible !important;
+ }
+
+ .box{
+   display:none !important;
  }
 
  .receipt{
-  display:block!important;
-  width:58mm!important;
-  min-width:58mm!important;
-  max-width:58mm!important;
-  margin:0!important;
-  padding:2mm!important;
-  font-family:monospace!important;
-  font-size:12px!important;
-  line-height:1.35!important;
-  font-weight:900!important;
-  color:#000!important;
-  background:#fff!important
+   display:block !important;
+   width:58mm !important;
+   min-width:58mm !important;
+   max-width:58mm !important;
+   margin:0 !important;
+   padding:2mm !important;
+   box-sizing:border-box !important;
+   font-family:monospace !important;
+   font-size:12px !important;
+   line-height:1.35 !important;
+   font-weight:900 !important;
+   color:#000 !important;
+   background:#fff !important;
  }
 
  .receipt,
  .receipt *{
-  font-weight:900!important;
-  color:#000!important
+   font-weight:900 !important;
  }
 
  .center{
-  text-align:center
+   text-align:center
  }
 
  .line{
-  border-top:1px dashed #000;
-  margin:6px 0
+   border-top:1px dashed #000;
+   margin:6px 0
  }
 
  .rrow{
-  display:grid;
-  grid-template-columns:minmax(0,1fr) auto;
-  gap:4px
+   display:grid !important;
+   grid-template-columns:minmax(0,1fr) auto !important;
+   gap:8px !important;
+   width:100% !important;
+   align-items:start !important;
+   margin:2px 0 !important;
+ }
+ .rname{
+   min-width:0 !important;
+   overflow-wrap:anywhere !important;
+   word-break:break-word !important;
+   text-align:left !important;
+ }
+ .rprice{
+   min-width:82px !important;
+   width:82px !important;
+   white-space:nowrap !important;
+   text-align:right !important;
+   font-weight:900 !important;
+   display:block !important;
  }
 
- .rrow span:first-child{
-  min-width:0;
-  overflow-wrap:anywhere
- }
-
- .rrow span:last-child{
-  white-space:nowrap;
-  text-align:right
+ *{
+   color:#000 !important;
+   box-shadow:none !important
  }
 }
 
-@media(max-width:520px){
-
- .stock-row{
-  grid-template-columns:1fr 80px 70px
- }
-
- .menu-row{
-  align-items:flex-start
- }
-
- .employee-actions{
-  grid-template-columns:1fr 1fr
- }
-
-}
+/* V3.1 ALL FEATURES */
+.admin-only,.owner-only{display:block}
+.hidden-role{display:none!important}
+.panel{margin-top:14px;padding:14px;border:2px solid #dfb52d;border-radius:14px;background:#fffdf4}
+.panel h4{margin:0 0 10px;color:#8d5200}
+.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.formgrid .full{grid-column:1/-1}
+.vbtn{width:100%;border:0;background:#925500;color:#fff;font-weight:900}
+.vbtn.alt{background:#fff3bd;color:#704300;border:1px solid #c99719}
+.vbtn.danger{background:#fff;color:#900;border:1px solid #b44}
+.badge{display:inline-block;padding:4px 8px;border-radius:99px;background:#fff3bd;color:#704300;font-size:12px}
+.login-wrap{position:fixed;inset:0;background:linear-gradient(135deg,#fff8d8,#fff1a8);display:flex;align-items:center;justify-content:center;padding:18px;z-index:99999}
+.login-card{width:min(420px,100%);background:#fff;padding:22px;border-radius:22px;box-shadow:0 10px 35px #0003}
+.login-card h2{text-align:center;color:#8d5200;margin-top:0}
+.login-subtitle{text-align:center;color:#76551f;font-size:13px;margin:-5px 0 12px}
+.login-role-hint{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:12px}
+.login-role-hint span{text-align:center;padding:7px 4px;border-radius:9px;background:#fff3bd;color:#704300;font-size:11px;font-weight:900}
+.login-main{padding:15px;font-size:16px;box-shadow:0 5px 14px #8d520033}
+.login-security{text-align:center;margin-top:12px;font-size:11px;color:#777;line-height:1.5}
+.user-bar{border:1px solid #dfb52d}
+.stock-low{color:#a00}
+.barcode-result{padding:8px;margin-top:8px;border-radius:8px;background:#fff3bd}
+.att-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:10px}
+.att-table th,.att-table td{border:1px solid #ddd;padding:7px;text-align:left;vertical-align:top}
+.att-table th{background:#fff3bd}
+@media(max-width:480px){.formgrid{grid-template-columns:1fr}.formgrid .full{grid-column:auto}}
 </style>
 </head>
 
 <body>
 
-<!-- =========================
-     LOGIN
-     ========================= -->
-
-<div id="loginOverlay" class="login-overlay">
-
-<div class="login-card">
-
-<h1>IQIHLO ES TEH</h1>
-
-<div class="role-info">
-SISTEM KASIR V3.0
+<div id="loginScreen" class="login-wrap">
+ <div class="login-card">
+  <h2>IQIHLO ES TEH</h2>
+  <div style="text-align:center;margin-bottom:14px">LOGIN SISTEM</div>
+  <div class="login-subtitle">Akses aman berdasarkan jabatan</div>
+  <div class="login-role-hint"><span>OWNER</span><span>ADMIN</span><span>KASIR</span></div>
+  <label>Username</label><input id="loginUser" autocomplete="username" placeholder="Masukkan username">
+  <label>Password</label><input id="loginPass" type="password" autocomplete="current-password" placeholder="Masukkan password">
+  <button type="button" class="vbtn login-main" onclick="loginSystem()">MASUK KE SISTEM</button>
+  <div id="loginMsg" style="text-align:center;margin-top:10px;color:#900"></div>
+  <div class="login-security">🔐 Password OWNER dan KASIR berbeda. Hak akses mengikuti jabatan.</div>
+ </div>
 </div>
 
-<label>Username</label>
-
-<input
- id="loginUser"
- type="text"
- placeholder="Username"
- autocomplete="username"
->
-
-<label>Password</label>
-
-<input
- id="loginPass"
- type="password"
- placeholder="Password"
- autocomplete="current-password"
->
-
-<button
- class="btn"
- type="button"
- onclick="login()"
- style="margin-top:12px"
->
-MASUK
-</button>
-
-<div
- style="
- margin-top:12px;
- text-align:center;
- font-size:12px;
- color:#777
- "
->
-Owner default: <b>owner</b> / <b>4826</b>
-</div>
-
-</div>
-
-</div>
-
-
-<!-- =========================
-     APLIKASI
-     ========================= -->
 
 <div class="box">
 
-<div class="user-bar">
-
-<div>
-👤 <span id="loggedUser">-</span>
-</div>
-
-<button
- type="button"
- onclick="logout()"
->
-KELUAR
-</button>
-
-</div>
-
-
 <h1>IQIHLO ES TEH</h1>
-
 <h3>SEGARNYA BEDA!</h3>
-
-
-<!-- =========================
-     KASIR
-     ========================= -->
-
-<section id="kasirSection">
+<div style="text-align:center;margin-bottom:8px"><span class="badge">Login: <span id="currentUser">-</span> • <span id="currentRole">-</span></span></div>
 
 <label>Nama Pelanggan</label>
-
-<input
- id="nama"
- placeholder="Masukkan nama pelanggan"
->
-
+<input id="nama" placeholder="Masukkan nama pelanggan">
 
 <label>Pilih Kategori</label>
-
-<div
- class="grid"
- id="kategori"
-></div>
-
+<div class="grid" id="kategori"></div>
 
 <label>Pilih Menu</label>
-
-<div
- class="grid"
- id="menu"
-></div>
-
-
-<!-- BARCODE -->
-
-<div class="barcode-box">
-
-<b>📦 BARCODE MENU</b>
-
-<input
- id="barcodeInput"
- style="margin-top:8px"
- placeholder="Masukkan / scan barcode"
- onkeydown="barcodeEnter(event)"
->
-
-<div class="grid" style="margin-top:8px">
-
-<button
- type="button"
- class="btn2"
- onclick="cariBarcode()"
->
-CARI BARCODE
-</button>
-
-<button
- type="button"
- class="btn2"
- onclick="startBarcodeCamera()"
->
-📷 SCAN KAMERA
-</button>
-
-</div>
-
-<div
- id="barcodeResult"
- class="barcode-result hidden"
-></div>
-
-<div
- id="cameraArea"
- class="camera-area hidden"
->
-
-<video
- id="barcodeVideo"
- autoplay
- playsinline
-></video>
-
-<button
- type="button"
- class="btn2"
- onclick="stopBarcodeCamera()"
- style="margin-top:8px"
->
-TUTUP KAMERA
-</button>
-
-</div>
-
-</div>
-
+<div class="grid" id="menu"></div>
 
 <label>Metode Pembayaran</label>
-
 <div class="pay">
-
-<button
- id="cash"
- type="button"
- onclick="pilihBayar('Cash')"
->
-CASH
-</button>
-
-<button
- id="qris"
- type="button"
- onclick="pilihBayar('QRIS')"
->
-QRIS
-</button>
-
+<button id="cash" onclick="pilihBayar('Cash')">CASH</button>
+<button id="qris" onclick="pilihBayar('QRIS')">QRIS</button>
 </div>
-
 
 <div class="cart">
-
 <b>DAFTAR PESANAN</b>
-
-<div id="pesanan">
-Belum ada pesanan
+<div id="pesanan">Belum ada pesanan</div>
 </div>
-
-</div>
-
 
 <div class="total">
-
-TOTAL:
-<span id="total">Rp0</span>
-
+TOTAL: <span id="total">Rp0</span>
 </div>
 
+<button class="print" onclick="cetak()">CETAK STRUK</button>
+<button class="clear" onclick="hapus()">KOSONGKAN PESANAN</button>
 
-<button
- class="print"
- type="button"
- onclick="cetak()"
->
-CETAK STRUK
-</button>
-
-
-<button
- class="clear"
- type="button"
- onclick="hapus()"
->
-KOSONGKAN PESANAN
-</button>
-
-</section>
-
-
-<!-- =========================
-     KELOLA MENU
-     ========================= -->
-
-<details id="menuManagerSection">
-
-<summary>
-<b>⚙️ ATUR HARGA & KELOLA MENU</b>
-</summary>
-
-<p>
-Harga dan menu tersimpan otomatis di perangkat.
-</p>
-
+<details>
+<summary><b>ATUR HARGA & KELOLA MENU</b></summary>
+<p>Harga dan menu baru tersimpan otomatis di perangkat ini.</p>
 <div id="harga"></div>
 
-
-<div class="box-section">
-
-<h4 style="margin-top:0">
-➕ TAMBAH MENU BARU
-</h4>
-
-<input
- id="newMenuName"
- placeholder="Nama menu baru"
->
-
-<input
- id="newMenuPrice"
- type="number"
- min="1"
- step="500"
- placeholder="Harga"
- style="margin-top:8px"
->
-
-<select
- id="newMenuCat"
- style="margin-top:8px"
-></select>
-
-<input
- id="newMenuBarcode"
- placeholder="Barcode menu (opsional)"
- style="margin-top:8px"
->
-
-<button
- type="button"
- class="btn"
- onclick="tambahMenuBaru()"
- style="margin-top:8px"
->
-SIMPAN MENU BARU
-</button>
-
+<div class="menu-manager">
+  <h4>➕ TAMBAH MENU BARU</h4>
+  <div class="mm-grid">
+    <input id="newMenuName" class="full" type="text" placeholder="Nama menu baru">
+    <input id="newMenuPrice" type="number" min="1" step="500" placeholder="Harga (contoh 5000)">
+    <select id="newMenuCat" style="width:100%;font-weight:700;padding:13px;font-size:16px;border:1px solid #aaa;border-radius:10px"></select>
+    <button type="button" class="mm-btn full" onclick="tambahMenuBaru()">SIMPAN MENU BARU</button>
+  </div>
+  <div id="menuTambahanList" style="margin-top:10px"></div>
 </div>
-
-
-<div
- id="menuTambahanList"
- style="margin-top:10px"
-></div>
-
 </details>
 
-
-<!-- =========================
-     KARYAWAN & ABSEN
-     ========================= -->
-
-<details id="attendanceSection">
-
-<summary>
-<b>👥 KARYAWAN & ABSEN</b>
-</summary>
-
-
-<div class="box-section">
-
-<h4 style="margin:0 0 10px">
-TAMBAH KARYAWAN
-</h4>
-
-<input
- id="employeeName"
- placeholder="Nama karyawan"
->
-
-<input
- id="employeeRole"
- placeholder="Jabatan"
- style="margin-top:8px"
->
-
-<button
- type="button"
- class="btn"
- onclick="tambahKaryawan()"
- style="margin-top:8px"
->
-SIMPAN KARYAWAN
-</button>
-
-</div>
-
-
-<div
- id="employeeList"
- class="box-section"
->
-</div>
-
-
-<div class="box-section">
-
-<h4 style="margin:0">
-RIWAYAT ABSEN
-</h4>
-
-<div id="attendanceHistory">
-Belum ada data absen.
-</div>
-
-</div>
-
+<!-- V3.1 KARYAWAN / ABSEN -->
+<details class="admin-only" id="employeePanel">
+ <summary><b>👥 KARYAWAN & ABSEN</b></summary>
+ <div class="panel">
+  <h4>TAMBAH KARYAWAN</h4>
+  <div class="formgrid">
+   <input id="employeeName" class="full" placeholder="Nama karyawan">
+   <input id="employeeRole" placeholder="Jabatan">
+   <button type="button" class="vbtn" onclick="addEmployee()">SIMPAN KARYAWAN</button>
+  </div>
+ </div>
+ <div id="employeeList" class="panel"></div>
+ <div class="panel"><h4>RIWAYAT ABSEN</h4><div id="attendanceHistory">Belum ada data absen.</div></div>
 </details>
 
-
-<!-- =========================
-     STOK
-     ========================= -->
-
-<details id="stockSection">
-
-<summary>
-<b>📦 STOK / INVENTORI</b>
-</summary>
-
-<div class="box-section">
-
-<p style="font-size:13px">
-Atur stok setiap menu. Stok akan berkurang otomatis
-ketika transaksi dicetak.
-</p>
-
-<div id="stockList"></div>
-
-</div>
-
+<!-- V3.1 STOK -->
+<details class="admin-only">
+ <summary><b>📦 STOK / INVENTORI</b></summary>
+ <div class="panel"><div id="stockList"></div></div>
 </details>
 
-
-<!-- =========================
-     PESANAN SHOPEE / GRAB
-     ========================= -->
-
-<details id="orderSection">
-
-<summary>
-<b>🛵 PESANAN SHOPEE / GRAB</b>
-</summary>
-
-<div class="box-section">
-
-<h4 style="margin-top:0">
-CATAT PESANAN ONLINE
-</h4>
-
-<input
- id="orderPlatform"
- placeholder="Platform: Shopee / Grab"
->
-
-<input
- id="orderNumber"
- placeholder="Nomor pesanan"
- style="margin-top:8px"
->
-
-<input
- id="orderCustomer"
- placeholder="Nama pelanggan"
- style="margin-top:8px"
->
-
-<input
- id="orderItems"
- placeholder="Pesanan, contoh: Es Teh x2"
- style="margin-top:8px"
->
-
-<input
- id="orderTotal"
- type="number"
- placeholder="Total pesanan"
- style="margin-top:8px"
->
-
-<button
- type="button"
- class="btn"
- onclick="tambahOrderOnline()"
- style="margin-top:8px"
->
-SIMPAN PESANAN ONLINE
-</button>
-
-</div>
-
-<div
- id="onlineOrderList"
- class="box-section"
->
-</div>
-
+<!-- V3.1 BARCODE -->
+<details class="admin-only">
+ <summary><b>▣ BARCODE</b></summary>
+ <div class="panel">
+  <div class="formgrid">
+   <input id="barcodeInput" class="full" placeholder="Scan / masukkan barcode">
+   <button type="button" class="vbtn" onclick="findBarcode()">CARI & TAMBAH</button>
+   <button type="button" class="vbtn alt" onclick="startBarcodeCamera()">BUKA KAMERA</button>
+  </div>
+  <div id="barcodeStatus" class="barcode-result">Belum ada barcode.</div>
+  <video id="barcodeVideo" playsinline style="display:none;width:100%;margin-top:8px;border-radius:10px"></video>
+  <div class="panel">
+   <h4>DAFTAR BARCODE MENU</h4>
+   <div class="formgrid">
+    <select id="barcodeMenu" class="full"></select>
+    <input id="barcodeValue" placeholder="Nomor barcode">
+    <button type="button" class="vbtn" onclick="saveBarcode()">SIMPAN BARCODE</button>
+   </div>
+   <div id="barcodeList" style="margin-top:10px"></div>
+  </div>
+ </div>
 </details>
 
-
-<!-- =========================
-     REKAP
-     ========================= -->
-
-<details id="recapSection">
-
-<summary>
-<b>🔒 REKAP PENJUALAN — OWNER</b>
-</summary>
-
-<div id="rekap">
-Belum ada penjualan
-</div>
-
+<!-- V3.1 PESANAN MARKETPLACE -->
+<details class="admin-only">
+ <summary><b>🛒 PESANAN SHOPEE / GRAB</b></summary>
+ <div class="panel">
+  <div class="badge">Mode web: input manual. Otomatis membutuhkan API/native integration.</div>
+  <div class="formgrid" style="margin-top:8px">
+   <select id="marketSource"><option>Shopee</option><option>Grab</option></select>
+   <input id="marketOrderId" placeholder="Nomor order">
+   <input id="marketCustomer" placeholder="Nama pelanggan">
+   <input id="marketItems" class="full" placeholder="Contoh: Es Teh x2, Milo x1">
+   <input id="marketTotal" type="number" placeholder="Total order">
+   <button type="button" class="vbtn" onclick="saveMarketOrder()">SIMPAN PESANAN</button>
+  </div>
+  <div id="marketOrders" style="margin-top:10px"></div>
+ </div>
 </details>
 
-
-<!-- =========================
-     PENGATURAN LOGIN
-     ========================= -->
-
-<details id="accountSection">
-
-<summary>
-<b>🔐 AKUN OWNER / ADMIN / KASIR</b>
-</summary>
-
-<div class="box-section">
-
-<h4 style="margin-top:0">
-TAMBAH / KELOLA AKUN
-</h4>
-
-<input
- id="accountUsername"
- placeholder="Username"
->
-
-<input
- id="accountPassword"
- type="password"
- placeholder="Password"
- style="margin-top:8px"
->
-
-<select
- id="accountRole"
- style="margin-top:8px"
->
-
-<option value="KASIR">
-KASIR
-</option>
-
-<option value="ADMIN">
-ADMIN
-</option>
-
-<option value="OWNER">
-OWNER
-</option>
-
-</select>
-
-<button
- type="button"
- class="btn"
- onclick="tambahAkun()"
- style="margin-top:8px"
->
-SIMPAN AKUN
-</button>
-
-</div>
-
-<div
- id="accountList"
- class="box-section"
-></div>
-
+<!-- V3.1 AKUN -->
+<details class="owner-only">
+ <summary><b>🔐 AKUN & LOGIN</b></summary>
+ <div class="panel">
+  <div class="badge">Owner: owner / 4826 • Kasir: kasir / 7391</div>
+  <p style="font-size:12px">Akun demo disimpan lokal. Untuk keamanan produksi, login final dipindahkan ke APK/backend.</p>
+  <div id="accountList"></div>
+ </div>
 </details>
 
+<details>
+<summary><b>REKAP PENJUALAN</b></summary>
+<div id="rekap">Belum ada penjualan</div>
+</details>
 
 <div class="contact">
-
 <b>IQIHLO ES TEH</b><br>
-
 Instagram: @iqihlo.esteh_id<br>
-
-TikTok: @iqihlo.es.teh
-
+TikTok: @iqihlo.es.teh<br>
 </div>
 
 </div>
 
-
-<!-- =========================
-     STRUK
-     ========================= -->
-
+<!-- STRUK -->
 <div class="receipt">
 
 <div class="center">
-
 <b>IQIHLO ES TEH</b><br>
-
 SEGARNYA BEDA!<br>
-
 <b>STRUK PEMBELIAN</b>
-
 </div>
 
 <div class="line"></div>
 
-Nama:
-<span id="rnama"></span>
-<br>
-
-Tanggal:
-<span id="rtgl"></span>
-<br>
-
-Jam:
-<span id="rjam"></span>
-<br>
-
-Bayar:
-<span id="rbayar"></span>
+Nama: <span id="rnama"></span><br>
+Tanggal: <span id="rtgl"></span><br>
+Jam: <span id="rjam"></span><br>
+Bayar: <span id="rbayar"></span><br>
+Kasir: <span id="rkasir"></span>
 
 <div class="line"></div>
 
@@ -1082,3314 +499,585 @@ Bayar:
 
 <div class="line"></div>
 
-<b>
-TOTAL:
-<span id="rtotal"></span>
-</b>
+<b>TOTAL: <span id="rtotal"></span></b>
 
 <div class="line"></div>
 
 <div class="center">
-
 TERIMA KASIH<br>
-
 SELAMAT MENIKMATI!<br><br>
-
 Instagram: @iqihlo.esteh_id<br>
-
-TikTok: @iqihlo.es.teh
-
+TikTok: @iqihlo.es.teh<br>
 </div>
 
 </div>
-
 
 <script>
 
-/* =====================================================
-   DATA MENU
-   ===================================================== */
-
 const data={
-
- "Es Teh":[
-  "Es Teh"
- ],
-
- "Es Jeruk Peras":[
-  "Es Jeruk Peras"
- ],
-
- "Goodday Biasa":[
-  "Mocacino",
-  "Vanilla Latte",
-  "Coolant",
-  "Chococino",
-  "Carebian Nut"
- ],
-
- "Nutrisari":[
-  "Mangga",
-  "Jeruk Peras",
-  "Cincau",
-  "Milky Orange"
- ],
-
- "Susu":[
-  "Putih",
-  "Coklat",
-  "Matcha",
-  "Milo"
- ],
-
- "Teh Tarik Maxtea":[
-  "Teh Tarik Maxtea"
- ],
-
- "Kopi Susu":[
-  "Tora Bika Creamy",
-  "Indocafe",
-  "White Coffee"
- ],
-
- "Kopi Hitam":[
-  "Kopi Kapal Api",
-  "Kopi ABC"
- ],
-
- "Chocolatos":[
-  "Matcha",
-  "Coklat",
-  "Creamy"
- ],
-
- "Goodday Latte":[
-  "Butterscotch",
-  "Original"
- ],
-
- "Air Putih Es/Panas":[
-  "Air Putih Es",
-  "Air Putih Panas"
- ]
-
+"Es Teh":["Es Teh"],
+"Es Jeruk Peras":["Es Jeruk Peras"],
+"Goodday Biasa":["Mocacino","Vanilla Latte","Coolant","Chococino","Carebian Nut"],
+"Nutrisari":["Mangga","Jeruk Peras","Cincau","Milky Orange"],
+"Susu":["Putih","Coklat","Matcha","Milo"],
+"Teh Tarik Maxtea":["Teh Tarik Maxtea"],
+"Kopi Susu":["Tora Bika Creamy","Indocafe","White Coffee"],
+"Kopi Hitam":["Kopi Kapal Api","Kopi ABC"],
+"Chocolatos":["Matcha","Coklat","Creamy"],
+"Goodday Latte":["Butterscotch","Original"],
+"Air Putih Es/Panas":["Air Putih Es","Air Putih Panas"]
 };
-
-
-/* =====================================================
-   HARGA DASAR
-   ===================================================== */
 
 const base={
-
- "Es Teh":3000,
- "Es Jeruk Peras":5000,
- "Mocacino":5000,
- "Vanilla Latte":5000,
- "Coolant":5000,
- "Chococino":5000,
- "Carebian Nut":5000,
- "Mangga":4000,
- "Jeruk Peras":4000,
- "Cincau":4000,
- "Milky Orange":4000,
- "Putih":5000,
- "Coklat":5000,
- "Matcha":5000,
- "Milo":5000,
- "Teh Tarik Maxtea":5000,
- "Tora Bika Creamy":5000,
- "Indocafe":5000,
- "White Coffee":5000,
- "Kopi Kapal Api":3000,
- "Kopi ABC":3000,
- "Creamy":5000,
- "Butterscotch":5000,
- "Original":5000,
- "Air Putih Es":2000,
- "Air Putih Panas":2000
-
+"Es Teh":3000,
+"Es Jeruk Peras":5000,
+"Mocacino":5000,
+"Vanilla Latte":5000,
+"Coolant":5000,
+"Chococino":5000,
+"Carebian Nut":5000,
+"Mangga":4000,
+"Jeruk Peras":4000,
+"Cincau":4000,
+"Milky Orange":4000,
+"Putih":5000,
+"Coklat":5000,
+"Matcha":5000,
+"Milo":5000,
+"Teh Tarik Maxtea":5000,
+"Tora Bika Creamy":5000,
+"Indocafe":5000,
+"White Coffee":5000,
+"Kopi Kapal Api":3000,
+"Kopi ABC":3000,
+"Creamy":5000,
+"Butterscotch":5000,
+"Original":5000,
+"Air Putih Es":2000,
+"Air Putih Panas":2000
 };
 
-
-/* =====================================================
-   STATE
-   ===================================================== */
-
-let prices=
- JSON.parse(
-  localStorage.getItem("iqihlo_prices")||"null"
- )||{...base};
+let prices=JSON.parse(
+ localStorage.getItem("iqihlo_prices")||"null"
+)||base;
 
 let cart={};
-
 let cat="Es Teh";
-
 let pay="Cash";
 
-let currentUser=null;
-
-let barcodeStream=null;
-
-
-/* =====================================================
-   HELPER
-   ===================================================== */
-
-const $=
- id=>document.getElementById(id);
-
+const $=id=>document.getElementById(id);
 
 function rupiah(n){
-
- return "Rp"+
- Number(n||0).toLocaleString("id-ID");
-
+ return "Rp"+Number(n).toLocaleString("id-ID");
 }
-
-
-function safeJson(key,defaultValue){
-
- try{
-
-  return JSON.parse(
-   localStorage.getItem(key)
-  )||defaultValue;
-
- }catch(e){
-
-  return defaultValue;
-
- }
-
-}
-
-
-function saveJson(key,value){
-
- localStorage.setItem(
-  key,
-  JSON.stringify(value)
- );
-
-}
-
-
-/* =====================================================
-   AKUN
-   ===================================================== */
-
-function defaultAccounts(){
-
- return [
-
-  {
-   username:"owner",
-   password:"4826",
-   role:"OWNER"
-  },
-
-  {
-   username:"admin",
-   password:"admin123",
-   role:"ADMIN"
-  },
-
-  {
-   username:"kasir",
-   password:"kasir123",
-   role:"KASIR"
-  }
-
- ];
-
-}
-
-
-function getAccounts(){
-
- let a=safeJson(
-  "iqihlo_accounts",
-  null
- );
-
- if(!a){
-
-  a=defaultAccounts();
-
-  saveJson(
-   "iqihlo_accounts",
-   a
-  );
-
- }
-
- return a;
-
-}
-
-
-function login(){
-
- const username=
-  $("loginUser").value.trim();
-
- const password=
-  $("loginPass").value;
-
-
- const account=
-  getAccounts().find(
-   x=>
-   x.username===username &&
-   x.password===password
-  );
-
-
- if(!account){
-
-  alert(
-   "Username atau password salah."
-  );
-
-  return;
-
- }
-
-
- currentUser=account;
-
- sessionStorage.setItem(
-  "iqihlo_current_user",
-  JSON.stringify(account)
- );
-
-
- $("loginOverlay")
-  .classList.add("hidden");
-
-
- $("loggedUser").textContent=
-  account.username+
-  " ("+
-  account.role+
-  ")";
-
-
- applyPermissions();
-
-}
-
-
-function logout(){
-
- currentUser=null;
-
- sessionStorage.removeItem(
-  "iqihlo_current_user"
- );
-
- $("loginOverlay")
-  .classList.remove("hidden");
-
- $("loginUser").value="";
- $("loginPass").value="";
-
-}
-
-
-function restoreLogin(){
-
- const u=
-  safeJson(
-   "iqihlo_current_user",
-   null
-  );
-
-
- if(u){
-
-  currentUser=u;
-
-  $("loginOverlay")
-   .classList.add("hidden");
-
-  $("loggedUser").textContent=
-   u.username+
-   " ("+
-   u.role+
-   ")";
-
-  applyPermissions();
-
- }
-
-}
-
-
-function applyPermissions(){
-
- if(!currentUser)return;
-
-
- const role=
-  currentUser.role;
-
-
- const owner=
-  role==="OWNER";
-
- const admin=
-  role==="ADMIN";
-
-
- $("menuManagerSection")
-  .classList.toggle(
-   "hidden",
-   !(owner||admin)
-  );
-
-
- $("attendanceSection")
-  .classList.toggle(
-   "hidden",
-   !(owner||admin)
-  );
-
-
- $("stockSection")
-  .classList.toggle(
-   "hidden",
-   !(owner||admin)
-  );
-
-
- $("accountSection")
-  .classList.toggle(
-   "hidden",
-   !owner
-  );
-
-
- $("recapSection")
-  .classList.remove("hidden");
-
-
- $("orderSection")
-  .classList.remove("hidden");
-
-}
-
-
-function tambahAkun(){
-
- if(!currentUser||
-    currentUser.role!=="OWNER"){
-
-  alert(
-   "Hanya Owner yang dapat mengelola akun."
-  );
-
-  return;
-
- }
-
-
- const username=
-  $("accountUsername").value.trim();
-
- const password=
-  $("accountPassword").value;
-
- const role=
-  $("accountRole").value;
-
-
- if(!username||!password){
-
-  alert(
-   "Username dan password wajib diisi."
-  );
-
-  return;
-
- }
-
-
- const accounts=
-  getAccounts();
-
-
- if(
-  accounts.some(
-   x=>x.username===username
-  )
- ){
-
-  alert(
-   "Username sudah digunakan."
-  );
-
-  return;
-
- }
-
-
- accounts.push({
-
-  username,
-  password,
-  role
-
- });
-
-
- saveJson(
-  "iqihlo_accounts",
-  accounts
- );
-
-
- $("accountUsername").value="";
- $("accountPassword").value="";
-
-
- renderAccounts();
-
-
- alert(
-  "Akun berhasil dibuat."
- );
-
-}
-
-
-function renderAccounts(){
-
- const el=
-  $("accountList");
-
- if(!el)return;
-
-
- const accounts=
-  getAccounts();
-
-
- let h="<b>DAFTAR AKUN</b>";
-
-
- accounts.forEach(
-  (x,i)=>{
-
-   h+=`
-
-   <div class="menu-row">
-
-    <div class="mn">
-
-     <b>${x.username}</b>
-
-     <small>
-      ${x.role}
-     </small>
-
-    </div>
-
-    ${
-     x.username==="owner"
-     ?""
-     :`
-     <button
-      type="button"
-      class="danger"
-      onclick="hapusAkun(${i})"
-     >
-      HAPUS
-     </button>
-     `
-    }
-
-   </div>
-
-   `;
-
-  }
- );
-
-
- el.innerHTML=h;
-
-}
-
-
-function hapusAkun(index){
-
- const accounts=
-  getAccounts();
-
- const x=
-  accounts[index];
-
- if(!x)return;
-
-
- if(x.username==="owner"){
-
-  alert(
-   "Akun Owner utama tidak dapat dihapus."
-  );
-
-  return;
-
- }
-
-
- if(
-  !confirm(
-   "Hapus akun "+
-   x.username+
-   "?"
-  )
- )return;
-
-
- accounts.splice(
-  index,
-  1
- );
-
-
- saveJson(
-  "iqihlo_accounts",
-  accounts
- );
-
-
- renderAccounts();
-
-}
-
-
-/* =====================================================
-   KATEGORI & MENU
-   ===================================================== */
-
-function getExtraMenus(){
-
- return safeJson(
-  "iqihlo_extra_menus",
-  []
- );
-
-}
-
-
-function daftarMenuKategori(c){
-
- const bawaan=
-  Array.isArray(data[c])
-  ?data[c]
-  :[];
-
-
- const tambahan=
-  getExtraMenus()
-  .filter(
-   x=>x.kategori===c
-  )
-  .map(
-   x=>x.nama
-  );
-
-
- return [
-  ...bawaan,
-  ...tambahan
- ];
-
-}
-
-
-function semuaNamaMenu(){
-
- const names=[];
-
-
- Object.keys(data)
- .forEach(
-  c=>{
-
-   daftarMenuKategori(c)
-   .forEach(
-    n=>{
-
-     if(
-      !names.includes(n)
-     )
-      names.push(n);
-
-    }
-   );
-
-  }
- );
-
-
- return names;
-
-}
-
 
 function cats(){
-
  let h="";
-
-
- Object.keys(data)
- .forEach(
-  c=>{
-
-   h+=`
-
-   <button
-    type="button"
-    class="cat ${
-     c===cat?"on":""
-    }"
-    onclick='pilihKat(
-     ${JSON.stringify(c)}
-    )'
-   >
-    ${c}
-   </button>
-
-   `;
-
-  }
- );
-
-
+ Object.keys(data).forEach(c=>{
+   h+=`<button type="button" class="cat ${c===cat?"on":""}"
+   onclick='pilihKat(${JSON.stringify(c)})'>${c}</button>`;
+ });
  $("kategori").innerHTML=h;
-
 }
-
 
 function pilihKat(c){
-
  cat=c;
-
  cats();
-
  menus();
-
 }
 
+function daftarMenuKategori(c){
+  const bawaan = Array.isArray(data[c]) ? data[c] : [];
+  const tambahan = JSON.parse(localStorage.getItem("iqihlo_extra_menus")||"[]")
+    .filter(x=>x.kategori===c).map(x=>x.nama);
+  return [...bawaan, ...tambahan];
+}
+
+function semuaNamaMenu(){
+  const names=[];
+  Object.keys(data).forEach(c=>daftarMenuKategori(c).forEach(n=>{if(!names.includes(n))names.push(n)}));
+  return names;
+}
 
 function menus(){
-
  let h="";
-
-
- daftarMenuKategori(cat)
- .forEach(
-  n=>{
-
-   const stock=
-    getStock(n);
-
-
-   const disabled=
-    stock<=0;
-
-
-   h+=`
-
-   <button
-    type="button"
-    class="menu"
-    onclick='tambah(
-     ${JSON.stringify(n)}
-    )'
-    ${disabled?"disabled":""}
-   >
-
-    ${n}
-
-    <small>
-     ${rupiah(prices[n]||0)}
-     ${
-      stock<=0
-      ?" • HABIS"
-      :" • Stok: "+stock
-     }
-    </small>
-
-   </button>
-
-   `;
-
-  }
- );
-
-
- $("menu").innerHTML=
-  h||
-  "<div>Belum ada menu.</div>";
-
+ daftarMenuKategori(cat).forEach(n=>{
+   h+=`<button type="button" class="menu"
+   onclick='tambah(${JSON.stringify(n)})'>
+   ${n}<small>${rupiah(prices[n]||0)}</small>
+   </button>`;
+ });
+ $("menu").innerHTML=h||"<div>Belum ada menu di kategori ini.</div>";
 }
-
 
 function tambah(n){
-
- const stock=
-  getStock(n);
-
-
- if(
-  stock<=0
- ){
-
-  alert(
-   n+
-   " sedang habis."
-  );
-
-  return;
-
- }
-
-
- if(
-  (cart[n]||0)>=stock
- ){
-
-  alert(
-   "Jumlah melebihi stok "+
-   n+
-   "."
-  );
-
-  return;
-
- }
-
-
- cart[n]=
-  (cart[n]||0)+1;
-
-
+ cart[n]=(cart[n]||0)+1;
  render();
-
 }
-
 
 function kurang(n){
-
  if(!cart[n])return;
-
-
  cart[n]--;
-
-
- if(
-  cart[n]<=0
- )
-  delete cart[n];
-
-
+ if(cart[n]<=0)delete cart[n];
  render();
-
 }
 
-
 function render(){
-
  let h="";
-
  let tot=0;
 
+ Object.keys(cart).forEach(n=>{
+   let q=cart[n];
+   let sub=q*prices[n];
+   tot+=sub;
 
- Object.keys(cart)
- .forEach(
-  n=>{
+   h+=`<div class="item">
+   <b>${n}</b><br>
+   ${rupiah(prices[n])} x ${q} = ${rupiah(sub)}
+   &nbsp;
+   <button type="button" onclick='kurang(${JSON.stringify(n)})'>−</button>
+   <button type="button" onclick='tambah(${JSON.stringify(n)})'>+</button>
+   </div>`;
+ });
 
-   const q=
-    cart[n];
+ $("pesanan").innerHTML=h||"Belum ada pesanan";
+ $("total").textContent=rupiah(tot);
+}
 
-   const sub=
-    q*(prices[n]||0);
+function pilihBayar(p){
+ pay=p;
+ $("cash").className=p==="Cash"?"on":"";
+ $("qris").className=p==="QRIS"?"on":"";
+}
 
+function hapus(){
+ cart={};
+ render();
+}
+
+function harga(){
+ let h="";
+ semuaNamaMenu().forEach(n=>{
+   h+=`<div class="p">
+   <span>${n}</span>
+   <input type="number" min="1" value="${prices[n]||0}"
+   onchange='ubahHarga(${JSON.stringify(n)},this.value)'>
+   </div>`;
+ });
+ $("harga").innerHTML=h||"Belum ada menu.";
+ renderMenuTambahan();
+}
+
+function isiPilihanKategori(){
+ const sel=$("newMenuCat");
+ if(!sel)return;
+ sel.innerHTML=Object.keys(data).map(c=>`<option value="${c}">${c}</option>`).join("");
+ if(cat && data[cat]) sel.value=cat;
+}
+
+function tambahMenuBaru(){
+ const nama=$("newMenuName").value.trim();
+ const hargaBaru=Number($("newMenuPrice").value);
+ const kategori=$("newMenuCat").value;
+ if(!nama){alert("Masukkan nama menu.");return;}
+ if(!hargaBaru || hargaBaru<=0){alert("Masukkan harga yang benar.");return;}
+ if(!kategori){alert("Pilih kategori.");return;}
+ if(semuaNamaMenu().some(n=>n.toLowerCase()===nama.toLowerCase())){
+   alert("Nama menu sudah ada. Gunakan nama yang berbeda.");return;
+ }
+ const extras=JSON.parse(localStorage.getItem("iqihlo_extra_menus")||"[]");
+ extras.push({id:"m_"+Date.now(),nama,harga:hargaBaru,kategori});
+ localStorage.setItem("iqihlo_extra_menus",JSON.stringify(extras));
+ prices[nama]=hargaBaru;
+ localStorage.setItem("iqihlo_prices",JSON.stringify(prices));
+ $("newMenuName").value="";
+ $("newMenuPrice").value="";
+ cat=kategori;
+ cats(); menus(); harga();
+ alert("Menu baru berhasil ditambahkan.");
+}
+
+function renderMenuTambahan(){
+ const el=$("menuTambahanList");
+ if(!el)return;
+ const extras=JSON.parse(localStorage.getItem("iqihlo_extra_menus")||"[]");
+ if(!extras.length){el.innerHTML="<small>Belum ada menu tambahan.</small>";return;}
+ el.innerHTML="<b>MENU TAMBAHAN</b>"+extras.map((x,i)=>`<div class="menu-row">
+   <div class="mn"><b>${x.nama}</b><small>${x.kategori} • ${rupiah(prices[x.nama]||x.harga)}</small></div>
+   <button type="button" onclick="editMenuTambahan(${i})">EDIT</button>
+   <button type="button" onclick="hapusMenuTambahan(${i})">HAPUS</button>
+ </div>`).join("");
+}
+
+function editMenuTambahan(index){
+ const extras=JSON.parse(localStorage.getItem("iqihlo_extra_menus")||"[]");
+ const x=extras[index]; if(!x)return;
+ const nama=prompt("Nama menu:",x.nama); if(nama===null)return;
+ const nilai=prompt("Harga:",String(prices[x.nama]||x.harga)); if(nilai===null)return;
+ const h=Number(nilai); if(!nama.trim()||!h||h<=0){alert("Data tidak valid.");return;}
+ const old=x.nama;
+ x.nama=nama.trim(); x.harga=h;
+ delete prices[old]; prices[x.nama]=h;
+ extras[index]=x;
+ localStorage.setItem("iqihlo_extra_menus",JSON.stringify(extras));
+ localStorage.setItem("iqihlo_prices",JSON.stringify(prices));
+ if(cart[old]){cart[x.nama]=(cart[x.nama]||0)+cart[old];delete cart[old];}
+ cats(); menus(); harga(); render();
+}
+
+function hapusMenuTambahan(index){
+ const extras=JSON.parse(localStorage.getItem("iqihlo_extra_menus")||"[]");
+ const x=extras[index]; if(!x)return;
+ if(!confirm("Hapus menu " + x.nama + "?"))return;
+ extras.splice(index,1);
+ localStorage.setItem("iqihlo_extra_menus",JSON.stringify(extras));
+ delete prices[x.nama];
+ localStorage.setItem("iqihlo_prices",JSON.stringify(prices));
+ delete cart[x.nama];
+ cats(); menus(); harga(); render();
+}
+
+function ubahHarga(n,v){
+ v=Number(v);
+
+ if(v>0){
+   prices[n]=v;
+
+   localStorage.setItem(
+     "iqihlo_prices",
+     JSON.stringify(prices)
+   );
+
+   menus();
+   render();
+ }
+}
+
+function rekap(){
+ let r=JSON.parse(localStorage.getItem("iqihlo_rekap")||"[]");
+
+ if(!r.length){
+   $("rekap").innerHTML="Belum ada penjualan";
+   return;
+ }
+
+ let h="";
+ r.slice().reverse().forEach((x,revIndex)=>{
+   const realIndex=r.length-1-revIndex;
+   let dh="";
+   (x.items||[]).forEach(it=>{
+     dh+=`<div>${it.nama} x${it.qty} = <b>${rupiah(it.sub)}</b></div>`;
+   });
+   h+=`<details class="rekap-item">
+     <summary><b>${x.tgl} — ${x.nama} — ${x.bayar} — ${rupiah(x.total)}</b></summary>
+     <div style="padding:8px 0">${dh||"Detail transaksi tidak tersedia."}</div>
+     <button type="button" class="clear" onclick="hapusRekap(${realIndex})">HAPUS TRANSAKSI</button>
+   </details>`;
+ });
+ $("rekap").innerHTML=h;
+}
+
+function hapusRekap(index){
+ let r=JSON.parse(localStorage.getItem("iqihlo_rekap")||"[]");
+ if(index<0 || index>=r.length)return;
+ if(!confirm("Hapus transaksi ini?"))return;
+ r.splice(index,1);
+ localStorage.setItem("iqihlo_rekap",JSON.stringify(r));
+ rekap();
+}
+
+/* CETAK STRUK */
+function cetak(){
+
+ const names=Object.keys(cart);
+
+ if(!names.length){
+   alert("Pilih menu dulu");
+   return;
+ }
+
+ const now=new Date();
+
+ let tot=0;
+ let h="";
+
+ names.forEach(n=>{
+   const q=cart[n];
+   const sub=q*prices[n];
 
    tot+=sub;
 
-
    h+=`
-
-   <div class="item">
-
-    <b>${n}</b><br>
-
-    ${rupiah(prices[n])}
-    x ${q}
-    =
-    ${rupiah(sub)}
-
-    &nbsp;
-
-    <button
-     type="button"
-     onclick='kurang(
-      ${JSON.stringify(n)}
-     )'
-    >
-     −
-    </button>
-
-    <button
-     type="button"
-     onclick='tambah(
-      ${JSON.stringify(n)}
-     )'
-    >
-     +
-    </button>
-
-   </div>
-
-   `;
-
-  }
- );
-
-
- $("pesanan").innerHTML=
-  h||"Belum ada pesanan";
-
-
- $("total").textContent=
-  rupiah(tot);
-
-}
-
-
-function pilihBayar(p){
-
- pay=p;
-
-
- $("cash").className=
-  p==="Cash"
-  ?"on"
-  :"";
-
-
- $("qris").className=
-  p==="QRIS"
-  ?"on"
-  :"";
-
-}
-
-
-function hapus(){
-
- cart={};
-
- render();
-
-}
-
-
-/* =====================================================
-   HARGA & MENU TAMBAHAN
-   ===================================================== */
-
-function harga(){
-
- let h="";
-
-
- semuaNamaMenu()
- .forEach(
-  n=>{
-
-   h+=`
-
-   <div class="p">
-
-    <span>
-     ${n}
-    </span>
-
-    <input
-     type="number"
-     min="1"
-     value="${prices[n]||0}"
-     onchange='ubahHarga(
-      ${JSON.stringify(n)},
-      this.value
-     )'
-    >
-
-   </div>
-
-   `;
-
-  }
- );
-
-
- $("harga").innerHTML=
-  h||"Belum ada menu.";
-
-
- renderMenuTambahan();
-
-}
-
-
-function isiPilihanKategori(){
-
- const sel=
-  $("newMenuCat");
-
-
- sel.innerHTML=
-  Object.keys(data)
-  .map(
-   c=>
-   `<option value="${c}">
-    ${c}
-   </option>`
-  )
-  .join("");
-
-
- sel.value=cat;
-
-}
-
-
-function getBarcodes(){
-
- return safeJson(
-  "iqihlo_barcodes",
-  {}
- );
-
-}
-
-
-function saveBarcodes(x){
-
- saveJson(
-  "iqihlo_barcodes",
-  x
- );
-
-}
-
-
-function tambahMenuBaru(){
-
- const nama=
-  $("newMenuName")
-  .value
-  .trim();
-
- const hargaBaru=
-  Number(
-   $("newMenuPrice").value
-  );
-
- const kategori=
-  $("newMenuCat").value;
-
- const barcode=
-  $("newMenuBarcode")
-  .value
-  .trim();
-
-
- if(!nama){
-
-  alert(
-   "Masukkan nama menu."
-  );
-
-  return;
-
- }
-
-
- if(
-  !hargaBaru||
-  hargaBaru<=0
- ){
-
-  alert(
-   "Masukkan harga yang benar."
-  );
-
-  return;
-
- }
-
-
- if(
-  !kategori
- ){
-
-  alert(
-   "Pilih kategori."
-  );
-
-  return;
-
- }
-
-
- if(
-  semuaNamaMenu()
-  .some(
-   n=>
-   n.toLowerCase()===
-   nama.toLowerCase()
-  )
- ){
-
-  alert(
-   "Nama menu sudah ada."
-  );
-
-  return;
-
- }
-
-
- if(barcode){
-
-  const b=
-   getBarcodes();
-
-  if(b[barcode]){
-
-   alert(
-    "Barcode sudah digunakan."
-   );
-
-   return;
-
-  }
-
-  b[barcode]=nama;
-
-  saveBarcodes(b);
-
- }
-
-
- const extras=
-  getExtraMenus();
-
-
- extras.push({
-
-  id:"m_"+Date.now(),
-
-  nama,
-
-  harga:hargaBaru,
-
-  kategori,
-
-  barcode
-
+   <div class="rrow">
+     <div class="rname">${n} x${q}</div>
+     <div class="rprice">${rupiah(sub)}</div>
+   </div>`;
  });
 
+ $("rnama").textContent=$("nama").value||"-";
+ $("rtgl").textContent=now.toLocaleDateString("id-ID");
+ $("rjam").textContent=now.toLocaleTimeString("id-ID");
+ $("rbayar").textContent=pay;
+ $("rkasir").textContent=currentSession?currentSession.u:"-";
+ $("ritem").innerHTML=h;
+ $("rtotal").textContent=rupiah(tot);
 
- saveJson(
-  "iqihlo_extra_menus",
-  extras
+ let r=JSON.parse(
+   localStorage.getItem("iqihlo_rekap")||"[]"
  );
-
-
- prices[nama]=
-  hargaBaru;
-
-
- saveJson(
-  "iqihlo_prices",
-  prices
- );
-
-
- $("newMenuName").value="";
- $("newMenuPrice").value="";
- $("newMenuBarcode").value="";
-
-
- cat=kategori;
-
-
- cats();
- menus();
- harga();
- renderStock();
-
-
- alert(
-  "Menu berhasil ditambahkan."
- );
-
-}
-
-
-function renderMenuTambahan(){
-
- const el=
-  $("menuTambahanList");
-
-
- const extras=
-  getExtraMenus();
-
-
- if(!extras.length){
-
-  el.innerHTML=
-   "<small>Belum ada menu tambahan.</small>";
-
-  return;
-
- }
-
-
- el.innerHTML=
-  "<b>MENU TAMBAHAN</b>"+
-  extras
-  .map(
-   (x,i)=>
-   `
-
-   <div class="menu-row">
-
-    <div class="mn">
-
-     <b>${x.nama}</b>
-
-     <small>
-      ${x.kategori}
-      •
-      ${rupiah(
-       prices[x.nama]||
-       x.harga
-      )}
-
-      ${
-       x.barcode
-       ?" • Barcode: "+x.barcode
-       :""
-      }
-
-     </small>
-
-    </div>
-
-    <button
-     type="button"
-     onclick="editMenuTambahan(${i})"
-    >
-     EDIT
-    </button>
-
-    <button
-     type="button"
-     class="danger"
-     onclick="hapusMenuTambahan(${i})"
-    >
-     HAPUS
-    </button>
-
-   </div>
-
-   `
-  )
-  .join("");
-
-}
-
-
-function editMenuTambahan(index){
-
- const extras=
-  getExtraMenus();
-
- const x=
-  extras[index];
-
- if(!x)return;
-
-
- const nama=
-  prompt(
-   "Nama menu:",
-   x.nama
-  );
-
-
- if(nama===null)return;
-
-
- const nilai=
-  prompt(
-   "Harga:",
-   String(
-    prices[x.nama]||
-    x.harga
-   )
-  );
-
-
- if(nilai===null)return;
-
-
- const h=
-  Number(nilai);
-
-
- if(
-  !nama.trim()||
-  !h||
-  h<=0
- ){
-
-  alert(
-   "Data tidak valid."
-  );
-
-  return;
-
- }
-
-
- const old=
-  x.nama;
-
-
- x.nama=
-  nama.trim();
-
- x.harga=h;
-
-
- delete prices[old];
-
- prices[x.nama]=h;
-
-
- if(cart[old]){
-
-  cart[x.nama]=
-   (cart[x.nama]||0)+
-   cart[old];
-
-  delete cart[old];
-
- }
-
-
- extras[index]=x;
-
-
- saveJson(
-  "iqihlo_extra_menus",
-  extras
- );
-
-
- saveJson(
-  "iqihlo_prices",
-  prices
- );
-
-
- cats();
- menus();
- harga();
- render();
-
-}
-
-
-function hapusMenuTambahan(index){
-
- const extras=
-  getExtraMenus();
-
- const x=
-  extras[index];
-
- if(!x)return;
-
-
- if(
-  !confirm(
-   "Hapus menu "+
-   x.nama+
-   "?"
-  )
- )
- return;
-
-
- extras.splice(
-  index,
-  1
- );
-
-
- saveJson(
-  "iqihlo_extra_menus",
-  extras
- );
-
-
- delete prices[x.nama];
-
-
- saveJson(
-  "iqihlo_prices",
-  prices
- );
-
-
- delete cart[x.nama];
-
-
- if(x.barcode){
-
-  const b=
-   getBarcodes();
-
-  delete b[x.barcode];
-
-  saveBarcodes(b);
-
- }
-
-
- cats();
- menus();
- harga();
- render();
- renderStock();
-
-}
-
-
-function ubahHarga(n,v){
-
- v=
-  Number(v);
-
-
- if(v>0){
-
-  prices[n]=v;
-
-
-  saveJson(
-   "iqihlo_prices",
-   prices
-  );
-
-
-  menus();
-
-  render();
-
- }
-
-}
-
-
-/* =====================================================
-   BARCODE
-   ===================================================== */
-
-function barcodeEnter(e){
-
- if(
-  e.key==="Enter"
- ){
-
-  e.preventDefault();
-
-  cariBarcode();
-
- }
-
-}
-
-
-function cariBarcode(){
-
- const code=
-  $("barcodeInput")
-  .value
-  .trim();
-
-
- if(!code){
-
-  alert(
-   "Masukkan barcode."
-  );
-
-  return;
-
- }
-
-
- const map=
-  getBarcodes();
-
-
- const nama=
-  map[code];
-
-
- if(!nama){
-
-  $("barcodeResult")
-   .classList.remove("hidden");
-
-  $("barcodeResult")
-   .textContent=
-   "Barcode tidak ditemukan: "+
-   code;
-
-  return;
-
- }
-
-
- $("barcodeResult")
-  .classList.remove("hidden");
-
- $("barcodeResult")
-  .innerHTML=
-  "<b>DITEMUKAN:</b> "+
-  nama;
-
-
- tambah(nama);
-
- $("barcodeInput").value="";
-
-}
-
-
-async function startBarcodeCamera(){
-
- if(
-  !navigator.mediaDevices||
-  !navigator.mediaDevices.getUserMedia
- ){
-
-  alert(
-   "Kamera tidak didukung oleh browser ini."
-  );
-
-  return;
-
- }
-
-
- if(
-  !("BarcodeDetector" in window)
- ){
-
-  alert(
-   "Scanner kamera BarcodeDetector belum didukung browser ini. Gunakan input barcode manual."
-  );
-
-  return;
-
- }
-
-
- try{
-
-  barcodeStream=
-   await navigator
-   .mediaDevices
-   .getUserMedia({
-    video:{
-     facingMode:{
-      ideal:"environment"
-     }
-    },
-    audio:false
-   });
-
-
-  $("cameraArea")
-   .classList.remove("hidden");
-
-
-  $("barcodeVideo").srcObject=
-   barcodeStream;
-
-
-  scanBarcodeLoop();
-
- }catch(e){
-
-  alert(
-   "Kamera tidak dapat dibuka. Pastikan izin kamera diberikan."
-  );
-
- }
-
-}
-
-
-async function scanBarcodeLoop(){
-
- if(!barcodeStream)return;
-
-
- const video=
-  $("barcodeVideo");
-
-
- const detector=
-  new BarcodeDetector({
-   formats:[
-    "ean_13",
-    "ean_8",
-    "code_128",
-    "code_39",
-    "upc_a",
-    "upc_e"
-   ]
-  });
-
-
- try{
-
-  const codes=
-   await detector.detect(video);
-
-
-  if(codes.length){
-
-   const code=
-    codes[0].rawValue;
-
-   $("barcodeInput").value=
-    code;
-
-   cariBarcode();
-
-   stopBarcodeCamera();
-
-   return;
-
-  }
-
- }catch(e){}
-
-
- requestAnimationFrame(
-  scanBarcodeLoop
- );
-
-}
-
-
-function stopBarcodeCamera(){
-
- if(barcodeStream){
-
-  barcodeStream
-  .getTracks()
-  .forEach(
-   t=>t.stop()
-  );
-
-  barcodeStream=null;
-
- }
-
-
- $("cameraArea")
-  .classList.add("hidden");
-
-}
-
-
-/* =====================================================
-   STOK
-   ===================================================== */
-
-function getStocks(){
-
- return safeJson(
-  "iqihlo_stocks",
-  {}
- );
-
-}
-
-
-function saveStocks(x){
-
- saveJson(
-  "iqihlo_stocks",
-  x
- );
-
-}
-
-
-function getStock(n){
-
- const s=
-  getStocks();
-
-
- if(
-  typeof s[n]!=="number"
- )
-  return 999999;
-
-
- return Math.max(
-  0,
-  s[n]
- );
-
-}
-
-
-function setStock(n,v){
-
- const stocks=
-  getStocks();
-
-
- stocks[n]=
-  Math.max(
-   0,
-   Number(v)||0
-  );
-
-
- saveStocks(stocks);
-
-}
-
-
-function renderStock(){
-
- const el=
-  $("stockList");
-
- if(!el)return;
-
-
- let h="";
-
-
- semuaNamaMenu()
- .forEach(
-  n=>{
-
-   const stock=
-    getStock(n);
-
-   const custom=
-    Object.prototype.hasOwnProperty
-    .call(
-     getStocks(),
-     n
-    );
-
-
-   h+=`
-
-   <div class="stock-row">
-
-    <div>
-
-     <b>${n}</b>
-
-     <div class="${
-      stock<=5
-      ?"stock-low"
-      :"stock-ok"
-     }">
-
-      ${
-       custom
-       ?"Stok: "+stock
-       :"Stok belum diatur"
-      }
-
-     </div>
-
-    </div>
-
-    <input
-     type="number"
-     min="0"
-     value="${
-      custom
-      ?stock
-      :""
-     }"
-     placeholder="Stok"
-     onchange='ubahStock(
-      ${JSON.stringify(n)},
-      this.value
-     )'
-    >
-
-    <button
-     type="button"
-     class="btn2"
-     onclick='setStockUnlimited(
-      ${JSON.stringify(n)}
-     )'
-    >
-     ∞
-    </button>
-
-   </div>
-
-   `;
-
-  }
- );
-
-
- el.innerHTML=
-  h||"Belum ada menu.";
-
-}
-
-
-function ubahStock(n,v){
-
- setStock(n,v);
-
- menus();
-
- renderStock();
-
-}
-
-
-function setStockUnlimited(n){
-
- const stocks=
-  getStocks();
-
- delete stocks[n];
-
- saveStocks(stocks);
-
- menus();
-
- renderStock();
-
-}
-
-
-function kurangiStock(items){
-
- const stocks=
-  getStocks();
-
-
- items.forEach(
-  it=>{
-
-   if(
-    Object.prototype.hasOwnProperty
-    .call(
-     stocks,
-     it.nama
-    )
-   ){
-
-    stocks[it.nama]=
-     Math.max(
-      0,
-      Number(stocks[it.nama])-
-      Number(it.qty)
-     );
-
-   }
-
-  }
- );
-
-
- saveStocks(stocks);
-
-}
-
-
-/* =====================================================
-   REKAP PENJUALAN
-   ===================================================== */
-
-function getRekap(){
-
- return safeJson(
-  "iqihlo_rekap",
-  []
- );
-
-}
-
-
-function saveRekap(x){
-
- saveJson(
-  "iqihlo_rekap",
-  x
- );
-
-}
-
-
-function rekap(){
-
- const el=
-  $("rekap");
-
- const r=
-  getRekap();
-
-
- if(!r.length){
-
-  el.innerHTML=
-   "Belum ada penjualan";
-
-  return;
-
- }
-
-
- let h="";
-
-
- r.slice()
- .reverse()
- .forEach(
-  (x,revIndex)=>{
-
-   const realIndex=
-    r.length-1-revIndex;
-
-
-   let dh="";
-
-
-   (x.items||[])
-   .forEach(
-    it=>{
-
-     dh+=`
-
-     <div>
-      ${it.nama}
-      x${it.qty}
-      =
-      <b>${rupiah(it.sub)}</b>
-     </div>
-
-     `;
-
-    }
-   );
-
-
-   h+=`
-
-   <details>
-
-    <summary>
-
-     <b>
-      ${x.tgl}
-      —
-      ${x.nama}
-      —
-      ${x.bayar}
-      —
-      ${rupiah(x.total)}
-     </b>
-
-    </summary>
-
-    <div style="padding:8px 0">
-
-     ${dh}
-
-    </div>
-
-    <button
-     type="button"
-     class="danger"
-     onclick="hapusRekap(${realIndex})"
-    >
-     HAPUS TRANSAKSI
-    </button>
-
-   </details>
-
-   `;
-
-  }
- );
-
-
- el.innerHTML=h;
-
-}
-
-
-function hapusRekap(index){
-
- const r=
-  getRekap();
-
-
- if(
-  !confirm(
-   "Hapus transaksi ini?"
-  )
- )
- return;
-
-
- r.splice(
-  index,
-  1
- );
-
-
- saveRekap(r);
-
- rekap();
-
-}
-
-
-/* =====================================================
-   CETAK
-   ===================================================== */
-
-function cetak(){
-
- const names=
-  Object.keys(cart);
-
-
- if(!names.length){
-
-  alert(
-   "Pilih menu dulu."
-  );
-
-  return;
-
- }
-
-
- const now=
-  new Date();
-
-
- let tot=0;
-
- let h="";
-
-
- const items=
-  names.map(
-   n=>{
-
-    const q=
-     cart[n];
-
-    const sub=
-     q*(prices[n]||0);
-
-
-    tot+=sub;
-
-
-    h+=`
-
-    <div class="rrow">
-
-     <span>
-      ${n} x${q}
-     </span>
-
-     <span>
-      ${rupiah(sub)}
-     </span>
-
-    </div>
-
-    `;
-
-
-    return {
-
-     nama:n,
-     qty:q,
-     sub:sub
-
-    };
-
-   }
-  );
-
-
- $("rnama").textContent=
-  $("nama").value||"-";
-
-
- $("rtgl").textContent=
-  now.toLocaleDateString("id-ID");
-
-
- $("rjam").textContent=
-  now.toLocaleTimeString("id-ID");
-
-
- $("rbayar").textContent=
-  pay;
-
-
- $("ritem").innerHTML=
-  h;
-
-
- $("rtotal").textContent=
-  rupiah(tot);
-
-
- const r=
-  getRekap();
-
 
  r.push({
-
-  tgl:
-   now.toLocaleString("id-ID"),
-
-  nama:
-   $("nama").value||"-",
-
-  bayar:
-   pay,
-
-  total:
-   tot,
-
-  kasir:
-   currentUser
-   ?currentUser.username
-   :"",
-
-  items:
-   items
-
+   tgl:now.toLocaleString("id-ID"),
+   nama:$("nama").value||"-",
+   bayar:pay,
+   total:tot,
+   items:names.map(n=>({
+     nama:n,
+     qty:cart[n],
+     sub:cart[n]*prices[n]
+   }))
  });
 
-
- saveRekap(r);
-
-
- kurangiStock(items);
-
+ localStorage.setItem(
+   "iqihlo_rekap",
+   JSON.stringify(r)
+ );
 
  rekap();
 
- menus();
-
- renderStock();
-
-
- setTimeout(
-  ()=>{
-
-   if(
-    window.AndroidPrint &&
-    typeof window.AndroidPrint.print===
-    "function"
-   ){
-
-    window.AndroidPrint.print();
-
+ /*
+  * Tunggu layout struk benar-benar selesai
+  * sebelum membuka dialog printer Android.
+  */
+ setTimeout(()=>{
+   if(window.AndroidPrint && typeof window.AndroidPrint.print === "function"){
+     window.AndroidPrint.print();
    }else{
-
-    window.print();
-
+     window.print();
    }
-
-  },
-  300
- );
-
+ },300);
 }
 
-
-/* =====================================================
-   KARYAWAN
-   ===================================================== */
-
-function getEmployees(){
-
- return safeJson(
-  "iqihlo_employees",
-  []
- );
-
-}
-
-
-function saveEmployees(x){
-
- saveJson(
-  "iqihlo_employees",
-  x
- );
-
-}
-
-
-function getAttendance(){
-
- return safeJson(
-  "iqihlo_attendance",
-  []
- );
-
-}
-
-
-function saveAttendance(x){
-
- saveJson(
-  "iqihlo_attendance",
-  x
- );
-
-}
-
-
-function waktuSekarang(){
-
- const d=
-  new Date();
-
-
- return {
-
-  tanggal:
-   d.toLocaleDateString("id-ID"),
-
-  jam:
-   d.toLocaleTimeString("id-ID"),
-
-  iso:
-   d.toISOString()
-
- };
-
-}
-
-
-function tambahKaryawan(){
-
- const nama=
-  $("employeeName")
-  .value
-  .trim();
-
- const jabatan=
-  $("employeeRole")
-  .value
-  .trim()||
-  "Karyawan";
-
-
- if(!nama){
-
-  alert(
-   "Masukkan nama karyawan."
-  );
-
-  return;
-
- }
-
-
- const list=
-  getEmployees();
-
-
- if(
-  list.some(
-   x=>
-   x.nama.toLowerCase()===
-   nama.toLowerCase()
-  )
- ){
-
-  alert(
-   "Nama karyawan sudah ada."
-  );
-
-  return;
-
- }
-
-
- list.push({
-
-  id:"k_"+Date.now(),
-
-  nama,
-
-  jabatan
-
- });
-
-
- saveEmployees(list);
-
-
- $("employeeName").value="";
- $("employeeRole").value="";
-
-
- renderEmployees();
-
-
- alert(
-  "Karyawan berhasil ditambahkan."
- );
-
-}
-
-
-function cariKaryawan(id){
-
- return getEmployees()
- .find(
-  x=>x.id===id
- );
-
-}
-
-
-function absenKaryawan(id,tipe){
-
- const k=
-  cariKaryawan(id);
-
-
- if(!k)return;
-
-
- if(
-  window.AndroidBiometric &&
-  typeof window.AndroidBiometric
-  .authenticateAttendance===
-  "function"
- ){
-
-  window.__pendingAttendance={
-
-   id:id,
-   tipe:tipe
-
-  };
-
-
-  window.AndroidBiometric
-  .authenticateAttendance(
-   k.nama,
-   tipe
-  );
-
-
-  return;
-
- }
-
-
- simpanAbsen(
-  id,
-  tipe
- );
-
-}
-
-
-function simpanAbsen(id,tipe){
-
- const k=
-  cariKaryawan(id);
-
-
- if(!k)return;
-
-
- const now=
-  waktuSekarang();
-
-
- const list=
-  getAttendance();
-
-
- if(
-  tipe==="MASUK"&&
-  list.some(
-   a=>
-   a.karyawanId===id&&
-   a.tanggal===now.tanggal&&
-   a.tipe==="MASUK"
-  )
- ){
-
-  alert(
-   k.nama+
-   " sudah absen MASUK hari ini."
-  );
-
-  return;
-
- }
-
-
- if(
-  tipe==="PULANG"&&
-  !list.some(
-   a=>
-   a.karyawanId===id&&
-   a.tanggal===now.tanggal&&
-   a.tipe==="MASUK"
-  )
- ){
-
-  alert(
-   "Karyawan belum absen MASUK hari ini."
-  );
-
-  return;
-
- }
-
-
- if(
-  tipe==="PULANG"&&
-  list.some(
-   a=>
-   a.karyawanId===id&&
-   a.tanggal===now.tanggal&&
-   a.tipe==="PULANG"
-  )
- ){
-
-  alert(
-   k.nama+
-   " sudah absen PULANG hari ini."
-  );
-
-  return;
-
- }
-
-
- list.push({
-
-  id:"a_"+Date.now(),
-
-  karyawanId:id,
-
-  nama:k.nama,
-
-  jabatan:k.jabatan,
-
-  tipe:tipe,
-
-  tanggal:now.tanggal,
-
-  jam:now.jam,
-
-  iso:now.iso
-
- });
-
-
- saveAttendance(list);
-
-
- renderEmployees();
-
- renderAttendanceHistory();
-
-
- alert(
-  k.nama+
-  " berhasil absen "+
-  tipe+
-  " pada "+
-  now.jam
- );
-
-}
-
-
-function renderEmployees(){
-
- const el=
-  $("employeeList");
-
- if(!el)return;
-
-
- const list=
-  getEmployees();
-
- const attendance=
-  getAttendance();
-
- const today=
-  waktuSekarang().tanggal;
-
-
- if(!list.length){
-
-  el.innerHTML=
-   "<b>DAFTAR KARYAWAN</b><br>"+
-   "<small>Belum ada karyawan.</small>";
-
-  return;
-
- }
-
-
- let h=
-  "<b>DAFTAR KARYAWAN</b>";
-
-
- list.forEach(
-  (x,index)=>{
-
-   const rows=
-    attendance.filter(
-     a=>
-     a.karyawanId===x.id&&
-     a.tanggal===today
-    );
-
-
-   const masuk=
-    rows.find(
-     a=>a.tipe==="MASUK"
-    );
-
-
-   const pulang=
-    rows.find(
-     a=>a.tipe==="PULANG"
-    );
-
-
-   let status=
-    "Belum absen hari ini";
-
-
-   if(masuk&&!pulang){
-
-    status=
-     "MASUK "+
-     masuk.jam;
-
-   }
-
-
-   if(masuk&&pulang){
-
-    status=
-     "MASUK "+
-     masuk.jam+
-     " • PULANG "+
-     pulang.jam;
-
-   }
-
-
-   h+=`
-
-   <div class="employee-card">
-
-    <b>${x.nama}</b>
-
-    <div class="att-status">
-
-     ${x.jabatan}
-     •
-     ${status}
-
-    </div>
-
-    <div class="employee-actions">
-
-     <button
-      type="button"
-      class="btn"
-      onclick='absenKaryawan(
-       ${JSON.stringify(x.id)},
-       "MASUK"
-      )'
-     >
-      ABSEN MASUK
-     </button>
-
-     <button
-      type="button"
-      class="btn2"
-      onclick='absenKaryawan(
-       ${JSON.stringify(x.id)},
-       "PULANG"
-      )'
-     >
-      ABSEN PULANG
-     </button>
-
-     <button
-      type="button"
-      class="btn2"
-      onclick="ubahKaryawan(${index})"
-     >
-      EDIT
-     </button>
-
-     <button
-      type="button"
-      class="danger"
-      onclick="hapusKaryawan(${index})"
-     >
-      HAPUS
-     </button>
-
-    </div>
-
-   </div>
-
-   `;
-
-  }
- );
-
-
- el.innerHTML=h;
-
-}
-
-
-function ubahKaryawan(index){
-
- const list=
-  getEmployees();
-
- const x=
-  list[index];
-
-
- if(!x)return;
-
-
- const nama=
-  prompt(
-   "Nama karyawan:",
-   x.nama
-  );
-
-
- if(nama===null)return;
-
-
- const jabatan=
-  prompt(
-   "Jabatan:",
-   x.jabatan
-  );
-
-
- if(jabatan===null)return;
-
-
- if(!nama.trim()){
-
-  alert(
-   "Nama tidak boleh kosong."
-  );
-
-  return;
-
- }
-
-
- x.nama=
-  nama.trim();
-
- x.jabatan=
-  jabatan.trim()||
-  "Karyawan";
-
-
- list[index]=x;
-
-
- saveEmployees(list);
-
-
- renderEmployees();
-
- renderAttendanceHistory();
-
-}
-
-
-function hapusKaryawan(index){
-
- const list=
-  getEmployees();
-
- const x=
-  list[index];
-
-
- if(!x)return;
-
-
- if(
-  !confirm(
-   "Hapus "+
-   x.nama+
-   " dan seluruh data absennya?"
-  )
- )
- return;
-
-
- list.splice(
-  index,
-  1
- );
-
-
- saveEmployees(list);
-
-
- saveAttendance(
-  getAttendance()
-  .filter(
-   a=>a.karyawanId!==x.id
-  )
- );
-
-
- renderEmployees();
-
- renderAttendanceHistory();
-
-}
-
-
-function renderAttendanceHistory(){
-
- const el=
-  $("attendanceHistory");
-
-
- const list=
-  getAttendance()
-  .slice()
-  .reverse();
-
-
- if(!list.length){
-
-  el.innerHTML=
-   "Belum ada data absen.";
-
-  return;
-
- }
-
-
- const all=
-  getAttendance();
-
-
- let h=`
-
- <table class="att-table">
-
- <tr>
-
-  <th>Tanggal</th>
-
-  <th>Nama</th>
-
-  <th>Status</th>
-
-  <th>Jam</th>
-
- </tr>
-
- `;
-
-
- list.forEach(
-  (x,revIndex)=>{
-
-   const realIndex=
-    all.length-1-revIndex;
-
-
-   h+=`
-
-   <tr>
-
-    <td>
-     ${x.tanggal}
-    </td>
-
-    <td>
-     ${x.nama}<br>
-     <small>
-      ${x.jabatan}
-     </small>
-    </td>
-
-    <td>
-     ${x.tipe}
-    </td>
-
-    <td>
-
-     ${x.jam}
-
-     <br>
-
-     <button
-      type="button"
-      class="danger"
-      style="
-       padding:5px 7px;
-       margin-top:4px
-      "
-      onclick="
-       hapusAbsen(${realIndex})
-      "
-     >
-      HAPUS
-     </button>
-
-    </td>
-
-   </tr>
-
-   `;
-
-  }
- );
-
-
- h+="</table>";
-
-
- el.innerHTML=h;
-
-}
-
-
-function hapusAbsen(index){
-
- const list=
-  getAttendance();
-
-
- if(
-  !confirm(
-   "Hapus data absen ini?"
-  )
- )
- return;
-
-
- list.splice(
-  index,
-  1
- );
-
-
- saveAttendance(list);
-
-
- renderEmployees();
-
- renderAttendanceHistory();
-
-}
-
-
-/* =====================================================
-   CALLBACK FINGERPRINT UNTUK APK
-   ===================================================== */
-
-window.attendanceBiometricSuccess=
-function(){
-
- const p=
-  window.__pendingAttendance;
-
-
- window.__pendingAttendance=
-  null;
-
-
- if(p){
-
-  simpanAbsen(
-   p.id,
-   p.tipe
-  );
-
- }
-
-};
-
-
-window.attendanceBiometricFailed=
-function(){
-
- window.__pendingAttendance=
-  null;
-
-};
-
-
-window.ownerBiometricSuccess=
-function(){
-
- const d=
-  document.querySelector(
-   "#recapSection"
-  );
-
-
- if(d)
-  d.setAttribute(
-   "open",
-   ""
-  );
-
-};
-
-
-window.ownerBiometricFailed=
-function(){};
-
-
-/* =====================================================
-   REKAP OWNER
-   ===================================================== */
-
-(function(){
-
- const d=
-  $("recapSection");
-
-
- if(!d)return;
-
-
- const summary=
-  d.querySelector("summary");
-
-
- summary.addEventListener(
-  "click",
-  function(e){
-
-   if(
-    !currentUser||
-    currentUser.role!=="OWNER"
-   ){
-
-    e.preventDefault();
-
-    alert(
-     "Rekap penjualan hanya dapat dibuka oleh Owner."
-    );
-
-    return;
-
-   }
-
-  }
- );
-
-})();
-
-
-/* =====================================================
-   PESANAN ONLINE
-   ===================================================== */
-
-function getOnlineOrders(){
-
- return safeJson(
-  "iqihlo_online_orders",
-  []
- );
-
-}
-
-
-function saveOnlineOrders(x){
-
- saveJson(
-  "iqihlo_online_orders",
-  x
- );
-
-}
-
-
-function tambahOrderOnline(){
-
- const platform=
-  $("orderPlatform")
-  .value
-  .trim();
-
- const nomor=
-  $("orderNumber")
-  .value
-  .trim();
-
- const customer=
-  $("orderCustomer")
-  .value
-  .trim();
-
- const items=
-  $("orderItems")
-  .value
-  .trim();
-
- const total=
-  Number(
-   $("orderTotal").value
-  );
-
-
- if(
-  !platform||
-  !nomor||
-  !items
- ){
-
-  alert(
-   "Platform, nomor pesanan, dan isi pesanan wajib diisi."
-  );
-
-  return;
-
- }
-
-
- const orders=
-  getOnlineOrders();
-
-
- orders.push({
-
-  id:"o_"+Date.now(),
-
-  platform,
-
-  nomor,
-
-  customer:
-   customer||"-",
-
-  items,
-
-  total:
-   total||0,
-
-  status:"BARU",
-
-  waktu:
-   new Date()
-   .toLocaleString("id-ID")
-
- });
-
-
- saveOnlineOrders(orders);
-
-
- $("orderPlatform").value="";
- $("orderNumber").value="";
- $("orderCustomer").value="";
- $("orderItems").value="";
- $("orderTotal").value="";
-
-
- renderOnlineOrders();
-
-
- alert(
-  "Pesanan online berhasil dicatat."
- );
-
-}
-
-
-function renderOnlineOrders(){
-
- const el=
-  $("onlineOrderList");
-
-
- const orders=
-  getOnlineOrders()
-  .slice()
-  .reverse();
-
-
- if(!orders.length){
-
-  el.innerHTML=
-   "Belum ada pesanan online.";
-
-  return;
-
- }
-
-
- const all=
-  getOnlineOrders();
-
-
- let h=
-  "<b>DAFTAR PESANAN ONLINE</b>";
-
-
- orders.forEach(
-  (x,revIndex)=>{
-
-   const realIndex=
-    all.length-1-revIndex;
-
-
-   h+=`
-
-   <div class="order-card">
-
-    <b>
-     ${x.platform}
-    </b>
-
-    <span class="order-status">
-     ${x.status}
-    </span>
-
-    <br><br>
-
-    Nomor:
-    <b>${x.nomor}</b>
-
-    <br>
-
-    Pelanggan:
-    ${x.customer}
-
-    <br>
-
-    Pesanan:
-    ${x.items}
-
-    <br>
-
-    Total:
-    <b>${rupiah(x.total)}</b>
-
-    <br>
-
-    Waktu:
-    ${x.waktu}
-
-    <div
-     class="grid"
-     style="margin-top:8px"
-    >
-
-     <button
-      type="button"
-      class="btn2"
-      onclick="
-       updateOrderStatus(
-        ${realIndex},
-        'DIPROSES'
-       )
-      "
-     >
-      DIPROSES
-     </button>
-
-     <button
-      type="button"
-      class="btn2"
-      onclick="
-       updateOrderStatus(
-        ${realIndex},
-        'SELESAI'
-       )
-      "
-     >
-      SELESAI
-     </button>
-
-    </div>
-
-    <button
-     type="button"
-     class="danger"
-     style="width:100%;margin-top:6px"
-     onclick="
-      hapusOrder(${realIndex})
-     "
-    >
-     HAPUS
-    </button>
-
-   </div>
-
-   `;
-
-  }
- );
-
-
- el.innerHTML=h;
-
-}
-
-
-function updateOrderStatus(
- index,
- status
-){
-
- const orders=
-  getOnlineOrders();
-
-
- if(!orders[index])return;
-
-
- orders[index].status=
-  status;
-
-
- saveOnlineOrders(orders);
-
- renderOnlineOrders();
-
-}
-
-
-function hapusOrder(index){
-
- const orders=
-  getOnlineOrders();
-
-
- if(
-  !confirm(
-   "Hapus pesanan ini?"
-  )
- )
- return;
-
-
- orders.splice(
-  index,
-  1
- );
-
-
- saveOnlineOrders(orders);
-
- renderOnlineOrders();
-
-}
-
-
-/* =====================================================
-   INISIALISASI
-   ===================================================== */
-
+/* MULAI */
 cats();
-
 menus();
-
 render();
-
 harga();
-
 isiPilihanKategori();
-
-renderStock();
-
-renderEmployees();
-
-renderAttendanceHistory();
-
-renderOnlineOrders();
-
-renderAccounts();
-
+renderMenuTambahan();
+rekap();
 pilihBayar("Cash");
 
-restoreLogin();
 
+/* =========================
+   V3.1 INTEGRATED FEATURES
+   ========================= */
+
+const LOGIN_ACCOUNTS_KEY="iqihlo_accounts";
+const STOCK_KEY="iqihlo_stock";
+const EMP_KEY="iqihlo_employees";
+const ATT_KEY="iqihlo_attendance";
+const BAR_KEY="iqihlo_barcodes";
+const MARKET_KEY="iqihlo_market_orders";
+let currentSession=null;
+
+function jget(key, fallback){
+ try{return JSON.parse(localStorage.getItem(key)||"null") ?? fallback}catch(e){return fallback}
+}
+function jset(key,val){localStorage.setItem(key,JSON.stringify(val))}
+function accounts(){
+ let a=jget(LOGIN_ACCOUNTS_KEY,null);
+ if(!a){
+  a=[
+   {u:"owner",p:"4826",role:"Owner"},
+   {u:"admin",p:"6842",role:"Admin"},
+   {u:"kasir",p:"7391",role:"Kasir"}
+  ];
+  jset(LOGIN_ACCOUNTS_KEY,a);
+ }else{
+  // Migrasi satu kali dari sandi demo lama agar Owner dan Kasir benar-benar berbeda.
+  let changed=false;
+  a=a.map(x=>{
+    if(x.u==="admin" && (x.p==="1234" || x.p==="admin123")){x.p="6842";changed=true}
+    if(x.u==="kasir" && (x.p==="1111" || x.p==="kasir123")){x.p="7391";changed=true}
+    if(x.u==="owner" && !x.p){x.p="4826";changed=true}
+    return x;
+  });
+  if(changed)jset(LOGIN_ACCOUNTS_KEY,a);
+ }
+ return a;
+}
+function loginSystem(){
+ const u=$("loginUser").value.trim().toLowerCase(), p=$("loginPass").value;
+ const a=accounts().find(x=>x.u.toLowerCase()===u&&x.p===p);
+ if(!a){$("loginMsg").textContent="Username atau password salah.";return}
+ currentSession=a;
+ sessionStorage.setItem("iqihlo_session",JSON.stringify(a));
+ $("loginScreen").style.display="none";
+ $("currentUser").textContent=a.u; $("currentRole").textContent=a.role;
+ applyRole(); renderAllV3();
+}
+function applyRole(){
+ const role=currentSession?.role||"Kasir";
+ document.querySelectorAll(".owner-only").forEach(e=>e.classList.toggle("hidden-role",role!=="Owner"));
+ document.querySelectorAll(".admin-only").forEach(e=>e.classList.toggle("hidden-role",!(role==="Owner"||role==="Admin")));
+}
+function restoreSession(){
+ try{currentSession=JSON.parse(sessionStorage.getItem("iqihlo_session")||"null")}catch(e){}
+ if(currentSession){$("loginScreen").style.display="none";$("currentUser").textContent=currentSession.u;$("currentRole").textContent=currentSession.role;applyRole();renderAllV3()}
+}
+
+function stockData(){
+ const all=semuaNamaMenu(); let st=jget(STOCK_KEY,{}), changed=false;
+ all.forEach(n=>{if(st[n]===undefined){st[n]=9999;changed=true}});
+ if(changed)jset(STOCK_KEY,st); return st;
+}
+function renderStock(){
+ const el=$("stockList"); if(!el)return; const st=stockData();
+ let h="<b>STOK MENU</b>";
+ semuaNamaMenu().forEach(n=>{h+=`<div class="p"><span>${n}<small class="${st[n]<=5?'stock-low':''}"> Stok: ${st[n]}</small></span><input type="number" min="0" value="${st[n]}" onchange='setStock(${JSON.stringify(n)},this.value)'></div>`});
+ el.innerHTML=h;
+}
+function setStock(n,v){const st=stockData();st[n]=Math.max(0,Number(v)||0);jset(STOCK_KEY,st);renderStock();}
+
+const origTambah=window.tambah;
+window.tambah=function(n){
+ const st=stockData();
+ if(st[n]<=0 && Object.prototype.hasOwnProperty.call(st,n)){alert("Stok "+n+" habis.");return}
+ origTambah(n);
+};
+const origCetak=window.cetak;
+window.cetak=function(){
+ const names=Object.keys(cart), st=stockData();
+ for(const n of names){if(st[n]<cart[n]){alert("Stok "+n+" tidak cukup. Stok: "+st[n]);return}}
+ origCetak();
+ names.forEach(n=>{st[n]-=cart[n]}); jset(STOCK_KEY,st); renderStock();
+};
+
+function addEmployee(){
+ const nama=$("employeeName").value.trim(), jab=$("employeeRole").value.trim()||"Karyawan";
+ if(!nama){alert("Masukkan nama karyawan.");return}
+ const a=jget(EMP_KEY,[]); if(a.some(x=>x.nama.toLowerCase()===nama.toLowerCase())){alert("Karyawan sudah ada.");return}
+ a.push({id:"k_"+Date.now(),nama,jabatan:jab});jset(EMP_KEY,a);$("employeeName").value="";$("employeeRole").value="";renderEmployees();
+}
+function renderEmployees(){
+ const el=$("employeeList"); if(!el)return; const a=jget(EMP_KEY,[]), att=jget(ATT_KEY,[]), today=new Date().toLocaleDateString("id-ID");
+ if(!a.length){el.innerHTML="Belum ada karyawan.";return}
+ let h="<b>DAFTAR KARYAWAN</b>";
+ a.forEach((x,i)=>{const m=att.find(z=>z.idK===x.id&&z.tanggal===today&&z.tipe==="MASUK"), p=att.find(z=>z.idK===x.id&&z.tanggal===today&&z.tipe==="PULANG");h+=`<div class="employee-card"><b>${x.nama}</b><div class="att-status">${x.jabatan} • ${m?"Masuk "+m.jam:"Belum masuk"}${p?" • Pulang "+p.jam:""}</div><div class="employee-actions"><button type="button" class="vbtn" onclick='attendance(${JSON.stringify(x.id)},"MASUK")'>ABSEN MASUK</button><button type="button" class="vbtn alt" onclick='attendance(${JSON.stringify(x.id)},"PULANG")'>ABSEN PULANG</button><button type="button" class="vbtn alt" onclick="editEmployee(${i})">EDIT</button><button type="button" class="danger" onclick="deleteEmployee(${i})">HAPUS</button></div></div>`});
+ el.innerHTML=h;renderAttendance();
+}
+function attendance(id,tipe){
+ const a=jget(ATT_KEY,[]), today=new Date().toLocaleDateString("id-ID"), k=jget(EMP_KEY,[]).find(x=>x.id===id); if(!k)return;
+ if(tipe==="MASUK"&&a.some(x=>x.idK===id&&x.tanggal===today&&x.tipe==="MASUK")){alert("Sudah absen masuk hari ini.");return}
+ if(tipe==="PULANG"&&!a.some(x=>x.idK===id&&x.tanggal===today&&x.tipe==="MASUK")){alert("Belum absen masuk.");return}
+ if(tipe==="PULANG"&&a.some(x=>x.idK===id&&x.tanggal===today&&x.tipe==="PULANG")){alert("Sudah absen pulang hari ini.");return}
+ if(window.AndroidBiometric&&typeof window.AndroidBiometric.authenticateAttendance==="function"){
+  window.__pendingAttendance={id,tipe};
+  window.AndroidBiometric.authenticateAttendance(k.nama,tipe);
+  return;
+ }
+ simpanAttendanceLocal(id,tipe);
+}
+function simpanAttendanceLocal(id,tipe){
+ const a=jget(ATT_KEY,[]), k=jget(EMP_KEY,[]).find(x=>x.id===id); if(!k)return;
+ const now=new Date(), today=now.toLocaleDateString("id-ID");
+ a.push({id:"a_"+Date.now(),idK:id,nama:k.nama,jabatan:k.jabatan,tipe,tanggal:today,jam:now.toLocaleTimeString("id-ID")});
+ jset(ATT_KEY,a);renderEmployees();
+}
+function renderAttendance(){
+ const el=$("attendanceHistory");if(!el)return;const a=jget(ATT_KEY,[]).slice().reverse();if(!a.length){el.textContent="Belum ada data absen.";return}let h='<table class="att-table"><tr><th>Tanggal</th><th>Nama</th><th>Status</th><th>Jam</th></tr>';a.forEach((x,i)=>{h+=`<tr><td>${x.tanggal}</td><td>${x.nama}<br><small>${x.jabatan}</small></td><td>${x.tipe}</td><td>${x.jam}<br><button type="button" class="danger" style="padding:5px" onclick="deleteAttendance(${a.length-1-i})">HAPUS</button></td></tr>`});el.innerHTML=h+'</table>'}
+function deleteAttendance(i){const a=jget(ATT_KEY,[]);if(!confirm("Hapus data absen ini?"))return;a.splice(i,1);jset(ATT_KEY,a);renderEmployees()}
+function editEmployee(i){const a=jget(EMP_KEY,[]),x=a[i];if(!x)return;const n=prompt("Nama:",x.nama);if(n===null)return;const r=prompt("Jabatan:",x.jabatan);if(r===null)return;x.nama=n.trim();x.jabatan=r.trim()||"Karyawan";jset(EMP_KEY,a);renderEmployees()}
+function deleteEmployee(i){const a=jget(EMP_KEY,[]),x=a[i];if(!x||!confirm("Hapus "+x.nama+"?"))return;a.splice(i,1);jset(EMP_KEY,a);jset(ATT_KEY,jget(ATT_KEY,[]).filter(z=>z.idK!==x.id));renderEmployees()}
+
+function barcodeMap(){return jget(BAR_KEY,{})}
+function fillBarcodeMenus(){const s=$("barcodeMenu");if(!s)return;s.innerHTML=semuaNamaMenu().map(n=>`<option value='${String(n).replaceAll("'","&#39;")}'>${n}</option>`).join("");renderBarcodeList()}
+function saveBarcode(){const n=$("barcodeMenu").value,b=$("barcodeValue").value.trim();if(!b){alert("Masukkan barcode.");return}const m=barcodeMap();m[b]=n;jset(BAR_KEY,m);$("barcodeValue").value="";renderBarcodeList()}
+function renderBarcodeList(){const el=$("barcodeList");if(!el)return;const m=barcodeMap();el.innerHTML=Object.keys(m).length?Object.entries(m).map(([b,n])=>`<div class="p"><span>${b} → ${n}</span><button type="button" class="danger" onclick='deleteBarcode(${JSON.stringify(b)})'>HAPUS</button></div>`).join(""):"Belum ada barcode."}
+function deleteBarcode(b){const m=barcodeMap();delete m[b];jset(BAR_KEY,m);renderBarcodeList()}
+function findBarcode(v){const b=(typeof v==="string"?v:$("barcodeInput").value).trim();if(!b)return;const n=barcodeMap()[b];if(n){tambah(n);$("barcodeStatus").textContent="Ditemukan: "+n}else $("barcodeStatus").textContent="Barcode tidak terdaftar: "+b}
+let barcodeStream=null;
+async function startBarcodeCamera(){const v=$("barcodeVideo"),s=$("barcodeStatus");if(!('BarcodeDetector' in window)){s.textContent="BarcodeDetector tidak didukung browser ini. Gunakan input manual atau APK native.";return}try{barcodeStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:"environment"}}});v.srcObject=barcodeStream;v.style.display="block";await v.play();const detector=new BarcodeDetector();const loop=async()=>{if(v.readyState>=2){try{const codes=await detector.detect(v);if(codes.length){findBarcode(codes[0].rawValue);stopBarcodeCamera();return}}catch(e){}}if(barcodeStream)requestAnimationFrame(loop)};loop()}catch(e){s.textContent="Kamera gagal dibuka. Izinkan Kamera pada pengaturan APK lalu coba lagi.";console.error(e)}}
+function stopBarcodeCamera(){if(barcodeStream){barcodeStream.getTracks().forEach(t=>t.stop());barcodeStream=null}const v=$("barcodeVideo");if(v){v.pause();v.style.display="none"}}
+
+function saveMarketOrder(){const o=jget(MARKET_KEY,[]);o.push({id:$("marketOrderId").value.trim()||"-",source:$("marketSource").value,customer:$("marketCustomer").value.trim()||"-",items:$("marketItems").value.trim(),total:Number($("marketTotal").value)||0,time:new Date().toLocaleString("id-ID")});jset(MARKET_KEY,o);["marketOrderId","marketCustomer","marketItems","marketTotal"].forEach(id=>$(id).value="");renderMarketOrders()}
+function renderMarketOrders(){const el=$("marketOrders");if(!el)return;const o=jget(MARKET_KEY,[]).slice().reverse();el.innerHTML=o.length?o.map(x=>`<div class="item"><b>${x.source} — ${x.id}</b><br>${x.customer}<br>${x.items||"-"}<br><b>${rupiah(x.total)}</b><br><small>${x.time}</small></div>`).join(""):"Belum ada pesanan."}
+function renderAccounts(){const el=$("accountList");if(!el)return;el.innerHTML=accounts().map((x,i)=>`<div class="p"><span><b>${x.u}</b> — ${x.role}</span><button type="button" class="vbtn alt" onclick="changeAccount(${i})">UBAH PASSWORD</button></div>`).join("")}
+function changeAccount(i){const a=accounts(),p=prompt("Password baru:",a[i].p);if(p===null||!p)return;a[i].p=p;jset(LOGIN_ACCOUNTS_KEY,a);alert("Password berhasil diubah.")}
+window.ownerAttendanceBiometricSuccess=function(){const p=window.__pendingAttendance;window.__pendingAttendance=null;if(p)simpanAttendanceLocal(p.id,p.tipe);};
+window.attendanceBiometricSuccess=window.ownerAttendanceBiometricSuccess;
+function renderAllV3(){renderStock();renderEmployees();fillBarcodeMenus();renderMarketOrders();renderAccounts()}
+restoreSession();
+</script>
+
+<script>
+/* =========================
+   KUNCI OWNER: BIOMETRIK / SANDI
+   ========================= */
+(function(){
+  const OWNER_PASSWORD = "4826";
+
+  function cariRekap(){
+    const ds = document.querySelectorAll("details");
+    for(let i=0;i<ds.length;i++){
+      const d = ds[i];
+      const s = d.querySelector("summary");
+      if(s && /REKAP PENJUALAN/i.test(s.textContent)){
+        return d;
+      }
+    }
+    return null;
+  }
+
+  function bukaDenganSandi(d){
+    const p = prompt("🔒 AKSES OWNER\nMasukkan sandi Owner:");
+    if(p === OWNER_PASSWORD){
+      d.setAttribute("open","");
+    }else if(p !== null){
+      alert("❌ Sandi Owner salah.");
+    }
+  }
+
+  function pasangKunci(){
+    const d = cariRekap();
+    if(!d || d.dataset.ownerLock === "1") return;
+
+    const s = d.querySelector("summary");
+    d.dataset.ownerLock = "1";
+    d.removeAttribute("open");
+    s.innerHTML = "<b>🔒 REKAP PENJUALAN — OWNER</b>";
+
+    s.addEventListener("click", function(e){
+      e.preventDefault();
+      d.removeAttribute("open");
+
+      if(window.AndroidBiometric &&
+         typeof window.AndroidBiometric.authenticateOwner === "function"){
+        window.AndroidBiometric.authenticateOwner();
+      }else{
+        bukaDenganSandi(d);
+      }
+      return false;
+    });
+  }
+
+  window.ownerBiometricSuccess = function(){
+    const d = cariRekap();
+    if(d){
+      d.setAttribute("open","");
+    }
+  };
+
+  window.ownerBiometricFailed = function(){
+    const d = cariRekap();
+    if(d) d.removeAttribute("open");
+  };
+
+  document.addEventListener("DOMContentLoaded", pasangKunci);
+  setTimeout(pasangKunci, 300);
+  setTimeout(pasangKunci, 1000);
+})();
 </script>
 
 </body>
