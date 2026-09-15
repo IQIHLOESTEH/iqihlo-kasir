@@ -192,6 +192,74 @@ details{
  line-height:1.8
 }
 
+.menu-manager{
+ margin-top:14px;
+ padding:12px;
+ border:2px solid #dfb52d;
+ border-radius:14px;
+ background:#fffdf4
+}
+
+.menu-manager h4{
+ margin:0 0 10px;
+ color:#8d5200
+}
+
+.mm-grid{
+ display:grid;
+ grid-template-columns:1fr 1fr;
+ gap:8px
+}
+
+.mm-grid .full{
+ grid-column:1/-1
+}
+
+.mm-btn{
+ background:#925500;
+ color:#fff;
+ border:0;
+ width:100%;
+ padding:12px;
+ border-radius:10px;
+ font-weight:900
+}
+
+.menu-row{
+ display:flex;
+ gap:7px;
+ align-items:center;
+ padding:8px 0;
+ border-bottom:1px solid #eee
+}
+
+.menu-row .mn{
+ flex:1;
+ font-size:13px
+}
+
+.menu-row small{
+ display:block;
+ color:#8d5200
+}
+
+.menu-row button{
+ padding:7px 9px;
+ background:#fff3bd;
+ border:1px solid #c99719
+}
+
+@media(max-width:480px){
+ .mm-grid{
+  grid-template-columns:1fr
+ }
+ .mm-grid .full{
+  grid-column:auto
+ }
+}
+
+/* CETAK THERMAL 58 MM */
+
 .receipt{
  display:none
 }
@@ -252,11 +320,20 @@ details{
  }
 
  .rrow{
- display:block;
- width:100%;
- margin:0 0 2px 0;
- white-space:normal;
- overflow-wrap:anywhere;
+   display:grid;
+   grid-template-columns:minmax(0,1fr) auto;
+   gap:4px;
+   width:100%
+ }
+
+ .rrow span:first-child{
+   min-width:0;
+   overflow-wrap:anywhere;
+ }
+
+ .rrow span:last-child{
+   white-space:nowrap;
+   text-align:right;
  }
 
  *{
@@ -284,9 +361,10 @@ details{
 <div class="grid" id="menu"></div>
 
 <label>Metode Pembayaran</label>
+
 <div class="pay">
-<button type="button" id="cash" onclick="pilihBayar('Cash')">CASH</button>
-<button type="button" id="qris" onclick="pilihBayar('QRIS')">QRIS</button>
+<button id="cash" onclick="pilihBayar('Cash')">CASH</button>
+<button id="qris" onclick="pilihBayar('QRIS')">QRIS</button>
 </div>
 
 <div class="cart">
@@ -298,41 +376,115 @@ details{
 TOTAL: <span id="total">Rp0</span>
 </div>
 
-<button type="button" class="print" onclick="cetak()">CETAK STRUK</button>
-<button type="button" class="clear" onclick="hapus()">KOSONGKAN PESANAN</button>
+<button class="print" onclick="cetak()">CETAK STRUK</button>
+
+<button class="clear" onclick="hapus()">
+KOSONGKAN PESANAN
+</button>
 
 <details>
-<summary><b>ATUR HARGA MENU</b></summary>
-<p>Harga tersimpan otomatis di perangkat.</p>
+
+<summary>
+<b>ATUR HARGA & KELOLA MENU</b>
+</summary>
+
+<p>
+Harga dan menu baru tersimpan otomatis di perangkat ini.
+</p>
+
 <div id="harga"></div>
+
+<div class="menu-manager">
+
+<h4>➕ TAMBAH MENU BARU</h4>
+
+<div class="mm-grid">
+
+<input
+ id="newMenuName"
+ class="full"
+ type="text"
+ placeholder="Nama menu baru"
+>
+
+<input
+ id="newMenuPrice"
+ type="number"
+ min="1"
+ step="500"
+ placeholder="Harga (contoh 5000)"
+>
+
+<select
+ id="newMenuCat"
+ style="width:100%;font-weight:700;padding:13px;font-size:16px;border:1px solid #aaa;border-radius:10px">
+</select>
+
+<button
+ type="button"
+ class="mm-btn full"
+ onclick="tambahMenuBaru()">
+SIMPAN MENU BARU
+</button>
+
+</div>
+
+<div
+ id="menuTambahanList"
+ style="margin-top:10px">
+</div>
+
+</div>
+
 </details>
 
 <details>
-<summary><b>REKAP PENJUALAN</b></summary>
-<div id="rekap">Belum ada penjualan</div>
+
+<summary>
+<b>REKAP PENJUALAN</b>
+</summary>
+
+<div id="rekap">
+Belum ada penjualan
+</div>
+
 </details>
 
 <div class="contact">
+
 <b>IQIHLO ES TEH</b><br>
+
 Instagram: @iqihlo.esteh_id<br>
+
 TikTok: @iqihlo.es.teh<br>
+
 </div>
 
 </div>
+
+
+<!-- STRUK -->
 
 <div class="receipt">
 
 <div class="center">
+
 <b>IQIHLO ES TEH</b><br>
+
 SEGARNYA BEDA!<br>
+
 <b>STRUK PEMBELIAN</b>
+
 </div>
 
 <div class="line"></div>
 
 Nama: <span id="rnama"></span><br>
+
 Tanggal: <span id="rtgl"></span><br>
+
 Jam: <span id="rjam"></span><br>
+
 Bayar: <span id="rbayar"></span>
 
 <div class="line"></div>
@@ -341,36 +493,97 @@ Bayar: <span id="rbayar"></span>
 
 <div class="line"></div>
 
-<b>TOTAL: <span id="rtotal"></span></b>
+<b>
+TOTAL: <span id="rtotal"></span>
+</b>
 
 <div class="line"></div>
 
 <div class="center">
+
 TERIMA KASIH<br>
+
 SELAMAT MENIKMATI!<br><br>
+
 Instagram: @iqihlo.esteh_id<br>
+
 TikTok: @iqihlo.es.teh<br>
+
 </div>
 
 </div>
+
 
 <script>
 
 const data={
-"Es Teh":["Es Teh"],
-"Es Jeruk Peras":["Es Jeruk Peras"],
-"Goodday Biasa":["Mocacino","Vanilla Latte","Coolant","Chococino","Carebian Nut"],
-"Nutrisari":["Mangga","Jeruk Peras","Cincau","Milky Orange"],
-"Susu":["Putih","Coklat","Matcha","Milo"],
-"Teh Tarik Maxtea":["Teh Tarik Maxtea"],
-"Kopi Susu":["Tora Bika Creamy","Indocafe","White Coffee"],
-"Kopi Hitam":["Kopi Kapal Api","Kopi ABC"],
-"Chocolatos":["Matcha","Coklat","Creamy"],
-"Goodday Latte":["Butterscotch","Original"],
-"Air Putih Es/Panas":["Air Putih Es","Air Putih Panas"]
+
+"Es Teh":[
+"Es Teh"
+],
+
+"Es Jeruk Peras":[
+"Es Jeruk Peras"
+],
+
+"Goodday Biasa":[
+"Mocacino",
+"Vanilla Latte",
+"Coolant",
+"Chococino",
+"Carebian Nut"
+],
+
+"Nutrisari":[
+"Mangga",
+"Jeruk Peras",
+"Cincau",
+"Milky Orange"
+],
+
+"Susu":[
+"Putih",
+"Coklat",
+"Matcha",
+"Milo"
+],
+
+"Teh Tarik Maxtea":[
+"Teh Tarik Maxtea"
+],
+
+"Kopi Susu":[
+"Tora Bika Creamy",
+"Indocafe",
+"White Coffee"
+],
+
+"Kopi Hitam":[
+"Kopi Kapal Api",
+"Kopi ABC"
+],
+
+"Chocolatos":[
+"Matcha",
+"Coklat",
+"Creamy"
+],
+
+"Goodday Latte":[
+"Butterscotch",
+"Original"
+],
+
+"Air Putih Es/Panas":[
+"Air Putih Es",
+"Air Putih Panas"
+]
+
 };
 
+
 const base={
+
 "Es Teh":3000,
 "Es Jeruk Peras":5000,
 "Mocacino":5000,
@@ -397,342 +610,1074 @@ const base={
 "Original":5000,
 "Air Putih Es":2000,
 "Air Putih Panas":2000
+
 };
+
 
 let prices=JSON.parse(
  localStorage.getItem("iqihlo_prices")||"null"
 )||base;
 
+
 let cart={};
+
 let cat="Es Teh";
+
 let pay="Cash";
 
-const $=id=>document.getElementById(id);
+
+const $=id=>
+document.getElementById(id);
+
 
 function rupiah(n){
+
  return "Rp"+Number(n).toLocaleString("id-ID");
+
 }
+
 
 function cats(){
+
  let h="";
+
  Object.keys(data).forEach(c=>{
-   h+=`<button type="button" class="cat ${c===cat?"on":""}"
-   onclick='pilihKat(${JSON.stringify(c)})'>${c}</button>`;
+
+   h+=`<button
+   type="button"
+   class="cat ${c===cat?"on":""}"
+   onclick='pilihKat(${JSON.stringify(c)})'>
+   ${c}
+   </button>`;
+
  });
+
  $("kategori").innerHTML=h;
+
 }
+
 
 function pilihKat(c){
+
  cat=c;
+
  cats();
+
  menus();
+
 }
+
+
+function daftarMenuKategori(c){
+
+ const bawaan =
+ Array.isArray(data[c]) ? data[c] : [];
+
+ const tambahan =
+ JSON.parse(
+   localStorage.getItem("iqihlo_extra_menus")||"[]"
+ )
+ .filter(x=>x.kategori===c)
+ .map(x=>x.nama);
+
+ return [
+   ...bawaan,
+   ...tambahan
+ ];
+
+}
+
+
+function semuaNamaMenu(){
+
+ const names=[];
+
+ Object.keys(data).forEach(c=>
+
+   daftarMenuKategori(c).forEach(n=>{
+
+     if(!names.includes(n))
+       names.push(n);
+
+   })
+
+ );
+
+ return names;
+
+}
+
 
 function menus(){
+
  let h="";
- data[cat].forEach(n=>{
-   h+=`<button type="button" class="menu"
+
+ daftarMenuKategori(cat).forEach(n=>{
+
+   h+=`<button
+   type="button"
+   class="menu"
    onclick='tambah(${JSON.stringify(n)})'>
-   ${n}<small>${rupiah(prices[n])}</small>
+
+   ${n}
+
+   <small>
+   ${rupiah(prices[n]||0)}
+   </small>
+
    </button>`;
+
  });
- $("menu").innerHTML=h;
+
+ $("menu").innerHTML=
+ h||
+ "<div>Belum ada menu di kategori ini.</div>";
+
 }
+
 
 function tambah(n){
+
  cart[n]=(cart[n]||0)+1;
+
  render();
+
 }
+
 
 function kurang(n){
+
  if(!cart[n])return;
+
  cart[n]--;
- if(cart[n]<=0)delete cart[n];
+
+ if(cart[n]<=0)
+   delete cart[n];
+
  render();
+
 }
+
 
 function render(){
+
  let h="";
+
  let tot=0;
 
+
  Object.keys(cart).forEach(n=>{
+
    let q=cart[n];
+
    let sub=q*prices[n];
+
    tot+=sub;
 
+
    h+=`<div class="item">
+
    <b>${n}</b><br>
-   ${rupiah(prices[n])} x ${q} = ${rupiah(sub)}
+
+   ${rupiah(prices[n])} x ${q}
+   = ${rupiah(sub)}
+
    &nbsp;
-   <button type="button" onclick='kurang(${JSON.stringify(n)})'>−</button>
-   <button type="button" onclick='tambah(${JSON.stringify(n)})'>+</button>
+
+   <button
+   type="button"
+   onclick='kurang(${JSON.stringify(n)})'>
+   −
+   </button>
+
+   <button
+   type="button"
+   onclick='tambah(${JSON.stringify(n)})'>
+   +
+   </button>
+
    </div>`;
+
  });
 
- $("pesanan").innerHTML=h||"Belum ada pesanan";
- $("total").textContent=rupiah(tot);
+
+ $("pesanan").innerHTML=
+ h||"Belum ada pesanan";
+
+ $("total").textContent=
+ rupiah(tot);
+
 }
+
 
 function pilihBayar(p){
+
  pay=p;
- $("cash").className=p==="Cash"?"on":"";
- $("qris").className=p==="QRIS"?"on":"";
+
+ $("cash").className=
+ p==="Cash"?"on":"";
+
+ $("qris").className=
+ p==="QRIS"?"on":"";
+
 }
+
 
 function hapus(){
+
  cart={};
+
  render();
+
 }
+
 
 function harga(){
+
  let h="";
 
- Object.keys(base).forEach(n=>{
+
+ semuaNamaMenu().forEach(n=>{
+
    h+=`<div class="p">
+
    <span>${n}</span>
-   <input type="number"
-   value="${prices[n]}"
+
+   <input
+   type="number"
+   min="1"
+   value="${prices[n]||0}"
    onchange='ubahHarga(${JSON.stringify(n)},this.value)'>
+
    </div>`;
+
  });
 
- $("harga").innerHTML=h;
+
+ $("harga").innerHTML=
+ h||"Belum ada menu.";
+
+ renderMenuTambahan();
+
 }
 
+
+function isiPilihanKategori(){
+
+ const sel=$("newMenuCat");
+
+ if(!sel)return;
+
+ sel.innerHTML=
+ Object.keys(data)
+ .map(c=>
+ `<option value="${c}">${c}</option>`
+ )
+ .join("");
+
+ if(cat && data[cat])
+   sel.value=cat;
+
+}
+
+
+function tambahMenuBaru(){
+
+ const nama=
+ $("newMenuName").value.trim();
+
+ const hargaBaru=
+ Number($("newMenuPrice").value);
+
+ const kategori=
+ $("newMenuCat").value;
+
+
+ if(!nama){
+
+   alert("Masukkan nama menu.");
+
+   return;
+
+ }
+
+
+ if(!hargaBaru || hargaBaru<=0){
+
+   alert("Masukkan harga yang benar.");
+
+   return;
+
+ }
+
+
+ if(!kategori){
+
+   alert("Pilih kategori.");
+
+   return;
+
+ }
+
+
+ if(
+   semuaNamaMenu().some(
+     n=>n.toLowerCase()===nama.toLowerCase()
+   )
+ ){
+
+   alert(
+     "Nama menu sudah ada. Gunakan nama yang berbeda."
+   );
+
+   return;
+
+ }
+
+
+ const extras=
+ JSON.parse(
+   localStorage.getItem("iqihlo_extra_menus")||"[]"
+ );
+
+
+ extras.push({
+
+   id:"m_"+Date.now(),
+
+   nama,
+
+   harga:hargaBaru,
+
+   kategori
+
+ });
+
+
+ localStorage.setItem(
+   "iqihlo_extra_menus",
+   JSON.stringify(extras)
+ );
+
+
+ prices[nama]=hargaBaru;
+
+
+ localStorage.setItem(
+   "iqihlo_prices",
+   JSON.stringify(prices)
+ );
+
+
+ $("newMenuName").value="";
+
+ $("newMenuPrice").value="";
+
+
+ cat=kategori;
+
+ cats();
+
+ menus();
+
+ harga();
+
+
+ alert(
+   "Menu baru berhasil ditambahkan."
+ );
+
+}
+
+
+function renderMenuTambahan(){
+
+ const el=
+ $("menuTambahanList");
+
+ if(!el)return;
+
+
+ const extras=
+ JSON.parse(
+   localStorage.getItem("iqihlo_extra_menus")||"[]"
+ );
+
+
+ if(!extras.length){
+
+   el.innerHTML=
+   "<small>Belum ada menu tambahan.</small>";
+
+   return;
+
+ }
+
+
+ el.innerHTML=
+ "<b>MENU TAMBAHAN</b>"+
+
+ extras.map((x,i)=>
+
+ `<div class="menu-row">
+
+   <div class="mn">
+
+     <b>${x.nama}</b>
+
+     <small>
+     ${x.kategori} •
+     ${rupiah(prices[x.nama]||x.harga)}
+     </small>
+
+   </div>
+
+   <button
+   type="button"
+   onclick="editMenuTambahan(${i})">
+   EDIT
+   </button>
+
+   <button
+   type="button"
+   onclick="hapusMenuTambahan(${i})">
+   HAPUS
+   </button>
+
+ </div>`
+
+ ).join("");
+
+}
+
+
+function editMenuTambahan(index){
+
+ const extras=
+ JSON.parse(
+   localStorage.getItem("iqihlo_extra_menus")||"[]"
+ );
+
+
+ const x=extras[index];
+
+ if(!x)return;
+
+
+ const nama=
+ prompt("Nama menu:",x.nama);
+
+ if(nama===null)return;
+
+
+ const nilai=
+ prompt(
+   "Harga:",
+   String(prices[x.nama]||x.harga)
+ );
+
+ if(nilai===null)return;
+
+
+ const h=Number(nilai);
+
+
+ if(
+   !nama.trim()||
+   !h||
+   h<=0
+ ){
+
+   alert("Data tidak valid.");
+
+   return;
+
+ }
+
+
+ const old=x.nama;
+
+
+ x.nama=nama.trim();
+
+ x.harga=h;
+
+
+ delete prices[old];
+
+ prices[x.nama]=h;
+
+
+ extras[index]=x;
+
+
+ localStorage.setItem(
+   "iqihlo_extra_menus",
+   JSON.stringify(extras)
+ );
+
+
+ localStorage.setItem(
+   "iqihlo_prices",
+   JSON.stringify(prices)
+ );
+
+
+ if(cart[old]){
+
+   cart[x.nama]=
+   (cart[x.nama]||0)+cart[old];
+
+   delete cart[old];
+
+ }
+
+
+ cats();
+
+ menus();
+
+ harga();
+
+ render();
+
+}
+
+
+function hapusMenuTambahan(index){
+
+ const extras=
+ JSON.parse(
+   localStorage.getItem("iqihlo_extra_menus")||"[]"
+ );
+
+
+ const x=extras[index];
+
+ if(!x)return;
+
+
+ if(
+   !confirm(
+     "Hapus menu " + x.nama + "?"
+   )
+ )
+ return;
+
+
+ extras.splice(index,1);
+
+
+ localStorage.setItem(
+   "iqihlo_extra_menus",
+   JSON.stringify(extras)
+ );
+
+
+ delete prices[x.nama];
+
+
+ localStorage.setItem(
+   "iqihlo_prices",
+   JSON.stringify(prices)
+ );
+
+
+ delete cart[x.nama];
+
+
+ cats();
+
+ menus();
+
+ harga();
+
+ render();
+
+}
+
+
 function ubahHarga(n,v){
+
  v=Number(v);
 
+
  if(v>0){
+
    prices[n]=v;
+
 
    localStorage.setItem(
      "iqihlo_prices",
      JSON.stringify(prices)
    );
 
+
    menus();
+
    render();
+
  }
+
 }
+
 
 function rekap(){
- let r=JSON.parse(localStorage.getItem("iqihlo_rekap")||"[]");
 
- if(!r.length){
-   $("rekap").innerHTML="Belum ada penjualan";
-   return;
- }
-
- let h="";
-
- r.slice().reverse().forEach((x,revIndex)=>{
-   const realIndex=r.length-1-revIndex;
-   let dh="";
-
-   (x.items||[]).forEach(it=>{
-     dh+=`<div>${it.nama} x${it.qty} = <b>${rupiah(it.sub)}</b></div>`;
-   });
-
-   h+=`<details class="rekap-item">
-     <summary><b>${x.tgl} — ${x.nama} — ${x.bayar} — ${rupiah(x.total)}</b></summary>
-     <div style="padding:8px 0">${dh||"Detail transaksi tidak tersedia."}</div>
-     <button type="button" class="clear" onclick="hapusRekap(${realIndex})">HAPUS TRANSAKSI</button>
-   </details>`;
- });
-
- $("rekap").innerHTML=h;
-}
-
-function hapusRekap(index){
- let r=JSON.parse(localStorage.getItem("iqihlo_rekap")||"[]");
-
- if(index<0 || index>=r.length)return;
-
- 
-
- r.splice(index,1);
-
- localStorage.setItem(
-   "iqihlo_rekap",
-   JSON.stringify(r)
- );
-
- rekap();
-}
-
-function cetak(){
-
- const names=Object.keys(cart);
-
- if(!names.length){
-   alert("Pilih menu dulu");
-   return;
- }
-
- const now=new Date();
-
- let tot=0;
- let h="";
-
- names.forEach(n=>{
-   const q=cart[n];
-   const sub=q*prices[n];
-
-   tot+=sub;
-
-   const qtyText=q>1?` x${q}`:"";
-
-h+=`
-<div class="rrow">${n}${qtyText} Rp. ${Number(sub).toLocaleString("id-ID")}</div>`;
- });
-
- $("rnama").textContent=$("nama").value||"-";
- $("rtgl").textContent=now.toLocaleDateString("id-ID");
- $("rjam").textContent=now.toLocaleTimeString("id-ID");
- $("rbayar").textContent=pay;
- $("ritem").innerHTML=h;
- $("rtotal").textContent=rupiah(tot);
-
- let r=JSON.parse(
+ let r=
+ JSON.parse(
    localStorage.getItem("iqihlo_rekap")||"[]"
  );
 
- r.push({
-   tgl:now.toLocaleString("id-ID"),
-   nama:$("nama").value||"-",
-   bayar:pay,
-   total:tot,
-   items:names.map(n=>({
-     nama:n,
-     qty:cart[n],
-     sub:cart[n]*prices[n]
-   }))
+
+ if(!r.length){
+
+   $("rekap").innerHTML=
+   "Belum ada penjualan";
+
+   return;
+
+ }
+
+
+ let h="";
+
+
+ r.slice()
+ .reverse()
+ .forEach((x,revIndex)=>{
+
+   const realIndex=
+   r.length-1-revIndex;
+
+
+   let dh="";
+
+
+   (x.items||[]).forEach(it=>{
+
+     dh+=`<div>
+
+     ${it.nama} x${it.qty}
+     = <b>${rupiah(it.sub)}</b>
+
+     </div>`;
+
+   });
+
+
+   h+=`<details class="rekap-item">
+
+   <summary>
+
+   <b>
+   ${x.tgl} —
+   ${x.nama} —
+   ${x.bayar} —
+   ${rupiah(x.total)}
+   </b>
+
+   </summary>
+
+   <div style="padding:8px 0">
+
+   ${dh||"Detail transaksi tidak tersedia."}
+
+   </div>
+
+   <button
+   type="button"
+   class="clear"
+   onclick="hapusRekap(${realIndex})">
+
+   HAPUS TRANSAKSI
+
+   </button>
+
+   </details>`;
+
  });
+
+
+ $("rekap").innerHTML=h;
+
+}
+
+
+function hapusRekap(index){
+
+ let r=
+ JSON.parse(
+   localStorage.getItem("iqihlo_rekap")||"[]"
+ );
+
+
+ if(
+   index<0||
+   index>=r.length
+ )
+ return;
+
+
+ if(
+   !confirm("Hapus transaksi ini?")
+ )
+ return;
+
+
+ r.splice(index,1);
+
 
  localStorage.setItem(
    "iqihlo_rekap",
    JSON.stringify(r)
  );
 
+
  rekap();
 
- setTimeout(()=>{
-   if(window.AndroidPrint &&
-      typeof window.AndroidPrint.print==="function"){
-     window.AndroidPrint.print();
-   }else{
-     window.print();
-   }
- },300);
 }
 
+
+/* CETAK STRUK */
+
+function cetak(){
+
+ const names=
+ Object.keys(cart);
+
+
+ if(!names.length){
+
+   alert("Pilih menu dulu");
+
+   return;
+
+ }
+
+
+ const now=
+ new Date();
+
+
+ let tot=0;
+
+ let h="";
+
+
+ names.forEach(n=>{
+
+   const q=cart[n];
+
+   const sub=q*prices[n];
+
+
+   tot+=sub;
+
+
+   h+=`
+
+   <div class="rrow">
+
+     <span>
+     ${n} x${q}
+     </span>
+
+     <span>
+     ${rupiah(sub)}
+     </span>
+
+   </div>`;
+
+ });
+
+
+ $("rnama").textContent=
+ $("nama").value||"-";
+
+
+ $("rtgl").textContent=
+ now.toLocaleDateString("id-ID");
+
+
+ $("rjam").textContent=
+ now.toLocaleTimeString("id-ID");
+
+
+ $("rbayar").textContent=
+ pay;
+
+
+ $("ritem").innerHTML=h;
+
+
+ $("rtotal").textContent=
+ rupiah(tot);
+
+
+ let r=
+ JSON.parse(
+   localStorage.getItem("iqihlo_rekap")||"[]"
+ );
+
+
+ r.push({
+
+   tgl:now.toLocaleString("id-ID"),
+
+   nama:$("nama").value||"-",
+
+   bayar:pay,
+
+   total:tot,
+
+   items:names.map(n=>({
+
+     nama:n,
+
+     qty:cart[n],
+
+     sub:cart[n]*prices[n]
+
+   }))
+
+ });
+
+
+ localStorage.setItem(
+   "iqihlo_rekap",
+   JSON.stringify(r)
+ );
+
+
+ rekap();
+
+
+ /*
+  * Tunggu layout struk benar-benar selesai
+  * sebelum membuka dialog printer Android.
+  */
+
+ setTimeout(()=>{
+
+   if(
+     window.AndroidPrint &&
+     typeof window.AndroidPrint.print==="function"
+   ){
+
+     window.AndroidPrint.print();
+
+   }else{
+
+     window.print();
+
+   }
+
+ },300);
+
+}
+
+
+/* MULAI */
+
 cats();
+
 menus();
+
 render();
+
 harga();
+
+isiPilihanKategori();
+
+renderMenuTambahan();
+
 rekap();
+
 pilihBayar("Cash");
 
 </script>
 
+
 <script>
+
+/* KUNCI OWNER: BIOMETRIK / SANDI */
 
 (function(){
 
  const OWNER_PASSWORD="4826";
 
+
  function cariRekap(){
-   const ds=document.querySelectorAll("details");
 
-   for(let i=0;i<ds.length;i++){
+   const ds=
+   document.querySelectorAll("details");
+
+
+   for(
+     let i=0;
+     i<ds.length;
+     i++
+   ){
+
      const d=ds[i];
-     const s=d.querySelector("summary");
 
-     if(s && /REKAP PENJUALAN/i.test(s.textContent)){
+     const s=
+     d.querySelector("summary");
+
+
+     if(
+       s &&
+       /REKAP PENJUALAN/i
+       .test(s.textContent)
+     ){
+
        return d;
+
      }
+
    }
 
+
    return null;
+
  }
+
 
  function bukaDenganSandi(d){
 
-   const p=prompt(
+   const p=
+   prompt(
      "🔒 AKSES OWNER\nMasukkan sandi Owner:"
    );
 
-   if(p===OWNER_PASSWORD){
 
-     d.setAttribute("open","");
+   if(
+     p===OWNER_PASSWORD
+   ){
 
-   }else if(p!==null){
+     d.setAttribute(
+       "open",""
+     );
 
-     alert("❌ Sandi Owner salah.");
+   }else if(
+     p!==null
+   ){
+
+     alert(
+       "❌ Sandi Owner salah."
+     );
 
    }
+
  }
+
 
  function pasangKunci(){
 
    const d=cariRekap();
 
-   if(!d || d.dataset.ownerLock==="1")return;
 
-   const s=d.querySelector("summary");
+   if(
+     !d ||
+     d.dataset.ownerLock==="1"
+   )
+   return;
+
+
+   const s=
+   d.querySelector("summary");
+
 
    d.dataset.ownerLock="1";
 
+
    d.removeAttribute("open");
 
-   s.innerHTML="<b>🔒 REKAP PENJUALAN — OWNER</b>";
 
-   s.addEventListener("click",function(e){
+   s.innerHTML=
+   "<b>🔒 REKAP PENJUALAN — OWNER</b>";
 
-     e.preventDefault();
 
-     d.removeAttribute("open");
+   s.addEventListener(
+     "click",
+     function(e){
 
-     if(window.AndroidBiometric &&
-        typeof window.AndroidBiometric.authenticateOwner==="function"){
+       e.preventDefault();
 
-       window.AndroidBiometric.authenticateOwner();
+       d.removeAttribute("open");
 
-     }else{
 
-       bukaDenganSandi(d);
+       if(
+         window.AndroidBiometric &&
+         typeof window.AndroidBiometric.authenticateOwner
+         ==="function"
+       ){
+
+         window.AndroidBiometric
+         .authenticateOwner();
+
+       }else{
+
+         bukaDenganSandi(d);
+
+       }
+
+
+       return false;
 
      }
+   );
 
-     return false;
-   });
  }
 
- window.ownerBiometricSuccess=function(){
+
+ window.ownerBiometricSuccess=
+ function(){
 
    const d=cariRekap();
 
    if(d){
-     d.setAttribute("open","");
+
+     d.setAttribute(
+       "open",""
+     );
+
    }
+
  };
 
- window.ownerBiometricFailed=function(){
+
+ window.ownerBiometricFailed=
+ function(){
 
    const d=cariRekap();
 
    if(d){
+
      d.removeAttribute("open");
+
    }
+
  };
+
 
  document.addEventListener(
    "DOMContentLoaded",
    pasangKunci
  );
 
- setTimeout(pasangKunci,300);
- setTimeout(pasangKunci,1000);
+
+ setTimeout(
+   pasangKunci,
+   300
+ );
+
+
+ setTimeout(
+   pasangKunci,
+   1000
+ );
 
 })();
 
