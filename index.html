@@ -1,340 +1,176 @@
-‎<!DOCTYPE html>
-‎<html lang="id">
-‎<head>
-‎  <meta charset="UTF-8">
-‎  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-‎  <title>IQIHLO ES TEH - POS 58mm</title>
-‎  <style>
-‎    * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; }
-‎    body { background: #f4f5f7; color: #333; }
-‎
-‎    /* LAYOUT LOGIN */
-‎    #loginPage {
-‎      display: flex; justify-content: center; align-items: center; min-height: 100vh; background: #e2e8f0; padding: 20px;
-‎    }
-‎    .login-card {
-‎      background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 320px; text-align: center;
-‎    }
-‎    .login-card h2 { color: #5c3a21; margin-bottom: 5px; }
-‎    .login-card p { font-size: 13px; color: #666; margin-bottom: 20px; }
-‎    .input-group { margin-bottom: 15px; text-align: left; }
-‎    .input-group label { font-size: 12px; font-weight: bold; color: #4a5568; display: block; margin-bottom: 5px; }
-‎    .input-group input { width: 100%; padding: 10px; border: 1px solid #cbd5e0; border-radius: 6px; font-size: 14px; outline: none; }
-‎    .btn-login { background: #5c3a21; color: white; border: none; width: 100%; padding: 12px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 15px; }
-‎
-‎    /* LAYOUT KASIR UTAMA */
-‎    #appPage { display: none; padding: 15px; }
-‎    header { background: #5c3a21; color: white; padding: 12px 15px; border-radius: 10px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
-‎    header h1 { font-size: 18px; }
-‎    .btn-logout { background: #e53e3e; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; }
-‎
-‎    .container { display: flex; flex-wrap: wrap; gap: 15px; }
-‎    .products-section { flex: 2; min-width: 280px; }
-‎    
-‎    /* CATEGORY TABS */
-‎    .filter-container { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 10px; }
-‎    .btn-filter { background: #e2e8f0; border: none; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; cursor: pointer; white-space: nowrap; color: #4a5568; }
-‎    .btn-filter.active { background: #5c3a21; color: white; }
-‎
-‎    .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; max-height: 60vh; overflow-y: auto; padding-right: 5px; }
-‎    
-‎    .card { background: white; border-radius: 8px; padding: 10px; text-align: center; border: 1px solid #e2e8f0; display: flex; flex-direction: column; justify-content: space-between; }
-‎    .card h4 { font-size: 12px; margin: 4px 0; color: #2d3748; }
-‎    .card p { font-size: 11px; color: #e53e3e; font-weight: bold; margin-bottom: 6px; }
-‎    .btn-add { background: #27ae60; color: white; border: none; padding: 6px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 11px; width: 100%; }
-‎
-‎    .cart-section { flex: 1; min-width: 280px; background: white; padding: 15px; border-radius: 10px; border: 1px solid #e2e8f0; height: fit-content; }
-‎    .cart-section h3 { border-bottom: 2px solid #5c3a21; padding-bottom: 6px; font-size: 15px; color: #5c3a21; margin-bottom: 10px; }
-‎    .cart-list { max-height: 220px; overflow-y: auto; margin-bottom: 10px; }
-‎    .cart-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 12px; border-bottom: 1px dashed #eee; padding-bottom: 4px; }
-‎    .cart-controls { display: flex; gap: 4px; align-items: center; }
-‎    .btn-qty { background: #edf2f7; border: 1px solid #cbd5e0; padding: 1px 5px; border-radius: 3px; font-weight: bold; cursor: pointer; }
-‎    
-‎    .total-box { font-size: 15px; margin: 10px 0; border-top: 1px solid #ddd; padding-top: 8px; }
-‎    .btn-pay { background: #5c3a21; color: white; width: 100%; border: none; padding: 10px; border-radius: 6px; font-size: 14px; font-weight: bold; cursor: pointer; }
-‎
-‎    /* LAYOUT KHUSUS STRUK PRINTER THERMAL 58MM */
-‎    #receiptModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); justify-content: center; align-items: center; z-index: 999; }
-‎    
-‎    .receipt-card { 
-‎      background: white; 
-‎      width: 58mm; /* Ukuran Kertas Thermal 58mm */
-‎      padding: 10px; 
-‎      font-family: 'Courier New', Courier, monospace; 
-‎      font-size: 11px; 
-‎      color: #000;
-‎      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-‎    }
-‎    
-‎    .receipt-header { text-align: center; margin-bottom: 8px; }
-‎    .receipt-header h2 { font-size: 13px; text-transform: uppercase; }
-‎    .receipt-header p { font-size: 9px; }
-‎    .receipt-divider { border-top: 1px dashed #000; margin: 6px 0; }
-‎    
-‎    .receipt-item { display: flex; justify-content: space-between; margin-bottom: 3px; font-size: 10px; }
-‎    .receipt-footer { text-align: center; margin-top: 10px; font-size: 9px; }
-‎    
-‎    .modal-actions { margin-top: 10px; display: flex; gap: 5px; }
-‎    .btn-print { background: #2b6cb0; color: white; border: none; padding: 8px; border-radius: 4px; flex: 1; cursor: pointer; font-weight: bold; }
-‎    .btn-close { background: #e53e3e; color: white; border: none; padding: 8px; border-radius: 4px; flex: 1; cursor: pointer; font-weight: bold; }
-‎
-‎    /* CSS CETAK PRINTER */
-‎    @media print {
-‎      body * { visibility: hidden; }
-‎      #receiptModal, #receiptModal * { visibility: visible; }
-‎      #receiptModal { position: absolute; left: 0; top: 0; width: 58mm; background: none; }
-‎      .modal-actions { display: none; }
-‎    }
-‎  </style>
-‎</head>
-‎<body>
-‎
-‎  <!-- HALAMAN LOGIN -->
-‎  <div id="loginPage">
-‎    <div class="login-card">
-‎      <h2>IQIHLO ES TEH</h2>
-‎      <p>Silakan masuk untuk melanjutkan</p>
-‎      <div class="input-group">
-‎        <label>Username</label>
-‎        <input type="text" id="userInput" placeholder="Username">
-‎      </div>
-‎      <div class="input-group">
-‎        <label>Password</label>
-‎        <input type="password" id="passInput" placeholder="Password">
-‎      </div>
-‎      <button class="btn-login" onclick="login()">MASUK</button>
-‎    </div>
-‎  </div>
-‎
-‎  <!-- HALAMAN KASIR UTAMA -->
-‎  <div id="appPage">
-‎    <header>
-‎      <div>
-‎        <h1>IQIHLO ES TEH</h1>
-‎        <small>Kasir: <span id="currentKasir">IQIH ES TEH</span></small>
-‎      </div>
-‎      <button class="btn-logout" onclick="logout()">LOGOUT</button>
-‎    </header>
-‎
-‎    <div class="container">
-‎      <div class="products-section">
-‎        <div class="filter-container">
-‎          <button class="btn-filter active" onclick="filterCategory('All', this)">Semua</button>
-‎          <button class="btn-filter" onclick="filterCategory('Teh & Jeruk', this)">Teh & Jeruk</button>
-‎          <button class="btn-filter" onclick="filterCategory('Goodday', this)">Goodday</button>
-‎          <button class="btn-filter" onclick="filterCategory('Nutrisari', this)">Nutrisari</button>
-‎          <button class="btn-filter" onclick="filterCategory('Susu', this)">Susu</button>
-‎          <button class="btn-filter" onclick="filterCategory('Kopi', this)">Kopi</button>
-‎          <button class="btn-filter" onclick="filterCategory('Chocolatos', this)">Chocolatos</button>
-‎        </div>
-‎
-‎        <div class="product-grid" id="productGrid"></div>
-‎      </div>
-‎
-‎      <div class="cart-section">
-‎        <h3>Keranjang Belanja</h3>
-‎        <div class="cart-list" id="cartList"></div>
-‎        <div class="total-box">
-‎          <strong>Total: Rp <span id="totalPrice">0</span></strong>
-‎        </div>
-‎        <button class="btn-pay" onclick="processPayment()">PROSES PEMBAYARAN</button>
-‎      </div>
-‎    </div>
-‎  </div>
-‎
-‎  <!-- MODAL STRUK (UKURAN 58MM) -->
-‎  <div id="receiptModal">
-‎    <div>
-‎      <div class="receipt-card" id="receiptArea">
-‎        <div class="receipt-header">
-‎          <h2>IQIHLO ES TEH</h2>
-‎          <p>Jl. Raya Manis No. 123</p>
-‎          <p>Kasir: IQIH ES TEH</p>
-‎        </div>
-‎        <div class="receipt-divider"></div>
-‎        <div id="receiptDetails"></div>
-‎        <div class="receipt-divider"></div>
-‎        <div class="receipt-item" style="font-weight: bold; font-size:11px;">
-‎          <span>TOTAL:</span>
-‎          <span>Rp <span id="receiptTotal">0</span></span>
-‎        </div>
-‎        <div class="receipt-divider"></div>
-‎        <div class="receipt-footer">
-‎          <p>Terima kasih!</p>
-‎          <p>Semoga hari Anda menyenangkan</p>
-‎        </div>
-‎      </div>
-‎      
-‎      <div class="modal-actions">
-‎        <button class="btn-print" onclick="window.print()">CETAK STRUK</button>
-‎        <button class="btn-close" onclick="closeReceipt()">TUTUP</button>
-‎      </div>
-‎    </div>
-‎  </div>
-‎
-‎  <script>
-‎    const USER_VALID = "IQIH ES TEH";
-‎    const PASS_VALID = "152108";
-‎
-‎    const products = [
-‎      // Teh & Jeruk
-‎      { id: 1, name: "Es Teh", price: 3000, cat: "Teh & Jeruk" },
-‎      { id: 2, name: "Es Jeruk Peras", price: 5000, cat: "Teh & Jeruk" },
-‎      { id: 3, name: "Teh Tarik Maxtea", price: 5000, cat: "Teh & Jeruk" },
-‎      { id: 4, name: "Air Putih Es/Panas", price: 2000, cat: "Teh & Jeruk" },
-‎
-‎      // Goodday Biasa
-‎      { id: 5, name: "Goodday Mocacino", price: 5000, cat: "Goodday" },
-‎      { id: 6, name: "Goodday Vanilla Latte", price: 5000, cat: "Goodday" },
-‎      { id: 7, name: "Goodday Coolant", price: 5000, cat: "Goodday" },
-‎      { id: 8, name: "Goodday Chococino", price: 5000, cat: "Goodday" },
-‎      { id: 9, name: "Goodday Carebian Nut", price: 5000, cat: "Goodday" },
-‎
-‎      // Goodday Latte
-‎      { id: 10, name: "Goodday Latte Butterscotch", price: 5000, cat: "Goodday" },
-‎      { id: 11, name: "Goodday Latte Original", price: 5000, cat: "Goodday" },
-‎
-‎      // Nutrisari
-‎      { id: 12, name: "Nutrisari Mangga", price: 4000, cat: "Nutrisari" },
-‎      { id: 13, name: "Nutrisari Jeruk Peras", price: 4000, cat: "Nutrisari" },
-‎      { id: 14, name: "Nutrisari Cincau", price: 4000, cat: "Nutrisari" },
-‎      { id: 15, name: "Nutrisari Milky Orange", price: 4000, cat: "Nutrisari" },
-‎
-‎      // Susu
-‎      { id: 16, name: "Susu Putih", price: 5000, cat: "Susu" },
-‎      { id: 17, name: "Susu Coklat", price: 5000, cat: "Susu" },
-‎      { id: 18, name: "Susu Matcha", price: 5000, cat: "Susu" },
-‎      { id: 19, name: "Susu Milo", price: 5000, cat: "Susu" },
-‎
-‎      // Kopi Susu & Hitam
-‎      { id: 20, name: "Kopi Susu Tora Bika Creamy", price: 5000, cat: "Kopi" },
-‎      { id: 21, name: "Kopi Susu Indocafe", price: 5000, cat: "Kopi" },
-‎      { id: 22, name: "Kopi Susu White Coffee", price: 5000, cat: "Kopi" },
-‎      { id: 23, name: "Kopi Hitam Kapal Api", price: 3000, cat: "Kopi" },
-‎      { id: 24, name: "Kopi Hitam ABC", price: 3000, cat: "Kopi" },
-‎
-‎      // Chocolatos
-‎      { id: 25, name: "Chocolatos Matcha", price: 5000, cat: "Chocolatos" },
-‎      { id: 26, name: "Chocolatos Coklat", price: 5000, cat: "Chocolatos" },
-‎      { id: 27, name: "Chocolatos Creamy", price: 5000, cat: "Chocolatos" }
-‎    ];
-‎
-‎    let cart = [];
-‎    let currentCategory = "All";
-‎
-‎    function login() {
-‎      const user = document.getElementById("userInput").value;
-‎      const pass = document.getElementById("passInput").value;
-‎
-‎      if(user === USER_VALID && pass === PASS_VALID) {
-‎        document.getElementById("loginPage").style.display = "none";
-‎        document.getElementById("appPage").style.display = "block";
-‎        renderProducts();
-‎        renderCart();
-‎      } else {
-‎        alert("Username atau Password Salah!");
-‎      }
-‎    }
-‎
-‎    function logout() {
-‎      document.getElementById("appPage").style.display = "none";
-‎      document.getElementById("loginPage").style.display = "flex";
-‎      document.getElementById("userInput").value = "";
-‎      document.getElementById("passInput").value = "";
-‎      cart = [];
-‎    }
-‎
-‎    function filterCategory(category, btn) {
-‎      currentCategory = category;
-‎      document.querySelectorAll('.btn-filter').forEach(b => b.classList.remove('active'));
-‎      btn.classList.add('active');
-‎      renderProducts();
-‎    }
-‎
-‎    function renderProducts() {
-‎      const grid = document.getElementById("productGrid");
-‎      const filtered = currentCategory === "All" 
-‎        ? products 
-‎        : products.filter(p => p.cat === currentCategory);
-‎
-‎      grid.innerHTML = filtered.map(p => `
-‎        <div class="card">
-‎          <h4>${p.name}</h4>
-‎          <p>Rp ${p.price.toLocaleString('id-ID')}</p>
-‎          <button class="btn-add" onclick="addToCart(${p.id})">+ TAMBAH</button>
-‎        </div>
-‎      `).join('');
-‎    }
-‎
-‎    function addToCart(id) {
-‎      const p = products.find(prod => prod.id === id);
-‎      const item = cart.find(c => c.id === id);
-‎      if (item) { item.qty++; } else { cart.push({ ...p, qty: 1 }); }
-‎      renderCart();
-‎    }
-‎
-‎    function updateQty(id, delta) {
-‎      const item = cart.find(c => c.id === id);
-‎      if (item) {
-‎        item.qty += delta;
-‎        if (item.qty <= 0) { cart = cart.filter(c => c.id !== id); }
-‎      }
-‎      renderCart();
-‎    }
-‎
-‎    function renderCart() {
-‎      const cartList = document.getElementById("cartList");
-‎      if(cart.length === 0) {
-‎        cartList.innerHTML = `<p style="color:#a0aec0; text-align:center; font-size:12px;">Keranjang kosong</p>`;
-‎        document.getElementById("totalPrice").innerText = "0";
-‎        return;
-‎      }
-‎
-‎      let total = 0;
-‎      cartList.innerHTML = cart.map(c => {
-‎        const subtotal = c.price * c.qty;
-‎        total += subtotal;
-‎        return `
-‎          <div class="cart-item">
-‎            <div>
-‎              <strong>${c.name}</strong><br>
-‎              <small>@ ${c.price.toLocaleString('id-ID')}</small>
-‎            </div>
-‎            <div class="cart-controls">
-‎              <button class="btn-qty" onclick="updateQty(${c.id}, -1)">-</button>
-‎              <span>${c.qty}</span>
-‎              <button class="btn-qty" onclick="updateQty(${c.id}, 1)">+</button>
-‎            </div>
-‎          </div>
-‎        `;
-‎      }).join('');
-‎      document.getElementById("totalPrice").innerText = total.toLocaleString('id-ID');
-‎    }
-‎
-‎    function processPayment() {
-‎      if(cart.length === 0) return alert("Keranjang kosong!");
-‎      
-‎      let total = 0;
-‎      const detailsHTML = cart.map(c => {
-‎        const subtotal = c.price * c.qty;
-‎        total += subtotal;
-‎        return `<div class="receipt-item">
-‎          <span>${c.name} x${c.qty}</span>
-‎          <span>${subtotal.toLocaleString('id-ID')}</span>
-‎        </div>`;
-‎      }).join('');
-‎
-‎      document.getElementById("receiptDetails").innerHTML = detailsHTML;
-‎      document.getElementById("receiptTotal").innerText = total.toLocaleString('id-ID');
-‎      document.getElementById("receiptModal").style.display = "flex";
-‎    }
-‎
-‎    function closeReceipt() {
-‎      document.getElementById("receiptModal").style.display = "none";
-‎      cart = [];
-‎      renderCart();
-‎    }
-‎  </script>
-‎</body>
-‎</html>
-‎
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IQIHLO ES TEH</title>
+    <style>
+        * { box-sizing: border-box; font-family: sans-serif; margin: 0; padding: 0; }
+        body { background: #f4f4f9; padding: 15px; }
+        .hidden { display: none !important; }
+        .card { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 15px; }
+        .login-box { max-width: 320px; margin: 40px auto; text-align: center; }
+        input { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 5px; }
+        button { width: 100%; padding: 10px; background: #5c3a21; color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; }
+        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 10px; }
+        .item { border: 1px solid #ddd; padding: 10px; border-radius: 5px; text-align: center; background: #fff; }
+        .item button { margin-top: 5px; background: #28a745; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { border-bottom: 1px solid #ddd; padding: 8px; text-align: left; font-size: 14px; }
+        .btn-qty { width: auto; padding: 2px 8px; font-size: 12px; }
+        .btn-del { background: #dc3545; width: auto; padding: 2px 8px; }
+        
+        /* Tampilan Struk Cetak Thermal 58mm */
+        @media print {
+            body * { visibility: hidden; }
+            #receipt, #receipt * { visibility: visible; }
+            #receipt { position: absolute; left: 0; top: 0; width: 58mm; font-family: monospace; font-size: 12px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HALAMAN LOGIN -->
+    <div id="loginPage" class="card login-box">
+        <h2 style="color:#5c3a21;">IQIHLO ES TEH</h2>
+        <p style="color:#666; font-size:12px; margin-bottom:10px;">Kasir POS</p>
+        <input type="text" id="username" placeholder="Username">
+        <input type="password" id="password" placeholder="Password">
+        <button onclick="login()">MASUK</button>
+    </div>
+
+    <!-- HALAMAN KASIR -->
+    <div id="mainApp" class="hidden">
+        <div class="card" style="display:flex; justify-content:space-between; align-items:center; background:#5c3a21; color:white;">
+            <h3>IQIHLO ES TEH</h3>
+            <button onclick="logout()" style="width:auto; background:#dc3545; padding:5px 10px;">Keluar</button>
+        </div>
+
+        <div class="card">
+            <h4>Pilih Menu</h4>
+            <div class="grid" id="menuGrid"></div>
+        </div>
+
+        <div class="card">
+            <h4>Keranjang</h4>
+            <table>
+                <thead>
+                    <tr><th>Menu</th><th>Qty</th><th>Total</th><th></th></tr>
+                </thead>
+                <tbody id="cartList"></tbody>
+            </table>
+            <h3 style="text-align:right; margin:15px 0;">Total: Rp <span id="grandTotal">0</span></h3>
+            <label>Bayar (Rp):</label>
+            <input type="number" id="cashAmount" placeholder="Masukkan uang" oninput="calcKembalian()">
+            <p style="font-weight:bold; margin-bottom:10px;">Kembalian: Rp <span id="changeAmount">0</span></p>
+            <button onclick="printReceipt()">BAYAR & CETAK NOTA</button>
+        </div>
+    </div>
+
+    <!-- STRUK CETAK THERMAL -->
+    <div id="receipt" class="hidden">
+        <center>
+            <h3>IQIHLO ES TEH</h3>
+            <p>========================</p>
+        </center>
+        <p>Kasir: IQIH ES TEH</p>
+        <p>========================</p>
+        <div id="receiptItems"></div>
+        <p>========================</p>
+        <p>Total  : Rp <span id="rTotal">0</span></p>
+        <p>Bayar  : Rp <span id="rCash">0</span></p>
+        <p>Kembali: Rp <span id="rChange">0</span></p>
+        <p>========================</p>
+        <center><p>Terima Kasih!</p></center>
+    </div>
+
+    <script>
+        const menu = [
+            { id: 1, name: "Es Teh Original", price: 3000 },
+            { id: 2, name: "Es Teh Jumbo", price: 5000 },
+            { id: 3, name: "Es Teh Lemon", price: 6000 },
+            { id: 4, name: "Es Teh Milk Tea", price: 7000 }
+        ];
+        let cart = [];
+
+        function login() {
+            if (document.getElementById("username").value === "IQIH ES TEH" && document.getElementById("password").value === "152108") {
+                document.getElementById("loginPage").classList.add("hidden");
+                document.getElementById("mainApp").classList.remove("hidden");
+                renderMenu();
+            } else {
+                alert("Username / Password salah!");
+            }
+        }
+
+        function logout() {
+            document.getElementById("mainApp").classList.add("hidden");
+            document.getElementById("loginPage").classList.remove("hidden");
+        }
+
+        function renderMenu() {
+            const grid = document.getElementById("menuGrid");
+            grid.innerHTML = "";
+            menu.forEach(m => {
+                grid.innerHTML += `<div class="item"><strong>${m.name}</strong><br>Rp ${m.price}<br><button onclick="addToCart(${m.id})">+ Tambah</button></div>`;
+            });
+        }
+
+        function addToCart(id) {
+            const item = menu.find(m => m.id === id);
+            const exist = cart.find(c => c.id === id);
+            if (exist) exist.qty++;
+            else cart.push({ ...item, qty: 1 });
+            renderCart();
+        }
+
+        function changeQty(id, delta) {
+            const item = cart.find(c => c.id === id);
+            if (item) {
+                item.qty += delta;
+                if (item.qty <= 0) cart = cart.filter(c => c.id !== id);
+            }
+            renderCart();
+        }
+
+        function renderCart() {
+            const list = document.getElementById("cartList");
+            list.innerHTML = "";
+            let total = 0;
+            cart.forEach(c => {
+                const sub = c.price * c.qty;
+                total += sub;
+                list.innerHTML += `<tr><td>${c.name}</td><td><button class="btn-qty" onclick="changeQty(${c.id},-1)">-</button> ${c.qty} <button class="btn-qty" onclick="changeQty(${c.id},1)">+</button></td><td>${sub}</td><td><button class="btn-del" onclick="changeQty(${c.id},-${c.qty})">x</button></td></tr>`;
+            });
+            document.getElementById("grandTotal").innerText = total;
+            calcKembalian();
+        }
+
+        function calcKembalian() {
+            const total = cart.reduce((s, c) => s + (c.price * c.qty), 0);
+            const cash = parseFloat(document.getElementById("cashAmount").value) || 0;
+            document.getElementById("changeAmount").innerText = cash >= total ? cash - total : 0;
+        }
+
+        function printReceipt() {
+            const total = cart.reduce((s, c) => s + (c.price * c.qty), 0);
+            const cash = parseFloat(document.getElementById("cashAmount").value) || 0;
+            if (cart.length === 0 || cash < total) return alert("Cek kembali pesanan/pembayaran!");
+
+            let itemsHtml = "";
+            cart.forEach(c => {
+                itemsHtml += `<div>${c.name} x${c.qty} <span style="float:right;">${c.price * c.qty}</span></div>`;
+            });
+
+            document.getElementById("receiptItems").innerHTML = itemsHtml;
+            document.getElementById("rTotal").innerText = total;
+            document.getElementById("rCash").innerText = cash;
+            document.getElementById("rChange").innerText = cash - total;
+
+            document.getElementById("receipt").classList.remove("hidden");
+            window.print();
+            document.getElementById("receipt").classList.add("hidden");
+        }
+    </script>
+</body>
+</html>
