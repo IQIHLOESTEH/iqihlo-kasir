@@ -620,39 +620,42 @@ button{
   }
 
   .rr {
-    display: grid !important;
-    grid-template-columns: minmax(0, 1fr) auto !important;
-    width: 100% !important;
-    column-gap: 2mm !important;
-    align-items: start !important;
-    overflow: visible !important;
-  }
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  align-items: start !important;
+  column-gap: 2mm !important;
+  overflow: visible !important;
+}
 
-  .rn {
-    min-width: 0 !important;
-    width: auto !important;
-    max-width: none !important;
+.rn {
+  min-width: 0 !important;
+  width: auto !important;
+  max-width: none !important;
+  white-space: normal !important;
+  overflow: visible !important;
+  overflow-wrap: anywhere !important;
+  font-size: 10px !important;
+  text-align: left !important;
+}
 
-    white-space: normal !important;
-    overflow: visible !important;
-    overflow-wrap: anywhere !important;
+.rp {
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  white-space: nowrap !important;
+  overflow: visible !important;
+  font-size: 10px !important;
+  text-align: right !important;
+}
 
-    font-size: 10px !important;
-    text-align: left !important;
-  }
-
-  .rp {
-    width: auto !important;
-    min-width: 0 !important;
-    max-width: none !important;
-
-    white-space: nowrap !important;
-    overflow: visible !important;
-
-    font-size: 10px !important;
-    text-align: right !important;
-  }
-
+.rt {
+  width: 100% !important;
+  font-size: 10px !important;
+  font-weight: 900 !important;
+  text-align: left !important;
+}
   .rb {
     font-size: 10px !important;
     font-weight: 900 !important;
@@ -1708,16 +1711,12 @@ function buildReceipt(r){
 
  (r.items||[]).forEach(x=>{
   lines.push(`
-   <div class="rr">
-    <span class="rn">
-     ${esc(x.n)} x${x.q}
-    </span>
-    <span class="rp">
-     ${rupiah(x.p*x.q)}
-    </span>
-   </div>
+    <div class="rr">
+      <span class="rn">${esc(x.n)} x${x.q}</span>
+      <span class="rp">${rupiah(x.p*x.q)}</span>
+    </div>
   `);
- });
+  });
 
  lines.push('<div class="rl"></div>');
 
