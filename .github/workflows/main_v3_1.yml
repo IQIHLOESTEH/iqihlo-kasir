@@ -362,10 +362,17 @@ jobs:
                   return s.length()<=max?s:s.substring(0,Math.max(0,max-1))+"?";
               }
               private static String row(String name,long price){
-                  int width=32,priceW=12,nameW=width-priceW;
-                  return String.format(Locale.US,"%-"+nameW+"s%"+priceW+"s\n",cut(name,nameW),rupiah(price));
-              }
+    int width=30;
+    int priceW=10;
+    int nameW=width-priceW;
 
+    return String.format(
+        Locale.US,
+        "%-"+nameW+"s%"+priceW+"s\n",
+        cut(name,nameW),
+        rupiah(price)
+    );
+}
               private void printReceipt(String json){
                   executor.execute(()->{
                       try{
