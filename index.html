@@ -552,10 +552,18 @@ button{
   display:none
 }
 
+@page {
+  size: 58mm auto;
+  margin: 0;
+}
+
 @media print {
 
-  html, body {
+  html,
+  body {
     width: 58mm !important;
+    min-width: 58mm !important;
+    max-width: 58mm !important;
     margin: 0 !important;
     padding: 0 !important;
     background: #fff !important;
@@ -572,21 +580,20 @@ button{
     display: block !important;
     box-sizing: border-box !important;
 
+    /* AREA CETAK AMAN UNTUK KERTAS 58mm */
     width: 48mm !important;
     max-width: 48mm !important;
 
-    margin-left: auto !important;
-    margin-right: auto !important;
-
+    margin: 0 auto !important;
     padding: 0 !important;
 
     font-family: monospace !important;
-    font-size: 8px !important;
-    line-height: 1.1 !important;
+    font-size: 10px !important;
+    line-height: 1.2 !important;
     font-weight: 700 !important;
 
     color: #000 !important;
-    overflow: hidden !important;
+    overflow: visible !important;
   }
 
   .receipt * {
@@ -600,7 +607,8 @@ button{
   }
 
   .rh {
-    font-size: 10px !important;
+    width: 100% !important;
+    font-size: 11px !important;
     font-weight: 900 !important;
     text-align: center !important;
   }
@@ -612,46 +620,50 @@ button{
   }
 
   .rr {
-    display: flex !important;
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto !important;
     width: 100% !important;
-    justify-content: space-between !important;
-    align-items: baseline !important;
-    gap: 1mm !important;
-    overflow: hidden !important;
+    column-gap: 2mm !important;
+    align-items: start !important;
+    overflow: visible !important;
   }
 
   .rn {
-    flex: 1 1 auto !important;
     min-width: 0 !important;
-    max-width: 70% !important;
-    overflow: hidden !important;
-    white-space: nowrap !important;
-    font-size: 8px !important;
+    width: auto !important;
+    max-width: none !important;
+
+    white-space: normal !important;
+    overflow: visible !important;
+    overflow-wrap: anywhere !important;
+
+    font-size: 10px !important;
     text-align: left !important;
   }
 
   .rp {
-    flex: 0 0 auto !important;
     width: auto !important;
-    min-width: 30% !important;
-    max-width: 30% !important;
-    text-align: right !important;
+    min-width: 0 !important;
+    max-width: none !important;
+
     white-space: nowrap !important;
-    font-size: 8px !important;
+    overflow: visible !important;
+
+    font-size: 10px !important;
+    text-align: right !important;
   }
 
   .rb {
-    font-size: 9px !important;
+    font-size: 10px !important;
     font-weight: 900 !important;
   }
 
   .rt {
     width: 100% !important;
-    font-size: 9px !important;
+    font-size: 10px !important;
     font-weight: 900 !important;
     text-align: center !important;
   }
-}
 
 }
 </style>
