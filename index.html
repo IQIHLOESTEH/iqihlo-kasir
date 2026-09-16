@@ -553,140 +553,92 @@ button{
 }
 
 @media print{
-  html,body{
-    width:58mm!important;
-    margin:0!important;
-    padding:0!important;
-    background:#fff!important
-  }
+    html,body{
+        width:58mm!important;
+        margin:0!important;
+        padding:0!important;
+        background:#fff!important;
+    }
 
-  .app,
-  .login,
-  .modal,
-  .cartbar{
-    display:none!important
-  }
+    .app,.login,.modal,.cartbar{
+        display:none!important;
+    }
 
-  .receipt{
-    display:block!important;
-    width:54mm!important;
-    margin:0 auto!important;
-    padding:1mm 0!important;
-    font-family:monospace!important;
-    font-size:13px!important;
-    line-height:1.28!important;
-    color:#000!important;
-    font-weight:700!important
-  }
+    .receipt{
+        display:block!important;
+        box-sizing:border-box!important;
+        width:48mm!important;
+        max-width:48mm!important;
+        margin:0 auto!important;
+        padding:0!important;
+        font-family:monospace!important;
+        font-size:8px!important;
+        line-height:1.1!important;
+        color:#000!important;
+        font-weight:700!important;
+        overflow:hidden!important;
+    }
 
-  .receipt *{
-    color:#000!important
-  }
+    .receipt *{
+        box-sizing:border-box!important;
+        color:#000!important;
+        max-width:100%!important;
+    }
 
-  .rc{
-    text-align:center
-  }
+    .rc{
+        width:100%!important;
+        text-align:center!important;
+    }
 
-  .rh{
-    font-size:13px!important;
-    font-weight:900!important;
-}
+    .rh{
+        font-size:10px!important;
+        font-weight:900!important;
+    }
 
-.rl{
-    border-top:1px dashed #000;
-    margin:4px 0!important;
-}
+    .rl{
+        width:100%!important;
+        border-top:1px dashed #000!important;
+        margin:3px 0!important;
+    }
 
-.rr{
-    display:flex!important;
-    justify-content:space-between!important;
-    gap:2px!important;
-    align-items:flex-start!important;
-    width:100%!important;
-}
+    .rr{
+        display:flex!important;
+        width:100%!important;
+        justify-content:space-between!important;
+        align-items:baseline!important;
+        gap:2px!important;
+        overflow:hidden!important;
+    }
 
-.rn{
-    flex:1 1 auto!important;
-@media print{
-  html,body{
-    width:58mm!important;
-    margin:0!important;
-    padding:0!important;
-    background:#fff!important;
-  }
+    .rn{
+        flex:1 1 auto!important;
+        min-width:0!important;
+        max-width:70%!important;
+        overflow:hidden!important;
+        white-space:nowrap!important;
+        font-size:8px!important;
+    }
 
-  .app,
-  .login,
-  .modal,
-  .cartbar{
-    display:none!important;
-  }
+    .rp{
+        flex:0 0 auto!important;
+        width:auto!important;
+        min-width:0!important;
+        max-width:30%!important;
+        text-align:right!important;
+        white-space:nowrap!important;
+        overflow:hidden!important;
+        font-size:8px!important;
+    }
 
-  .receipt{
-    display:block!important;
-    width:52mm!important;
-    margin:0 auto!important;
-    padding:1mm 0!important;
-    font-family:monospace!important;
-    font-size:8px!important;
-    line-height:1.15!important;
-    color:#000!important;
-    font-weight:700!important;
-  }
+    .rb{
+        font-size:9px!important;
+        font-weight:900!important;
+    }
 
-  .receipt *{
-    color:#000!important;
-  }
-
-  .rc{
-    text-align:center;
-  }
-
-  .rh{
-    font-size:11px!important;
-    font-weight:900!important;
-  }
-
-  .rl{
-    border-top:1px dashed #000;
-    margin:4px 0!important;
-  }
-
-  .rr{
-    display:flex!important;
-    justify-content:space-between!important;
-    gap:2px!important;
-    align-items:flex-start!important;
-    width:100%!important;
-  }
-
-  .rn{
-    flex:1 1 auto!important;
-    min-width:0!important;
-    max-width:68%!important;
-    overflow:hidden!important;
-    overflow-wrap:anywhere!important;
-    font-size:8px!important;
-  }
-
-  .rp{
-    flex:0 0 auto!important;
-    min-width:29%!important;
-    max-width:32%!important;
-    text-align:right!important;
-    white-space:nowrap!important;
-    font-size:8px!important;
-  }
-
-  .rb{
-    font-weight:900!important;
-    font-size:10px!important;
-  }
-
-  .rt{
-    font-size:11px!important;
-    font-weight:900!important;
-  }
+    .rt{
+        font-size:10px!important;
+        font-weight:900!important;
+    }
 
 }
 </style>
