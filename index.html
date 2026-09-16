@@ -552,93 +552,106 @@ button{
   display:none
 }
 
-@media print{
-    html,body{
-        width:58mm!important;
-        margin:0!important;
-        padding:0!important;
-        background:#fff!important;
-    }
+@media print {
 
-    .app,.login,.modal,.cartbar{
-        display:none!important;
-    }
+  html, body {
+    width: 58mm !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #fff !important;
+  }
 
-    .receipt{
-        display:block!important;
-        box-sizing:border-box!important;
-        width:48mm!important;
-        max-width:48mm!important;
-        margin:0 auto!important;
-        padding:0!important;
-        font-family:monospace!important;
-        font-size:8px!important;
-        line-height:1.1!important;
-        color:#000!important;
-        font-weight:700!important;
-        overflow:hidden!important;
-    }
+  .app,
+  .login,
+  .modal,
+  .cartbar {
+    display: none !important;
+  }
 
-    .receipt *{
-        box-sizing:border-box!important;
-        color:#000!important;
-        max-width:100%!important;
-    }
+  .receipt {
+    display: block !important;
+    box-sizing: border-box !important;
 
-    .rc{
-        width:100%!important;
-        text-align:center!important;
-    }
+    width: 48mm !important;
+    max-width: 48mm !important;
 
-    .rh{
-        font-size:10px!important;
-        font-weight:900!important;
-    }
+    margin-left: auto !important;
+    margin-right: auto !important;
 
-    .rl{
-        width:100%!important;
-        border-top:1px dashed #000!important;
-        margin:3px 0!important;
-    }
+    padding: 0 !important;
 
-    .rr{
-        display:flex!important;
-        width:100%!important;
-        justify-content:space-between!important;
-        align-items:baseline!important;
-        gap:2px!important;
-        overflow:hidden!important;
-    }
+    font-family: monospace !important;
+    font-size: 8px !important;
+    line-height: 1.1 !important;
+    font-weight: 700 !important;
 
-    .rn{
-        flex:1 1 auto!important;
-        min-width:0!important;
-        max-width:70%!important;
-        overflow:hidden!important;
-        white-space:nowrap!important;
-        font-size:8px!important;
-    }
+    color: #000 !important;
+    overflow: hidden !important;
+  }
 
-    .rp{
-        flex:0 0 auto!important;
-        width:auto!important;
-        min-width:0!important;
-        max-width:30%!important;
-        text-align:right!important;
-        white-space:nowrap!important;
-        overflow:hidden!important;
-        font-size:8px!important;
-    }
+  .receipt * {
+    box-sizing: border-box !important;
+    max-width: 100% !important;
+  }
 
-    .rb{
-        font-size:9px!important;
-        font-weight:900!important;
-    }
+  .rc {
+    width: 100% !important;
+    text-align: center !important;
+  }
 
-    .rt{
-        font-size:10px!important;
-        font-weight:900!important;
-    }
+  .rh {
+    font-size: 10px !important;
+    font-weight: 900 !important;
+    text-align: center !important;
+  }
+
+  .rl {
+    width: 100% !important;
+    border-top: 1px dashed #000 !important;
+    margin: 3px 0 !important;
+  }
+
+  .rr {
+    display: flex !important;
+    width: 100% !important;
+    justify-content: space-between !important;
+    align-items: baseline !important;
+    gap: 1mm !important;
+    overflow: hidden !important;
+  }
+
+  .rn {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    max-width: 70% !important;
+    overflow: hidden !important;
+    white-space: nowrap !important;
+    font-size: 8px !important;
+    text-align: left !important;
+  }
+
+  .rp {
+    flex: 0 0 auto !important;
+    width: auto !important;
+    min-width: 30% !important;
+    max-width: 30% !important;
+    text-align: right !important;
+    white-space: nowrap !important;
+    font-size: 8px !important;
+  }
+
+  .rb {
+    font-size: 9px !important;
+    font-weight: 900 !important;
+  }
+
+  .rt {
+    width: 100% !important;
+    font-size: 9px !important;
+    font-weight: 900 !important;
+    text-align: center !important;
+  }
+}
 
 }
 </style>
