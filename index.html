@@ -668,6 +668,60 @@ button{
     text-align: center !important;
   }
 
+}/* SIDEBAR MENU KIRI */
+#menuModal{
+  align-items:stretch;
+  justify-content:flex-start;
+  background:#0007;
+}
+
+#menuModal .sheet{
+  width:82%;
+  max-width:330px;
+  height:100vh;
+  max-height:100vh;
+  border-radius:0 22px 22px 0;
+  padding:18px 14px;
+  overflow-y:auto;
+  animation:menuSlide .22s ease-out;
+}
+
+.menu-side-btn{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  width:100%;
+  margin-top:8px;
+  padding:13px 14px;
+  border-radius:13px;
+  background:#f5eee7;
+  color:#3e3129;
+  text-align:left;
+  font-weight:900;
+  font-size:14px;
+}
+
+.menu-side-btn .mi{
+  width:28px;
+  text-align:center;
+  font-size:21px;
+}
+
+.menu-side-btn.logout{
+  margin-top:18px;
+  background:#fff0ed;
+  color:#a52b25;
+}
+
+@keyframes menuSlide{
+  from{
+    transform:translateX(-100%);
+    opacity:.5;
+  }
+  to{
+    transform:translateX(0);
+    opacity:1;
+  }
 }
 </style>
 </head>
@@ -1208,54 +1262,240 @@ function applyRole(){
 }
 
 function openMenu(){
- const body=$('menuModalBody');
 
- if(!body)return;
+  const body = $('menuModalBody');
+  if(!body) return;
 
- const r=session?.r||'KASIR';
+  const r = session?.r || 'KASIR';
 
- let html=`
- <button class="secondary full" onclick="closeMenu();window.scrollTo({top:0,behavior:'smooth'})">
- 🏠 Beranda
- </button>
+  let html = `
 
- <button class="secondary full" style="margin-top:7px" onclick="closeMenu();openCart()">
- 🛒 Kasir / Keranjang
- </button>
+    <button class="menu-side-btn"
+      onclick="goHomeFromMenu()">
+      <span class="mi">🏠</span>
+      <span>Beranda</span>
+    </button>
 
- <button class="secondary full" style="margin-top:7px" onclick="closeMenu();openHistory()">
- 🧾 Riwayat Transaksi
- </button>
- `;
+    <button class="menu-side-btn"
+      onclick="goFeatureFromMenu('KASIR')">
+      <span class="mi">🧾</span>
+      <span>Kasir</span>
+    </button>
 
- if(r==='OWNER'||r==='ADMIN'){
-  html+=`
-  <button class="secondary full" style="margin-top:7px" onclick="closeMenu();openEditMenu()">
-  ✏️ Edit Menu
-  </button>
-
-  <button class="secondary full" style="margin-top:7px" onclick="closeMenu();openSettings()">
-  ⚙️ Pengaturan
-  </button>
   `;
- }
 
- if(r==='OWNER'){
-  html+=`
-  <button class="secondary full" style="margin-top:7px" onclick="closeMenu();openPrinterSettings()">
-  🖨️ Printer
-  </button>
+  if(r === 'OWNER' || r === 'ADMIN'){
+    html += `
+
+      <button class="menu-side-btn"
+        onclick="goFeatureFromMenu('PESANAN')">
+        <span class="mi">📦</span>
+        <span>Pesanan</span>
+      </button>
+
+      <button class="menu-side-btn"
+        onclick="goFeatureFromMenu('BARCODE')">
+        <span class="mi">📷</span>
+        <span>Scan Barcode</span>
+      </button>
+
+      <button class="menu-side-btn"
+        onclick="goFeatureFromMenu('STOK')">
+        <span class="mi">📊</span>
+        <span>Stok</span>
+      </button>
+
+      <button class="menu-side-btn"
+        onclick="goFeatureFromMenu('KELOLA MENU')">
+        <span class="mi">🛠️</span>
+        <span>Kelola Menu</span>
+      </button>
+
+      <button class="menu-side-btn"
+        onclick="goFeatureFromMenu('KARYAWAN')">
+        <span class="mi">👥</span>
+        <span>Karyawan</span>
+      </button>
+
+      <button class="menu-side-btn"
+        onclick="goFeatureFromMenu('LAPORAN')">
+        <span class="mi">📈</span>
+        <span>Laporan</span>
+      </button>
+
+      <button class="menu-side-btn"
+        onclick="goFeatureFromMenu('RIWAYAT')">
+        <span class="mi">🕘</span>
+        <span>Riwayat</span>
+      </button>
+
+      <button class="menu-side-btn"
+        onclick="openSettingsFromMenu()">
+        <span class="mi">⚙️</span>
+        <span>Pengaturan</span>
+      </button>
+
+    `;
+  }
+
+  if(r === 'OWNER'){
+    html += `
+
+      <button class="menu-side-btn"
+        onclick="goFeatureFromMenu('PRINTER')">
+        <span class="mi">🖨️</span>
+        <span>Printer</span>
+      </button>
+
+      <button class="menu-side-btn"
+        onclick="goFeatureFromMenu('AKUN')">
+        <span class="mi">👤</span>
+        <span>Akun</span>
+      </button>
+
+    `;
+  }
+
+  html += `
+
+    <button class="menu-side-btn logout"
+      onclick="closeMenu();lockApp()">
+      <span class="mi">🚪</span>
+      <span>Keluar</span>
+    </button>
+
   `;
- }
 
- html+=`
- <button class="danger full" style="margin-top:12px" onclick="closeMenu();lockApp()">
- 🔒 Kunci / Logout
- </button>
- `;
+  body.innerHTML = html;
 
- body.innerHTML=html;
- $('menuModal').classList.remove('hidden');
+  $('menuModal').classList.remove('hidden');
+}
+
+
+/* =========================
+   NAVIGASI DARI SIDEBAR
+========================= */
+
+function hideFeatures(){
+
+  const f = document.querySelector('.features');
+
+  if(f){
+    f.classList.remove('show-feature');
+  }
+
+  document.querySelectorAll('.features .details')
+    .forEach(d => d.open = false);
+}
+
+
+function goHomeFromMenu(){
+
+  closeMenu();
+  hideFeatures();
+
+  window.scrollTo({
+    top:0,
+    behavior:'smooth'
+  });
+}
+
+
+function goFeatureFromMenu(keyword){
+
+  closeMenu();
+
+  const features = document.querySelector('.features');
+
+  if(!features) return;
+
+  features.classList.add('show-feature');
+
+  const details =
+    [...features.querySelectorAll('.details')];
+
+  details.forEach(d => {
+    d.open = false;
+  });
+
+  const target =
+    details.find(d =>
+      d.textContent
+       .toUpperCase()
+       .includes(keyword.toUpperCase())
+    );
+
+  if(!target){
+
+    if(keyword === 'KASIR'){
+      openCart();
+      return;
+    }
+
+    return;
+  }
+
+  target.open = true;
+
+  target.scrollIntoView({
+    behavior:'smooth',
+    block:'start'
+  });
+
+  if(keyword === 'RIWAYAT'){
+    renderHistory();
+  }
+
+  if(keyword === 'LAPORAN'){
+    renderReport();
+  }
+
+  if(keyword === 'BARCODE'){
+    renderBarcode();
+  }
+
+  if(keyword === 'STOK'){
+    renderStock();
+  }
+
+  if(keyword === 'PESANAN'){
+    renderMarket();
+  }
+
+  if(keyword === 'KARYAWAN'){
+    renderEmployees();
+  }
+}
+
+
+/* =========================
+   PENGATURAN
+========================= */
+
+function openSettingsFromMenu(){
+
+  if(!session) return;
+
+  if(session.r === 'KASIR'){
+    alert(
+      'Pengaturan hanya dapat digunakan oleh Admin atau Owner.'
+    );
+    return;
+  }
+
+  closeMenu();
+
+  const features =
+    document.querySelector('.features');
+
+  if(features){
+    features.classList.add('show-feature');
+
+    features.scrollIntoView({
+      behavior:'smooth',
+      block:'start'
+    });
+  }
 }
 
 function closeMenu(){
