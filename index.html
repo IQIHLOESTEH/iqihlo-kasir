@@ -271,7 +271,7 @@ button{
 }
 
 .features{
-  padding:0 12px
+    padding:0 12px;
 }
 
 .details{
@@ -721,7 +721,25 @@ button{
   to{
     transform:translateX(0);
     opacity:1;
-  }
+ }  
+}
+  .cup{
+  height:110px;
+  border-radius:16px;
+  background:linear-gradient(145deg,#fff8ec,#f1dfc5);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+  margin-bottom:8px;
+  position:relative;
+}
+
+.drink-img{
+  width:100%;
+  height:100%;
+  display:block;
+  object-fit:contain;
 }
 </style>
 </head>
@@ -738,7 +756,7 @@ button{
 <div id="app" class="app hidden">
 <header class="topbar">
 <div class="brand"><span class="leaf">🍃</span><div><h1>IQIHLO ES TEH</h1><small>Lebih dari Sekedar Minuman</small></div></div>
-<div class="userbox"><span class="role"><span id="currentUser">-</span> • <span id="currentRole">-</span></span><button class="topbtn topmenu" onclick="openMenu()" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);z-index:10;">☰</button><button class="topbtn" onclick="lockApp()">🔒</button><button class="topbtn" onclick="exitApp()">×</button></div>
+<div class="userbox"><span class="role"><span id="currentUser">-</span> • <span id="currentRole">-</span></span><button class="topbtn topmenu" onclick="openMenu()" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);...z-index:10;" onclick="openSideMenu()">☰</button><button class="topbtn" onclick="lockApp()">🔒</button><button class="topbtn" onclick="exitApp()">×</button></div>
 </header>
 
 <main class="content">
@@ -749,12 +767,7 @@ button{
 </main>
 
 <section class="features">
-<div class="menu-actions">
-<button class="menu-action" onclick="openSettings()">⚙️ Pengaturan<small>Buka pengaturan sesuai jabatan</small></button>
-<button class="menu-action" onclick="openEditMenu()">✏️ Edit Menu<small>Ubah harga / tambah menu</small></button>
-<button class="menu-action" onclick="openHistory()">🧾 Riwayat<small>Lihat & hapus rekaman</small></button>
-<button class="menu-action" onclick="openPrinterSettings()">🖨️ Printer<small>Hubungkan printer Bluetooth</small></button>
-</div>
+
 
 <details id="menuSettings" class="details admin-only">
 <summary>⚙️ ATUR HARGA & KELOLA MENU</summary>
@@ -1641,25 +1654,143 @@ function setCat(c){
 function renderMenus(){
  const a=menus.filter(m=>m.c===category);
 
- const icon={
-   'Es Teh':'🧋',
-   'Es Jeruk Peras':'🍊',
-   'Goodday Biasa':'☕',
-   'Nutrisari':'🥤'
- };
+ function ilustrasi(n){
+   const x=(n||'').toLowerCase();
+
+   if(x.includes('jeruk')){
+     return `
+     <svg viewBox="0 0 180 120" class="drink-img">
+       <defs>
+         <linearGradient id="oj" x1="0" y1="0" x2="0" y2="1">
+           <stop offset="0" stop-color="#ffd96a"/>
+           <stop offset="1" stop-color="#f28b18"/>
+         </linearGradient>
+       </defs>
+       <ellipse cx="90" cy="105" rx="47" ry="7" fill="#0002"/>
+       <path d="M55 38 L63 98 Q90 108 117 98 L125 38Z"
+             fill="url(#oj)" stroke="#d87512" stroke-width="3"/>
+       <path d="M55 38 Q90 28 125 38 Q90 49 55 38Z"
+             fill="#fff9" stroke="#d87512" stroke-width="3"/>
+       <circle cx="42" cy="42" r="17" fill="#ff9d19"/>
+       <path d="M42 25 A17 17 0 0 0 42 59 A17 17 0 0 0 42 25"
+             fill="#ffd35c"/>
+       <path d="M109 27 L136 5" stroke="#7b4a24" stroke-width="4"/>
+       <path d="M132 9 Q146 1 153 8 Q143 17 132 9"
+             fill="#4cae45"/>
+       <circle cx="72" cy="61" r="3" fill="#fff8"/>
+       <circle cx="91" cy="74" r="3" fill="#fff8"/>
+     </svg>`;
+   }
+
+   if(x.includes('goodday') || x.includes('kopi')){
+     return `
+     <svg viewBox="0 0 180 120" class="drink-img">
+       <defs>
+         <linearGradient id="cf" x1="0" y1="0" x2="0" y2="1">
+           <stop offset="0" stop-color="#9b6139"/>
+           <stop offset="1" stop-color="#3e1d12"/>
+         </linearGradient>
+       </defs>
+       <ellipse cx="90" cy="105" rx="48" ry="7" fill="#0002"/>
+       <path d="M54 39 L62 98 Q90 108 118 98 L126 39Z"
+             fill="url(#cf)" stroke="#6b3820" stroke-width="3"/>
+       <ellipse cx="90" cy="39" rx="36" ry="10"
+                fill="#d8a77b" stroke="#6b3820" stroke-width="3"/>
+       <ellipse cx="90" cy="40" rx="29" ry="6" fill="#fff4df"/>
+       <path d="M63 37 Q72 25 82 37 Q90 22 99 37 Q110 24 118 38"
+             fill="none" stroke="#f7dfbd" stroke-width="7"/>
+       <path d="M113 29 L142 5" stroke="#7b4a24" stroke-width="4"/>
+       <path d="M138 9 Q150 2 157 10 Q147 18 138 9"
+             fill="#4cae45"/>
+       <rect x="69" y="55" width="42" height="3" rx="2" fill="#fff4"/>
+     </svg>`;
+   }
+
+   if(x.includes('nutrisari')){
+     return `
+     <svg viewBox="0 0 180 120" class="drink-img">
+       <defs>
+         <linearGradient id="ns" x1="0" y1="0" x2="0" y2="1">
+           <stop offset="0" stop-color="#ffe45d"/>
+           <stop offset="1" stop-color="#f39a12"/>
+         </linearGradient>
+       </defs>
+       <ellipse cx="90" cy="105" rx="47" ry="7" fill="#0002"/>
+       <path d="M55 38 L63 98 Q90 108 117 98 L125 38Z"
+             fill="url(#ns)" stroke="#dc7d0b" stroke-width="3"/>
+       <ellipse cx="90" cy="38" rx="35" ry="9"
+                fill="#fff8df" stroke="#dc7d0b" stroke-width="3"/>
+       <circle cx="76" cy="60" r="4" fill="#fff8"/>
+       <circle cx="96" cy="76" r="4" fill="#fff8"/>
+       <circle cx="106" cy="55" r="3" fill="#fff8"/>
+       <path d="M112 29 L139 4" stroke="#7b4a24" stroke-width="4"/>
+       <path d="M136 8 Q149 1 156 9 Q147 17 136 8"
+             fill="#4cae45"/>
+       <path d="M68 30 Q90 19 112 30" fill="none"
+             stroke="#ffffff" stroke-width="3" opacity=".8"/>
+     </svg>`;
+   }
+
+   /* ES TEH + semua minuman lain */
+   return `
+   <svg viewBox="0 0 180 120" class="drink-img">
+     <defs>
+       <linearGradient id="tea" x1="0" y1="0" x2="0" y2="1">
+         <stop offset="0" stop-color="#d88938"/>
+         <stop offset="1" stop-color="#6d2e13"/>
+       </linearGradient>
+     </defs>
+
+     <ellipse cx="90" cy="106" rx="48" ry="7" fill="#0002"/>
+
+     <!-- gelas -->
+     <path d="M52 35 L61 98 Q90 109 119 98 L128 35Z"
+           fill="#ffffff30" stroke="#bcae9f" stroke-width="3"/>
+
+     <!-- teh -->
+     <path d="M57 50 L63 96 Q90 104 117 96 L123 50Z"
+           fill="url(#tea)"/>
+
+     <!-- es batu -->
+     <g fill="#fff8" stroke="#ffffff80" stroke-width="1">
+       <rect x="65" y="48" width="18" height="15" rx="4"
+             transform="rotate(-10 65 48)"/>
+       <rect x="88" y="51" width="18" height="16" rx="4"
+             transform="rotate(8 88 51)"/>
+       <rect x="105" y="44" width="16" height="15" rx="4"
+             transform="rotate(-7 105 44)"/>
+     </g>
+
+     <!-- sedotan -->
+     <path d="M105 45 L132 8" stroke="#c73528" stroke-width="5"
+           stroke-linecap="round"/>
+     <path d="M132 8 L151 8" stroke="#c73528" stroke-width="5"
+           stroke-linecap="round"/>
+
+     <!-- daun -->
+     <path d="M73 38 Q55 18 72 11 Q84 24 73 38Z"
+           fill="#3f9d3f"/>
+     <path d="M83 38 Q85 13 101 15 Q101 32 83 38Z"
+           fill="#56b84c"/>
+
+     <!-- highlight gelas -->
+     <path d="M65 65 L69 91" stroke="#fff" stroke-width="4"
+           stroke-linecap="round" opacity=".65"/>
+   </svg>`;
+ }
 
  $('menu').innerHTML=a.map(m=>`
- <button class="menu" onclick='addCart(${JSON.stringify(m.n)})'>
-  <div class="cup">
-    ${icon[m.n] || '🥤'}
-  </div>
-  <b>${esc(m.n)}</b>
-  <small>${rupiah(m.p)}</small>
-  <span class="add">+</span>
- </button>
- `).join('')||
+   <button class="menu" onclick='addCart(${JSON.stringify(m.n)})'>
+     <div class="cup">
+       ${ilustrasi(m.n)}
+     </div>
+     <b>${esc(m.n)}</b>
+     <small>${rupiah(m.p)}</small>
+     <span class="add">+</span>
+   </button>
+ `).join('') ||
  '<div class="muted">Belum ada menu pada kategori ini.</div>';
-   }
+}
 
 function addCart(n){
  const m=menus.find(x=>x.n===n);
