@@ -1641,16 +1641,25 @@ function setCat(c){
 function renderMenus(){
  const a=menus.filter(m=>m.c===category);
 
+ const icon={
+   'Es Teh':'🧋',
+   'Es Jeruk Peras':'🍊',
+   'Goodday Biasa':'☕',
+   'Nutrisari':'🥤'
+ };
+
  $('menu').innerHTML=a.map(m=>`
  <button class="menu" onclick='addCart(${JSON.stringify(m.n)})'>
-  <div class="cup">🥤</div>
+  <div class="cup">
+    ${icon[m.n] || '🥤'}
+  </div>
   <b>${esc(m.n)}</b>
   <small>${rupiah(m.p)}</small>
   <span class="add">+</span>
  </button>
  `).join('')||
  '<div class="muted">Belum ada menu pada kategori ini.</div>';
-}
+   }
 
 function addCart(n){
  const m=menus.find(x=>x.n===n);
