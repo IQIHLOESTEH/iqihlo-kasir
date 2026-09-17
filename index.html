@@ -684,7 +684,7 @@ button{
 <div id="app" class="app hidden">
 <header class="topbar">
 <div class="brand"><span class="leaf">🍃</span><div><h1>IQIHLO ES TEH</h1><small>Lebih dari Sekedar Minuman</small></div></div>
-<div class="userbox"><span class="role"><span id="currentUser">-</span> • <span id="currentRole">-</span></span><button class="topbtn topmenu" onclick="openMenu()">☰ MENU</button><button class="topbtn" onclick="lockApp()">🔒</button><button class="topbtn" onclick="exitApp()">×</button></div>
+<div class="userbox"><span class="role"><span id="currentUser">-</span> • <span id="currentRole">-</span></span><button class="topbtn topmenu" onclick="openMenu()" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);z-index:10;">☰ MENU</button><button class="topbtn" onclick="lockApp()">🔒</button><button class="topbtn" onclick="exitApp()">×</button></div>
 </header>
 
 <main class="content">
@@ -985,9 +985,7 @@ const KEYS={
 };
 
 const DEFAULT_ACCOUNTS=[
- {u:'owner',p:'4826',r:'OWNER'},
- {u:'admin',p:'6842',r:'ADMIN'},
- {u:'kasir',p:'7391',r:'KASIR'}
+  {u:'iqihloesteh',p:'Bakmimania2108',r:'OWNER'}
 ];
 
 let accounts=[];
@@ -1078,21 +1076,36 @@ function initAccounts(){
 }
 
 function loginSystem(){
- const u=$('loginUser').value.trim().toLowerCase();
- const p=$('loginPass').value;
+  const u=$('loginUser').value.trim().toLowerCase();
+  const p=$('loginPass').value;
 
- const a=accounts.find(x=>x.u===u&&x.p===p);
+  let a=null;
 
- if(!a){
-  $('loginMsg').textContent='Username atau password salah.';
-  return;
- }
+  // LOGIN OWNER UTAMA
+  if(u==='iqihloesteh' && p==='Bakmimania2108'){
+    a={
+      u:'iqihloesteh',
+      p:'Bakmimania2108',
+      r:'OWNER'
+    };
+  }else{
+    // LOGIN AKUN LAIN YANG MASIH TERSIMPAN
+    a=accounts.find(x=>x.u===u&&x.p===p);
+  }
 
- session={...a};
- sessionStorage.setItem('iqihlo_session',JSON.stringify(session));
+  if(!a){
+    $('loginMsg').textContent='Username atau password salah.';
+    return;
+  }
 
- $('loginMsg').textContent='';
- applySession();
+  session={...a};
+  sessionStorage.setItem(
+    'iqihlo_session',
+    JSON.stringify(session)
+  );
+
+  $('loginMsg').textContent='';
+  applySession();
 }
 
 function biometricLogin(){
@@ -1105,7 +1118,7 @@ function biometricLogin(){
 }
 
 function ownerBiometricSuccess(){
- const a=accounts.find(x=>x.u==='owner');
+ const a=accounts.find(x=>x.u==='iqihloesteh');
  if(a){
   session={...a};
   sessionStorage.setItem('iqihlo_session',JSON.stringify(session));
