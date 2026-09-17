@@ -1677,88 +1677,102 @@ function showSuccess(r){
 ========================= */
 
 function buildReceipt(r){
- const lines=[];
+  const lines=[];
 
- lines.push(
-  '<div class="rc rh">IQIHLO ES TEH</div>'
- );
+  lines.push(
+    '<div style="width:58mm;max-width:58mm;box-sizing:border-box;font-family:monospace;font-size:12px;line-height:1.35;overflow:hidden;">' +
+    '<div style="text-align:center;font-weight:bold;font-size:15px;">IQIHLO ES TEH</div>' +
+    '<div style="text-align:center;font-weight:bold;">SEGARNYA BEDA!</div>' +
+    '<div style="text-align:center;">' +
+    new Date(r.date).toLocaleString('id-ID') +
+    '</div>' +
+    '<div style="border-top:1px dashed #000;margin:5px 0;"></div>'
+  );
 
- lines.push(
-  '<div class="rc">SEGARNYA BEDA!</div>'
- );
+  lines.push(
+    '<div>Pelanggan: ' +
+    esc(r.customer || 'Umum') +
+    '</div>'
+  );
 
- lines.push(
-  '<div class="rc">'+
-  new Date(r.date).toLocaleString('id-ID')+
-  '</div>'
- );
+  lines.push(
+    '<div>Kasir: ' +
+    esc(r.user || '-') +
+    '</div>'
+  );
 
- lines.push('<div class="rl"></div>');
+  lines.push(
+    '<div style="border-top:1px dashed #000;margin:5px 0;"></div>'
+  );
 
- lines.push(
-  '<div>Pelanggan: '+
-  esc(r.customer||'Umum')+
-  '</div>'
- );
+  (r.items || []).forEach(x=>{
+    const nama = esc(x.n || '');
+    const qty = esc(x.q || 1);
+    const harga = rupiah(x.p * x.q);
 
- lines.push(
-  '<div>Kasir: '+
-  esc(r.user||'-')+
-  '</div>'
- );
-
- lines.push('<div class="rl"></div>');
-
- (r.items||[]).forEach(x=>{
-  lines.push(`
-    <div class="rr">
-      <span class="rn">${esc(x.n)} x${x.q}</span>
-      <span class="rp">${rupiah(x.p*x.q)}</span>
-    </div>
-  `);
+    lines.push(
+      '<div style="display:flex;width:100%;box-sizing:border-box;align-items:flex-start;gap:4px;">' +
+        '<span style="flex:1;min-width:0;white-space:normal;overflow-wrap:anywhere;word-break:break-word;">' +
+          nama + ' x' + qty +
+        '</span>' +
+        '<span style="flex:0 0 auto;text-align:right;white-space:nowrap;">' +
+          harga +
+        '</span>' +
+      '</div>'
+    );
   });
 
- lines.push('<div class="rl"></div>');
+  lines.push(
+    '<div style="border-top:1px dashed #000;margin:5px 0;"></div>'
+  );
 
- lines.push(`
- <div class="rr rt">
-  <span>TOTAL</span>
-  <span>${rupiah(r.total)}</span>
- </div>
- `);
+  lines.push(
+    '<div style="display:flex;width:100%;font-weight:bold;">' +
+      '<span style="flex:1;">TOTAL:</span>' +
+      '<span style="white-space:nowrap;">' +
+        rupiah(r.total) +
+      '</span>' +
+    '</div>'
+  );
 
- if(r.payment==='Cash'){
-  lines.push(`
-  <div class="rr rb">
-   <span>TUNAI</span>
-   <span>${rupiah(r.cash)}</span>
-  </div>
-  `);
+  if(r.payment==='Cash'){
+    lines.push(
+      '<div style="display:flex;width:100%;">' +
+        '<span style="flex:1;">TUNAI:</span>' +
+        '<span style="white-space:nowrap;">' +
+          rupiah(r.cash) +
+        '</span>' +
+      '</div>'
+    );
 
-  lines.push(`
-  <div class="rr rb">
-   <span>KEMBALI</span>
-   <span>${rupiah(r.change)}</span>
-  </div>
-  `);
- }else{
-  lines.push(`
-  <div class="rr rb">
-   <span>QRIS</span>
-   <span>${rupiah(r.total)}</span>
-  </div>
-  `);
- }
+    lines.push(
+      '<div style="display:flex;width:100%;">' +
+        '<span style="flex:1;">KEMBALI:</span>' +
+        '<span style="white-space:nowrap;">' +
+          rupiah(r.change) +
+        '</span>' +
+      '</div>'
+    );
+  }else{
+    lines.push(
+      '<div style="display:flex;width:100%;">' +
+        '<span style="flex:1;">QRIS:</span>' +
+        '<span style="white-space:nowrap;">' +
+          rupiah(r.total) +
+        '</span>' +
+      '</div>'
+    );
+  }
 
- lines.push(
-  '<div class="rl"></div>'+
-  '<div class="rc rh">TERIMA KASIH</div>'+
-  '<div class="rc">SELAMAT MENIKMATI</div>'
- );
+  lines.push(
+    '<div style="border-top:1px dashed #000;margin:5px 0;"></div>' +
+    '<div style="text-align:center;font-weight:bold;">TERIMA KASIH</div>' +
+    '<div style="text-align:center;">IQIHLO ES TEH</div>' +
+    '</div>'
+  );
 
- return lines.join('');
+  return lines.join('');
 }
-
 function printReceipt(){
  const r=lastReceipt||tx[tx.length-1];
 
