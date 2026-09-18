@@ -2551,21 +2551,55 @@ function saveBarcode(){
 function findBarcode(){
  const v=$('barcodeInput').value.trim();
 
- const m=barcodes[v];
-
- if(!m){
-  alert('Barcode tidak ditemukan.');
+ if(!v){
+  alert('Silakan scan barcode terlebih dahulu.');
   return;
  }
 
- const x=menus.find(
-  a=>a.n===m
+ const m=barcodes[v];
+
+ // Barcode sudah terdaftar
+ if(m){
+  const x=menus.find(a=>a.n===m);
+
+  if(x){
+   addCart(x.n);
+   $('barcodeInput').value='';
+   return;
+  }
+
+  alert('Menu untuk barcode ini tidak ditemukan.');
+  return;
+ }
+
+ // Barcode baru
+ const nama=prompt(
+  'Barcode baru terdeteksi.\n\nMasukkan NAMA MENU untuk barcode ini:'
  );
 
- if(x){
-  addCart(x.n);
-  $('barcodeInput').value='';
+ if(!nama)return;
+
+ const x=menus.find(
+  a=>a.n.toLowerCase()===nama.trim().toLowerCase()
+ );
+
+ if(!x){
+  alert('Nama menu tidak ditemukan.\nPilih nama menu yang sesuai.');
+  return;
  }
+
+ // Simpan barcode sebagai barcode tambahan untuk menu tersebut
+ barcodes[v]=x.n;
+ save(KEYS.barcodes,barcodes);
+
+ addCart(x.n);
+ $('barcodeInput').value='';
+
+ renderBarcode();
+
+ alert(
+  'Barcode berhasil didaftarkan untuk menu: '+x.n
+ );
 }
 
 /* =========================
