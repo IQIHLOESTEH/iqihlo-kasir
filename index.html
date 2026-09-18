@@ -1131,10 +1131,11 @@ function initAccounts(){
  }
 
  accounts=a.map(x=>({
-  u:String(x.u||'').trim().toLowerCase(),
-  p:String(x.p||''),
-  r:String(x.r||'KASIR').toUpperCase()
- })).filter(x=>x.u);
+ u:String(x.u||'').trim().toLowerCase(),
+ p:String(x.p||''),
+ r:String(x.r||'KASIR').toUpperCase(),
+ active:x.active!==false
+})).filter(x=>x.u);
 
  DEFAULT_ACCOUNTS.forEach(def=>{
   if(!accounts.some(x=>x.u===def.u)){
@@ -1146,36 +1147,34 @@ function initAccounts(){
 }
 
 function loginSystem(){
-  const u=$('loginUser').value.trim().toLowerCase();
-  const p=$('loginPass').value;
+ const u=$('loginUser').value.trim().toLowerCase();
+ const p=$('loginPass').value;
 
-  let a=null;
+ const a=accounts.find(x=>x.u===u&&x.p===p);
 
-  // LOGIN OWNER UTAMA
-  if(u==='iqihloesteh' && p==='Bakmimania2108'){
-    a={
-      u:'iqihloesteh',
-      p:'Bakmimania2108',
-      r:'OWNER'
-    };
-  }else{
-    // LOGIN AKUN LAIN YANG MASIH TERSIMPAN
-    a=accounts.find(x=>x.u===u&&x.p===p);
-  }
+ if(!a){
+  $('loginMsg').textContent='Username atau password salah.';
+  return;
+ }
 
-  if(!a){
-    $('loginMsg').textContent='Username atau password salah.';
-    return;
-  }
+ // CEK STATUS AKUN
+ if(a.active===false){
+  $('loginMsg').textContent='Akun ini sedang dinonaktifkan oleh Owner.';
+  return;
+ }
 
-  session={...a};
-  sessionStorage.setItem(
-    'iqihlo_session',
-    JSON.stringify(session)
-  );
+ session={
+  ...a,
+  active:true
+ };
 
-  $('loginMsg').textContent='';
-  applySession();
+ sessionStorage.setItem(
+  'iqihlo_session',
+  JSON.stringify(session)
+ );
+
+ $('loginMsg').textContent='';
+ applySession();
 }
 
 function biometricLogin(){
