@@ -2098,99 +2098,103 @@ function buildReceipt(r){
   const lines=[];
 
   lines.push(
-    '<div style="width:58mm;max-width:58mm;box-sizing:border-box;font-family:monospace;font-size:12px;line-height:1.35;overflow:hidden;">' +
-    '<div style="text-align:center;font-weight:bold;font-size:15px;">IQIHLO ES TEH</div>' +
-    '<div style="text-align:center;font-weight:bold;">SEGARNYA BEDA!</div>' +
-    '<div style="text-align:center;">' +
-    new Date(r.date).toLocaleString('id-ID') +
-    '</div>' +
+    '<div style="width:58mm;max-width:58mm;box-sizing:border-box;font-family:monospace;font-size:12px;line-height:1.3;color:#000;overflow:hidden;">',
+
+    '<div style="text-align:center;font-weight:bold;font-size:15px;">IQIHLO ES TEH</div>',
+    '<div style="text-align:center;font-weight:bold;">SEGARNYA BEDA!</div>',
+
+    '<div style="text-align:center;">'+
+      new Date(r.date).toLocaleString('id-ID')+
+    '</div>',
+
+    '<div style="border-top:1px dashed #000;margin:5px 0;"></div>',
+
+    '<div>Pelanggan: '+
+      esc(r.customer||'Umum')+
+    '</div>',
+
+    '<div>Kasir: '+
+      esc(r.user||'-')+
+    '</div>',
+
     '<div style="border-top:1px dashed #000;margin:5px 0;"></div>'
   );
 
-  lines.push(
-    '<div>Pelanggan: ' +
-    esc(r.customer || 'Umum') +
-    '</div>'
-  );
-
-  lines.push(
-    '<div>Kasir: ' +
-    esc(r.user || '-') +
-    '</div>'
-  );
-
-  lines.push(
-    '<div style="border-top:1px dashed #000;margin:5px 0;"></div>'
-  );
-
-  (r.items || []).forEach(x=>{
-    const nama = esc(x.n || '');
-    const qty = esc(x.q || 1);
-    const harga = rupiah(x.p * x.q);
+  (r.items||[]).forEach(x=>{
+    const nama=esc(x.n||'Item');
+    const qty=Number(x.q||1);
+    const subtotal=Number(x.p||0)*qty;
 
     lines.push(
-      '<div style="display:flex;width:100%;box-sizing:border-box;align-items:flex-start;gap:4px;">' +
-        '<span style="flex:1;min-width:0;white-space:normal;overflow-wrap:anywhere;word-break:break-word;">' +
-          nama + ' x' + qty +
-        '</span>' +
-        '<span style="flex:0 0 auto;text-align:right;white-space:nowrap;">' +
-          harga +
-        '</span>' +
+      '<div style="display:flex;width:100%;align-items:flex-start;">'+
+
+        '<span style="flex:1;min-width:0;white-space:normal;overflow-wrap:anywhere;word-break:break-word;">'+
+          nama+' x'+qty+
+        '</span>'+
+
+        '<span style="margin-left:4px;white-space:nowrap;text-align:right;">'+
+          rupiah(subtotal)+
+        '</span>'+
+
       '</div>'
     );
   });
 
   lines.push(
-    '<div style="border-top:1px dashed #000;margin:5px 0;"></div>'
-  );
+    '<div style="border-top:1px dashed #000;margin:5px 0;"></div>',
 
-  lines.push(
-    '<div style="display:flex;width:100%;font-weight:bold;">' +
-      '<span style="flex:1;">TOTAL:</span>' +
-      '<span style="white-space:nowrap;">' +
-        rupiah(r.total) +
-      '</span>' +
+    '<div style="display:flex;width:100%;font-weight:bold;">'+
+      '<span style="flex:1;">TOTAL:</span>'+
+      '<span style="white-space:nowrap;">'+
+        rupiah(r.total)+
+      '</span>'+
     '</div>'
   );
 
   if(r.payment==='Cash'){
+
     lines.push(
-      '<div style="display:flex;width:100%;">' +
-        '<span style="flex:1;">TUNAI:</span>' +
-        '<span style="white-space:nowrap;">' +
-          rupiah(r.cash) +
-        '</span>' +
+      '<div style="display:flex;width:100%;">'+
+        '<span style="flex:1;">TUNAI:</span>'+
+        '<span style="white-space:nowrap;">'+
+          rupiah(r.cash)+
+        '</span>'+
+      '</div>',
+
+      '<div style="display:flex;width:100%;">'+
+        '<span style="flex:1;">KEMBALI:</span>'+
+        '<span style="white-space:nowrap;">'+
+          rupiah(r.change)+
+        '</span>'+
       '</div>'
     );
 
-    lines.push(
-      '<div style="display:flex;width:100%;">' +
-        '<span style="flex:1;">KEMBALI:</span>' +
-        '<span style="white-space:nowrap;">' +
-          rupiah(r.change) +
-        '</span>' +
-      '</div>'
-    );
   }else{
+
     lines.push(
-      '<div style="display:flex;width:100%;">' +
-        '<span style="flex:1;">QRIS:</span>' +
-        '<span style="white-space:nowrap;">' +
-          rupiah(r.total) +
-        '</span>' +
+      '<div style="display:flex;width:100%;">'+
+        '<span style="flex:1;">PEMBAYARAN:</span>'+
+        '<span style="white-space:nowrap;">'+
+          esc(r.payment||'-')+
+        '</span>'+
       '</div>'
     );
   }
 
   lines.push(
-    '<div style="border-top:1px dashed #000;margin:5px 0;"></div>' +
-    '<div style="text-align:center;font-weight:bold;">TERIMA KASIH</div>' +
-    '<div style="text-align:center;">IQIHLO ES TEH</div>' +
+    '<div style="border-top:1px dashed #000;margin:5px 0;"></div>',
+
+    '<div style="text-align:center;font-weight:bold;">TERIMA KASIH</div>',
+
+    '<div style="text-align:center;">Instagram: iqihlo.esteh_id</div>',
+
+    '<div style="text-align:center;">TikTok: iqihlo.es.teh</div>',
+
     '</div>'
   );
 
   return lines.join('');
-}
+  }
 function printReceipt(){
  const r=lastReceipt||tx[tx.length-1];
 
