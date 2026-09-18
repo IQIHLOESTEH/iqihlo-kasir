@@ -1382,51 +1382,69 @@ function handleCloudAccounts(value){
 }
 
 async function loginSystem(){
- const u=$('loginUser').value.trim().toLowerCase();
- const p=$('loginPass').value;
+  const u = $('loginUser').value.trim().toLowerCase();
+  const p = $('loginPass').value;
 
- if(!u||!p){
-  $('loginMsg').textContent='Username dan password wajib diisi.';
-  return;
- }
-
- $('loginMsg').textContent='Menghubungkan ke database...';
-
- try{
-  // Semua perangkat memakai Firebase Authentication agar bisa membaca
-  // status akun yang sama dari Firestore. Owner memakai email/password;
-  // kasir/admin memakai sesi anonim lalu divalidasi terhadap akun cloud.
-  if(u==='iqihloesteh'){
-   await window.IQIHLO_CLOUD.signIn('iqihloesteh@gmail.com',p);
-  }else{
-   if(!window.IQIHLO_CLOUD?.auth?.currentUser){
-    await window.IQIHLO_CLOUD.signInAnonymous();
-   }
+  if(!u || !p){
+    $('loginMsg').textContent = 'Username dan password wajib diisi.';
+    return;
   }
 
-  await refreshCloudAccounts();
+  $('loginMsg').textContent = 'Memproses login...';
 
-  const a=accounts.find(x=>x.u===u&&x.p===p);
-  if(!a){
-   $('loginMsg').textContent='Username atau password salah.';
-   if(u==='iqihloesteh') await window.IQIHLO_CLOUD.signOut();
-   return;
-  }
-  if(a.active===false){
-   $('loginMsg').textContent='Akun ini sedang dinonaktifkan oleh Owner.';
-   if(u==='iqihloesteh') await window.IQIHLO_CLOUD.signOut();
-   return;
-  }
+  try {
+    // Jangan paksa Firebase terlebih dahulu.
+    // Cek akun yang tersimpan di perangkat.
+    const a = accounts.find(x =>
+      x.u === u &&
+      x.p === p
+    );
 
-  session={...a,active:a.active!==false};
-  sessionStorage.setItem('iqihlo_session',JSON.stringify(session));
-  $('loginMsg').textContent='';
-  await connectFirebaseForCurrentSession();
-  applySession();
- }catch(e){
-  console.error('Firebase login failed:',e);
-  $('loginMsg').textContent='Database Firebase belum siap untuk login perangkat ini. Pastikan Authentication > Sign-in method > Anonymous sudah diaktifkan.';
- }
+    if(!a){
+      $('loginMsg').textContent =
+        'Username atau password salah.';
+      return;
+    }
+
+    if(a.active === false){
+      $('loginMsg').textContent =
+        'Akun ini sedang dinonaktifkan oleh Owner.';
+      return;
+    }
+
+    // Simpan sesi
+    session = {
+      ...a,
+      active: true
+    };
+
+    sessionStorage.setItem(
+      'iqihlo_session',
+      JSON.stringify(session)
+    );
+
+    $('loginMsg').textContent = '';
+
+    // Masuk ke aplikasi terlebih dahulu
+    applySession();
+
+    // Setelah berhasil masuk, coba hubungkan Firebase
+    try{
+      if(window.IQIHLO_CLOUD){
+        await connectFirebaseForCurrentSession();
+      }
+    }catch(firebaseError){
+      console.error(
+        'Firebase connection error:',
+        firebaseError
+      );
+    }
+
+  }catch(e){
+    console.error('Login error:',e);
+    $('loginMsg').textContent =
+      'Gagal login: ' + (e?.message || e);
+  }
 }
 
 function biometricLogin(){
