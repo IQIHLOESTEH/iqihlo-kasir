@@ -3334,8 +3334,7 @@ async function toggleManagedAccount(index){
   if(session?.r!=='OWNER'){
     alert('Hanya Owner yang dapat mengaktifkan atau menonaktifkan akun.');
     return;
-  }
-
+    }
   const a=accounts[index];
 
   if(!a){
@@ -3413,8 +3412,6 @@ async function toggleManagedAccount(index){
     );
 
   }
-
-}
 function changeOwnerPassword(){
 
  if(session?.r!=='OWNER'){
