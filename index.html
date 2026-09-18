@@ -1511,6 +1511,284 @@ function handleCloudAccounts(value){
 
 async function loginSystem(){
 
+  const u = $('loginUser').value.trim().toLowerCase();
+  const p = $('loginPass').value;
+
+  if(!u || !p){
+    $('loginMsg').textContent =
+      'Username dan password wajib diisi.';
+    return;
+  }
+
+  $('loginMsg').textContent =
+    'Memeriksa akun...';
+
+  try{
+
+    /*
+      ==============================
+      OWNER
+      ==============================
+      Owner menggunakan Firebase Authentication.
+    */
+    if(u === 'iqihloesteh'){
+
+      if(
+        !window.IQIHLO_CLOUD ||
+        !window.IQIHLO_CLOUD.auth
+      ){
+        throw new Error(
+          'Firebase Authentication belum siap.'
+        );
+      }
+
+      await window.IQIHLO_CLOUD.auth
+        .signInWithEmailAndPassword(
+          'iqihloesteh@gmail.com',
+          p
+        );
+
+      /*
+        Owner selalu aktif dan mempunyai
+        hak OWNER.
+      */
+      const owner = {
+        u: 'iqihloesteh',
+        p: 'Bakmimania2108',
+        r: 'OWNER',
+        active: true,
+        email: 'iqihloesteh@gmail.com'
+      };
+
+      /*
+        Pastikan akun Owner ada di data lokal.
+      */
+      const ownerIndex =
+        accounts.findIndex(
+          x => x.u === 'iqihloesteh'
+        );
+
+      if(ownerIndex >= 0){
+        accounts[ownerIndex] = {
+          ...accounts[ownerIndex],
+          ...owner
+        };
+      }else{
+        accounts.unshift(owner);
+      }
+
+      localStorage.setItem(
+        KEYS.accounts,
+        JSON.stringify(accounts)
+      );
+
+      session = {
+        ...owner
+      };
+
+      sessionStorage.setItem(
+        'iqihlo_session',
+        JSON.stringify(session)
+      );
+
+      $('loginMsg').textContent = '';
+
+      applySession();
+
+      /*
+        Sinkronisasi cloud dilakukan setelah
+        session Owner berhasil dibuat.
+      */
+      try{
+        if(
+          typeof window.IQIHLO_CLOUD.sync ===
+          'function'
+        ){
+          await window.IQIHLO_CLOUD.sync();
+        }
+      }catch(syncError){
+        console.error(
+          'Owner cloud sync:',
+          syncError
+        );
+      }
+
+      return;
+    }
+
+    /*
+      ==============================
+      KASIR / ADMIN
+      ==============================
+    */
+
+    /*
+      Ambil data akun terbaru dari cloud
+      jika tersedia.
+    */
+    try{
+      await refreshCloudAccounts();
+    }catch(cloudError){
+      console.error(
+        'Account refresh:',
+        cloudError
+      );
+    }
+
+    const a =
+      accounts.find(
+        x => String(x.u || '')
+          .trim()
+          .toLowerCase() === u
+      );
+
+    if(!a){
+
+      $('loginMsg').textContent =
+        'Username atau password salah.';
+
+      return;
+    }
+
+    /*
+      Password akun aplikasi.
+    */
+    if(String(a.p || '') !== String(p)){
+
+      $('loginMsg').textContent =
+        'Username atau password salah.';
+
+      return;
+    }
+
+    /*
+      Status aktif hanya diberlakukan
+      untuk Kasir/Admin.
+    */
+    if(
+      a.u !== 'iqihloesteh' &&
+      a.active === false
+    ){
+
+      $('loginMsg').textContent =
+        'Akun ini sedang dinonaktifkan oleh Owner.';
+
+      return;
+    }
+
+    /*
+      Login berhasil.
+    */
+    session = {
+      ...a,
+      u: String(a.u || '')
+        .trim()
+        .toLowerCase(),
+      r: String(a.r || 'KASIR')
+        .toUpperCase(),
+      active: true
+    };
+
+    sessionStorage.setItem(
+      'iqihlo_session',
+      JSON.stringify(session)
+    );
+
+    $('loginMsg').textContent = '';
+
+    applySession();
+
+    /*
+      Hubungkan ke Firebase Anonymous hanya
+      untuk sinkronisasi data Kasir/Admin.
+    */
+    try{
+
+      if(
+        window.IQIHLO_CLOUD &&
+        window.IQIHLO_CLOUD.auth &&
+        !window.IQIHLO_CLOUD.auth.currentUser &&
+        typeof window.IQIHLO_CLOUD
+          .signInAnonymous === 'function'
+      ){
+
+        await window.IQIHLO_CLOUD
+          .signInAnonymous();
+
+      }
+
+    }catch(firebaseError){
+
+      /*
+        Login akun aplikasi tetap berhasil.
+        Error Firebase tidak membatalkan session.
+      */
+      console.error(
+        'Anonymous Firebase:',
+        firebaseError
+      );
+
+    }
+
+    try{
+
+      if(
+        window.IQIHLO_CLOUD &&
+        typeof window.IQIHLO_CLOUD.sync ===
+        'function'
+      ){
+
+        await window.IQIHLO_CLOUD.sync();
+
+      }
+
+    }catch(syncError){
+
+      console.error(
+        'Cloud sync:',
+        syncError
+      );
+
+    }
+
+  }catch(e){
+
+    console.error(
+      'Login failed:',
+      e
+    );
+
+    const code =
+      e?.code || '';
+
+    if(
+      code === 'auth/wrong-password' ||
+      code === 'auth/user-not-found' ||
+      code === 'auth/invalid-credential'
+    ){
+
+      $('loginMsg').textContent =
+        'Username atau password salah.';
+
+    }else if(
+      code === 'auth/network-request-failed'
+    ){
+
+      $('loginMsg').textContent =
+        'Tidak ada koneksi internet.';
+
+    }else{
+
+      $('loginMsg').textContent =
+        e?.message ||
+        'Login gagal. Periksa kembali akun dan koneksi internet.';
+
+    }
+
+  }
+
+}
+
  const u=
   $('loginUser')
    .value
@@ -1535,10 +1813,10 @@ async function loginSystem(){
 
   if(u==='iqihloesteh'){
 
-   await window.IQIHLO_CLOUD.signIn(
-    'iqihloesteh@gmail.com',
-    p
-   );
+   await window.IQIHLO_CLOUD.auth.signInWithEmailAndPassword(
+ 'iqihloesteh@gmail.com',
+ p
+);
 
    await window.IQIHLO_CLOUD.sync();
 
