@@ -1183,50 +1183,42 @@ function guessCat(n){
 ========================= */
 
 function initAccounts(){
- let a=load(KEYS.accounts,null);
+  let a=load(KEYS.accounts,null);
 
- if(!Array.isArray(a)||!a.length){
-  a=DEFAULT_ACCOUNTS.map(x=>({...x}));
- }
-
- accounts=a.map(x=>({
-  u:String(x.u||'').trim().toLowerCase(),
-  p:String(x.p||''),
-  r:String(x.r||'KASIR').toUpperCase(),
-  active:x.active!==false
- })).filter(x=>x.u);
-
- // HAPUS AKUN OWNER LAMA
- accounts=accounts.filter(x=>x.u!=='owner');
-
- // HANYA IQIHLOESTEH YANG MENJADI OWNER
- let owner=accounts.find(
-  x=>x.u==='iqihloesteh'
- );
-
- if(!owner){
-  owner={
-   u:'iqihloesteh',
-   p:'Bakmimania2108',
-   r:'OWNER',
-   active:true
-  };
-
-  accounts.push(owner);
- }else{
-  owner.r='OWNER';
-  owner.active=true;
- }
-
- // Tidak boleh ada akun lain berstatus OWNER
- accounts.forEach(x=>{
-  if(x.u!=='iqihloesteh'&&x.r==='OWNER'){
-   x.r='ADMIN';
+  if(!Array.isArray(a)){
+    a=[];
   }
- });
 
- save(KEYS.accounts,accounts);
+  accounts=a.map(x=>({
+    u:String(x.u||'').trim().toLowerCase(),
+    p:String(x.p||''),
+    r:String(x.r||'KASIR').toUpperCase(),
+    active:x.active!==false
+  })).filter(x=>x.u);
+
+  // Pastikan akun bawaan selalu ada, password dan statusnya benar
+  DEFAULT_ACCOUNTS.forEach(def=>{
+    const existing=accounts.find(x=>x.u===def.u);
+
+    if(existing){
+      existing.p=def.p;
+      existing.r=def.r;
+      existing.active=true;
+    }else{
+      accounts.push({...def});
+    }
+  });
+
+  // Hanya IQIHLOESTEH yang boleh menjadi OWNER
+  accounts.forEach(x=>{
+    if(x.u!=='iqihloesteh' && x.r==='OWNER'){
+      x.r='ADMIN';
+    }
+  });
+
+  save(KEYS.accounts,accounts);
 }
+
 
 function loginSystem(){
  const u=$('loginUser').value.trim().toLowerCase();
