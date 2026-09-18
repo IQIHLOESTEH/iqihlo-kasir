@@ -1335,14 +1335,35 @@ async function refreshCloudAccounts(){
  if(!window.IQIHLO_CLOUD?.user)return false;
  try{
   const snap=await window.IQIHLO_CLOUD.db.collection('app_data').doc(KEYS.accounts).get();
-  if(snap.exists && snap.data()?.data && Array.isArray(snap.data().data)){
-   accounts=snap.data().data.map(x=>({
-    u:String(x.u||'').trim().toLowerCase(),
-    p:String(x.p||''),
-    r:String(x.r||'KASIR').toUpperCase(),
-    active:x.active!==false,
-    email:x.email||''
-   })).filter(x=>x.u);
+  if(snap.exists()){
+  const raw = snap.data();
+
+  const list = Array.isArray(raw)
+    ? raw
+    : Array.isArray(raw.data)
+      ? raw.data
+      : Array.isArray(raw.accounts)
+        ? raw.accounts
+        : [];
+
+  accounts = list.map(x => ({
+    u: String(x.u || '').trim().toLowerCase(),
+    p: String(x.p || ''),
+    r: String(x.r || 'KASIR').toUpperCase(),
+    active: x.active !== false,
+    email: x.email || ''
+  })).filter(x => x.u);
+   accounts = list.map(x => ({
+  u: String(x.u || '').trim().toLowerCase(),
+  p: String(x.p || ''),
+  r: String(x.r || 'KASIR').toUpperCase(),
+  active: x.active !== false,
+  email: x.email || ''
+})).filter(x => x.u);
+
+localStorage.setItem(KEYS.accounts, JSON.stringify(accounts));
+renderAccounts();
+return true;
    localStorage.setItem(KEYS.accounts,JSON.stringify(accounts));
    renderAccounts();
    return true;
@@ -1382,51 +1403,59 @@ function handleCloudAccounts(value){
 }
 
 async function loginSystem(){
- const u=$('loginUser').value.trim().toLowerCase();
- const p=$('loginPass').value;
+  const u=$('loginUser').value.trim().toLowerCase();
+  const p=$('loginPass').value;
 
- if(!u||!p){
-  $('loginMsg').textContent='Username dan password wajib diisi.';
-  return;
- }
-
- $('loginMsg').textContent='Menghubungkan ke database...';
-
- try{
-  // Semua perangkat memakai Firebase Authentication agar bisa membaca
-  // status akun yang sama dari Firestore. Owner memakai email/password;
-  // kasir/admin memakai sesi anonim lalu divalidasi terhadap akun cloud.
-  if(u==='iqihloesteh'){
-   await window.IQIHLO_CLOUD.signIn('iqihloesteh@gmail.com',p);
-  }else{
-   if(!window.IQIHLO_CLOUD?.auth?.currentUser){
-    await window.IQIHLO_CLOUD.signInAnonymous();
-   }
+  if(!u||!p){
+    $('loginMsg').textContent='Username dan password wajib diisi.';
+    return;
   }
 
-  await refreshCloudAccounts();
+  $('loginMsg').textContent='Memeriksa akun...';
 
-  const a=accounts.find(x=>x.u===u&&x.p===p);
-  if(!a){
-   $('loginMsg').textContent='Username atau password salah.';
-   if(u==='iqihloesteh') await window.IQIHLO_CLOUD.signOut();
-   return;
-  }
-  if(a.active===false){
-   $('loginMsg').textContent='Akun ini sedang dinonaktifkan oleh Owner.';
-   if(u==='iqihloesteh') await window.IQIHLO_CLOUD.signOut();
-   return;
-  }
+  try{
+    if(u==='iqihloesteh'){
+      await window.IQIHLO_CLOUD.signIn('iqihloesteh@gmail.com',p);
+      await refreshCloudAccounts();
+    }else{
+      try{
+        if(!window.IQIHLO_CLOUD?.auth?.currentUser){
+          await window.IQIHLO_CLOUD.signInAnonymous();
+        }
+        await refreshCloudAccounts();
+      }catch(syncErr){
+        console.warn('Cloud account sync skipped:',syncErr);
+      }
+    }
 
-  session={...a,active:true};
-  sessionStorage.setItem('iqihlo_session',JSON.stringify(session));
-  $('loginMsg').textContent='';
-  await connectFirebaseForCurrentSession();
-  applySession();
- }catch(e){
-  console.error('Firebase login failed:',e);
-  $('loginMsg').textContent='Database Firebase belum siap untuk login perangkat ini. Pastikan Authentication > Sign-in method > Anonymous sudah diaktifkan.';
- }
+    const a=accounts.find(x=>x.u===u&&x.p===p);
+
+    if(!a){
+      $('loginMsg').textContent='Username atau password salah.';
+      return;
+    }
+
+    if(a.active===false){
+      $('loginMsg').textContent='Akun ini sedang dinonaktifkan oleh Owner.';
+      return;
+    }
+
+    session={...a};
+    sessionStorage.setItem('iqihlo_session',JSON.stringify(session));
+    $('loginMsg').textContent='';
+
+    try{
+      await connectFirebaseForCurrentSession();
+    }catch(e){
+      console.warn('Session cloud sync:',e);
+    }
+
+    applySession();
+
+  }catch(e){
+    console.error('Login failed:',e);
+    $('loginMsg').textContent=e?.message||'Login gagal. Periksa username dan password.';
+  }
 }
 
 function biometricLogin(){
