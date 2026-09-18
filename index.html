@@ -1131,15 +1131,38 @@ function initAccounts(){
  }
 
  accounts=a.map(x=>({
- u:String(x.u||'').trim().toLowerCase(),
- p:String(x.p||''),
- r:String(x.r||'KASIR').toUpperCase(),
- active:x.active!==false
-})).filter(x=>x.u);
+  u:String(x.u||'').trim().toLowerCase(),
+  p:String(x.p||''),
+  r:String(x.r||'KASIR').toUpperCase(),
+  active:x.active!==false
+ })).filter(x=>x.u);
 
- DEFAULT_ACCOUNTS.forEach(def=>{
-  if(!accounts.some(x=>x.u===def.u)){
-   accounts.push({...def});
+ // HAPUS AKUN OWNER LAMA
+ accounts=accounts.filter(x=>x.u!=='owner');
+
+ // HANYA IQIHLOESTEH YANG MENJADI OWNER
+ let owner=accounts.find(
+  x=>x.u==='iqihloesteh'
+ );
+
+ if(!owner){
+  owner={
+   u:'iqihloesteh',
+   p:'Bakmimania2108',
+   r:'OWNER',
+   active:true
+  };
+
+  accounts.push(owner);
+ }else{
+  owner.r='OWNER';
+  owner.active=true;
+ }
+
+ // Tidak boleh ada akun lain berstatus OWNER
+ accounts.forEach(x=>{
+  if(x.u!=='iqihloesteh'&&x.r==='OWNER'){
+   x.r='ADMIN';
   }
  });
 
