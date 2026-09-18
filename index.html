@@ -2062,8 +2062,8 @@ function checkout(){
  const rec={
   id:Date.now(),
   date:new Date().toISOString(),
-  user:session?.u||'-',
-  customer:'Umum',
+  user:session?.u||'Kasir',
+customer:(prompt('Nama pelanggan:','Umum')||'Umum').trim(),
   payment,
   total,
   cash,
