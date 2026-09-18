@@ -1017,29 +1017,71 @@ Scan barcode produk, lalu stok produk tersebut otomatis bertambah 1.
 </div>
 
 <div id="receipt" class="receipt"></div>
-<!-- kode HTML/CSS sebelumnya -->
-
 <script src="https://www.gstatic.com/firebasejs/12.9.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.9.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore-compat.js"></script>
-
 <script>
-const firebaseConfig = {
-  apiKey: "AIzaSyCVIEe-CDyaNDTU9DuvxKMRPY4wH-6Rp-o",
-  authDomain: "iqihlo-es-teh.firebaseapp.com",
-  projectId: "iqihlo-es-teh",
-  storageBucket: "iqihlo-es-teh.firebasestorage.app",
-  messagingSenderId: "382120711455",
-  appId: "1:382120711455:web:5281431a89a3cf2de08c2a",
-  measurementId: "G-VGG6XWQ5GL"
-};
+/* IQIHLO ES TEH - Firebase connection */
+(function(){
+  const firebaseConfig = {
+    apiKey: "AIzaSyCVIeE-CDyaNDTU9DuvxKMRPY4wH-6Rp-o",
+    authDomain: "iqihlo-es-teh.firebaseapp.com",
+    projectId: "iqihlo-es-teh",
+    storageBucket: "iqihlo-es-teh.firebasestorage.app",
+    messagingSenderId: "382120711455",
+    appId: "1:382120711455:web:5281431a89a3cf2de08c2a",
+    measurementId: "G-VGG6XWQ5GL"
+  };
 
-firebase.initializeApp(firebaseConfig);
-
-const db = firebase.firestore();
-const auth = firebase.auth();
+  try {
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    window.IQIHLO_CLOUD = {
+      auth, db, user:null, ready:false, applying:false, listeners:[],
+      dataKeys:['iqihlo_accounts_v7','iqihlo_menus_v7','iqihlo_tx_v7','iqihlo_employees_v7','iqihlo_att_v7','iqihlo_stock_v7','iqihlo_barcodes_v7','iqihlo_market_v7'],
+      async signIn(email,password){ return auth.signInWithEmailAndPassword(email,password); },
+      async signInAnonymous(){ return auth.signInAnonymously(); },
+      async signOut(){ return auth.signOut(); },
+      async save(key,value){
+        if(!this.ready || this.applying || !this.dataKeys.includes(key)) return;
+        try {
+          await db.collection('app_data').doc(key).set({data:value,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
+        } catch(e){ console.error('Firebase save failed:',key,e); }
+      },
+      async sync(){
+        if(!this.user) return;
+        this.ready=true;
+        try {
+          const snaps=await Promise.all(this.dataKeys.map(k=>db.collection('app_data').doc(k).get()));
+          const data={};
+          snaps.forEach((snap,i)=>{ if(snap.exists && snap.data() && snap.data().data!==undefined) data[this.dataKeys[i]]=snap.data().data; });
+          if(window.IQIHLO_APPLY_CLOUD) window.IQIHLO_APPLY_CLOUD(data);
+          this.listen();
+        } catch(e){ console.error('Firebase sync failed:',e); }
+      },
+      listen(){
+        this.listeners.forEach(u=>{try{u();}catch(e){}});
+        this.listeners=[];
+        this.dataKeys.forEach(key=>{
+          const unsub=db.collection('app_data').doc(key).onSnapshot(snap=>{
+            if(!snap.exists || !snap.data() || snap.data().data===undefined) return;
+            if(window.IQIHLO_APPLY_CLOUD) window.IQIHLO_APPLY_CLOUD({[key]:snap.data().data});
+          },err=>console.error('Firebase listener failed:',key,err));
+          this.listeners.push(unsub);
+        });
+      }
+    };
+    auth.onAuthStateChanged(user=>{
+      window.IQIHLO_CLOUD.user=user||null;
+      window.IQIHLO_CLOUD.ready=!!user;
+      if(user && window.IQIHLO_APPLY_AUTH) window.IQIHLO_APPLY_AUTH(user);
+    });
+  } catch(e) {
+    console.error('Firebase initialization failed:',e);
+  }
+})();
 </script>
-
 <script>
 'use strict';
 
@@ -1103,9 +1145,7 @@ const KEYS={
 };
 
 const DEFAULT_ACCOUNTS=[
-  {u:'iqihloesteh',p:'Bakmimania2108',r:'OWNER',active:true},
-  {u:'admin',p:'2510',r:'ADMIN',active:true},
-  {u:'kasir',p:'1525',r:'KASIR',active:true}
+  {u:'iqihloesteh',p:'Bakmimania2108',r:'OWNER'}
 ];
 
 let accounts=[];
@@ -1137,18 +1177,94 @@ function load(k,d){
  }
 }
 
-async function save(k,v){
-  localStorage.setItem(k,JSON.stringify(v));
-
-  try{
-    await db.collection('appData').doc(k).set({
-      value: v,
-      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
-  }catch(e){
-    console.error('Gagal menyimpan ke Firebase:',e);
-  }
+function save(k,v){
+ localStorage.setItem(k,JSON.stringify(v));
+ if(window.IQIHLO_CLOUD && !window.IQIHLO_CLOUD.applying){
+  window.IQIHLO_CLOUD.save(k,v);
+ }
 }
+
+/* =========================
+   FIREBASE CLOUD SYNC
+========================= */
+
+const CLOUD_KEY_MAP={
+ 'iqihlo_accounts_v7':'accounts',
+ 'iqihlo_menus_v7':'menus',
+ 'iqihlo_tx_v7':'tx',
+ 'iqihlo_employees_v7':'employees',
+ 'iqihlo_att_v7':'att',
+ 'iqihlo_stock_v7':'stock',
+ 'iqihlo_barcodes_v7':'barcodes',
+ 'iqihlo_market_v7':'market'
+};
+
+function applyCloudData(data){
+ if(!data || !Object.keys(data).length)return;
+
+ const oldApplying=window.IQIHLO_CLOUD?.applying;
+ if(window.IQIHLO_CLOUD)window.IQIHLO_CLOUD.applying=true;
+
+ try{
+  Object.entries(data).forEach(([key,value])=>{
+   if(key===KEYS.accounts && Array.isArray(value)) handleCloudAccounts(value);
+   if(key===KEYS.menus && Array.isArray(value)) menus=value;
+   if(key===KEYS.tx && Array.isArray(value)) tx=value;
+   if(key===KEYS.employees && Array.isArray(value)) employees=value;
+   if(key===KEYS.att && Array.isArray(value)) att=value;
+   if(key===KEYS.stock && value && typeof value==='object') stock=value;
+   if(key===KEYS.barcodes && value && typeof value==='object') barcodes=value;
+   if(key===KEYS.market && Array.isArray(value)) market=value;
+  });
+
+  Object.entries(data).forEach(([key,value])=>{
+   try{localStorage.setItem(key,JSON.stringify(value));}catch(e){}
+  });
+
+  renderCats();
+  renderMenus();
+  renderManagers();
+  renderEmployees();
+  renderStock();
+  renderBarcode();
+  renderMarket();
+  renderReport();
+  renderHistory();
+  renderStats();
+ }finally{
+  if(window.IQIHLO_CLOUD)window.IQIHLO_CLOUD.applying=!!oldApplying;
+ }
+}
+
+window.IQIHLO_APPLY_CLOUD=applyCloudData;
+
+async function connectFirebaseForCurrentSession(){
+ if(!window.IQIHLO_CLOUD || !window.IQIHLO_CLOUD.user)return;
+ try{
+  const email=window.IQIHLO_CLOUD.user.email;
+  if(email){
+   const snap=await window.IQIHLO_CLOUD.db.collection('users').doc(email).get();
+   if(snap.exists){
+    const d=snap.data()||{};
+    const a=accounts.find(x=>x.u==='iqihloesteh');
+    if(a){
+     if(d.role)a.r=String(d.role).toUpperCase();
+     if(d.active!==undefined)a.active=d.active!==false;
+     a.email=email;
+    }
+   }
+  }
+  await window.IQIHLO_CLOUD.sync();
+  await refreshCloudAccounts();
+ }catch(e){
+  console.error('Firebase account sync failed:',e);
+ }
+}
+
+window.IQIHLO_APPLY_AUTH=function(user){
+ if(document.readyState!=='loading') connectFirebaseForCurrentSession();
+};
+
 
 function rupiah(n){
  return 'Rp'+Number(n||0).toLocaleString('id-ID');
@@ -1183,72 +1299,134 @@ function guessCat(n){
 ========================= */
 
 function initAccounts(){
-  let a=load(KEYS.accounts,null);
+ let a=load(KEYS.accounts,null);
 
-  if(!Array.isArray(a)){
-    a=[];
-  }
+ if(!Array.isArray(a)||!a.length){
+  a=DEFAULT_ACCOUNTS.map(x=>({...x}));
+ }
 
-  accounts=a.map(x=>({
+ accounts=a.map(x=>({
+  u:String(x.u||'').trim().toLowerCase(),
+  p:String(x.p||''),
+  r:String(x.r||'KASIR').toUpperCase(),
+  active:x.active!==false,
+  email:x.email||''
+ })).filter(x=>x.u);
+
+ // Pastikan Owner bawaan tersedia tanpa mengaktifkan kembali akun lain.
+ let owner=accounts.find(x=>x.u==='iqihloesteh');
+ if(!owner){
+  owner={u:'iqihloesteh',p:'Bakmimania2108',r:'OWNER',active:true,email:'iqihloesteh@gmail.com'};
+  accounts.push(owner);
+ }else{
+  owner.r='OWNER';
+  owner.email=owner.email||'iqihloesteh@gmail.com';
+ }
+
+ // Hanya IQIHLOESTEH yang boleh OWNER.
+ accounts.forEach(x=>{
+  if(x.u!=='iqihloesteh'&&x.r==='OWNER') x.r='ADMIN';
+ });
+
+ try{localStorage.setItem(KEYS.accounts,JSON.stringify(accounts));}catch(e){}
+}
+
+async function refreshCloudAccounts(){
+ if(!window.IQIHLO_CLOUD?.user)return false;
+ try{
+  const snap=await window.IQIHLO_CLOUD.db.collection('app_data').doc(KEYS.accounts).get();
+  if(snap.exists && snap.data()?.data && Array.isArray(snap.data().data)){
+   accounts=snap.data().data.map(x=>({
     u:String(x.u||'').trim().toLowerCase(),
     p:String(x.p||''),
     r:String(x.r||'KASIR').toUpperCase(),
-    active:x.active!==false
-  })).filter(x=>x.u);
-
-  // Pastikan akun bawaan selalu ada, password dan statusnya benar
-  DEFAULT_ACCOUNTS.forEach(def=>{
-    const existing=accounts.find(x=>x.u===def.u);
-
-    if(existing){
-      existing.p=def.p;
-      existing.r=def.r;
-      existing.active=true;
-    }else{
-      accounts.push({...def});
-    }
-  });
-
-  // Hanya IQIHLOESTEH yang boleh menjadi OWNER
-  accounts.forEach(x=>{
-    if(x.u!=='iqihloesteh' && x.r==='OWNER'){
-      x.r='ADMIN';
-    }
-  });
-
-  save(KEYS.accounts,accounts);
+    active:x.active!==false,
+    email:x.email||''
+   })).filter(x=>x.u);
+   localStorage.setItem(KEYS.accounts,JSON.stringify(accounts));
+   renderAccounts();
+   return true;
+  }
+  // Dokumen akun belum ada: Owner menginisialisasi dari data lokal.
+  if(session?.r==='OWNER' || window.IQIHLO_CLOUD.user.email==='iqihloesteh@gmail.com'){
+   await window.IQIHLO_CLOUD.save(KEYS.accounts,accounts);
+  }
+ }catch(e){ console.error('Cloud accounts refresh failed:',e); }
+ return false;
 }
 
+function handleCloudAccounts(value){
+ if(!Array.isArray(value))return;
+ accounts=value.map(x=>({
+  u:String(x.u||'').trim().toLowerCase(),
+  p:String(x.p||''),
+  r:String(x.r||'KASIR').toUpperCase(),
+  active:x.active!==false,
+  email:x.email||''
+ })).filter(x=>x.u);
+ try{localStorage.setItem(KEYS.accounts,JSON.stringify(accounts));}catch(e){}
+ renderAccounts();
 
-function loginSystem(){
+ // Kalau akun yang sedang login dinonaktifkan, langsung kunci sesi.
+ if(session){
+  const current=accounts.find(x=>x.u===session.u);
+  if(!current || current.active===false){
+   lockApp();
+   $('loginMsg').textContent='Akun ini dinonaktifkan oleh Owner.';
+  }else if(session.r!==current.r){
+   session={...current};
+   sessionStorage.setItem('iqihlo_session',JSON.stringify(session));
+   applySession();
+  }
+ }
+}
+
+async function loginSystem(){
  const u=$('loginUser').value.trim().toLowerCase();
  const p=$('loginPass').value;
 
- const a=accounts.find(x=>x.u===u&&x.p===p);
-
- if(!a){
-  $('loginMsg').textContent='Username atau password salah.';
+ if(!u||!p){
+  $('loginMsg').textContent='Username dan password wajib diisi.';
   return;
  }
 
- // CEK STATUS AKUN
- if(a.active===false){
-  $('loginMsg').textContent='Akun ini sedang dinonaktifkan oleh Owner.';
-  return;
+ $('loginMsg').textContent='Menghubungkan ke database...';
+
+ try{
+  // Semua perangkat memakai Firebase Authentication agar bisa membaca
+  // status akun yang sama dari Firestore. Owner memakai email/password;
+  // kasir/admin memakai sesi anonim lalu divalidasi terhadap akun cloud.
+  if(u==='iqihloesteh'){
+   await window.IQIHLO_CLOUD.signIn('iqihloesteh@gmail.com',p);
+  }else{
+   if(!window.IQIHLO_CLOUD?.auth?.currentUser){
+    await window.IQIHLO_CLOUD.signInAnonymous();
+   }
+  }
+
+  await refreshCloudAccounts();
+
+  const a=accounts.find(x=>x.u===u&&x.p===p);
+  if(!a){
+   $('loginMsg').textContent='Username atau password salah.';
+   if(u==='iqihloesteh') await window.IQIHLO_CLOUD.signOut();
+   return;
+  }
+  if(a.active===false){
+   $('loginMsg').textContent='Akun ini sedang dinonaktifkan oleh Owner.';
+   if(u==='iqihloesteh') await window.IQIHLO_CLOUD.signOut();
+   return;
+  }
+
+  session={...a,active:true};
+  sessionStorage.setItem('iqihlo_session',JSON.stringify(session));
+  $('loginMsg').textContent='';
+  await connectFirebaseForCurrentSession();
+  applySession();
+ }catch(e){
+  console.error('Firebase login failed:',e);
+  $('loginMsg').textContent='Database Firebase belum siap untuk login perangkat ini. Pastikan Authentication > Sign-in method > Anonymous sudah diaktifkan.';
  }
-
- session={
-  ...a,
-  active:true
- };
-
- sessionStorage.setItem(
-  'iqihlo_session',
-  JSON.stringify(session)
- );
-
- $('loginMsg').textContent='';
- applySession();
 }
 
 function biometricLogin(){
@@ -1313,6 +1491,13 @@ function restoreSession(){
 
 function lockApp(){
  stopBarcodeCamera();
+
+ if(window.IQIHLO_CLOUD){
+  window.IQIHLO_CLOUD.listeners?.forEach(u=>{try{u();}catch(e){}});
+  window.IQIHLO_CLOUD.listeners=[];
+  window.IQIHLO_CLOUD.ready=false;
+  window.IQIHLO_CLOUD.signOut().catch(()=>{});
+ }
 
  session=null;
  sessionStorage.removeItem('iqihlo_session');
@@ -1706,6 +1891,10 @@ function init(){
  }
 
  setPay('Cash');
+
+ if(window.IQIHLO_CLOUD && window.IQIHLO_CLOUD.auth.currentUser){
+  connectFirebaseForCurrentSession();
+ }
 }
 
 /* =========================
@@ -3124,16 +3313,19 @@ function changeOwnerPassword(){
  }
 
  const a=
-  accounts.find(x=>x.u==='owner');
+  accounts.find(x=>x.u==='iqihloesteh');
 
  if(a){
   a.p=p;
-
   save(KEYS.accounts,accounts);
 
-  alert(
-   'Password Owner berhasil diubah.'
-  );
+  if(window.IQIHLO_CLOUD?.auth?.currentUser){
+    window.IQIHLO_CLOUD.auth.currentUser.updatePassword(p)
+      .then(()=>alert('Password Owner berhasil diubah di Firebase.'))
+      .catch(e=>alert('Password lokal tersimpan, tetapi Firebase menolak perubahan. Login ulang lalu coba lagi.'));
+  }else{
+    alert('Password Owner berhasil diubah.');
+  }
  }
 }
 
