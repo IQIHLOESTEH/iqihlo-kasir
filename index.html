@@ -1017,6 +1017,29 @@ Scan barcode produk, lalu stok produk tersebut otomatis bertambah 1.
 </div>
 
 <div id="receipt" class="receipt"></div>
+<!-- kode HTML/CSS sebelumnya -->
+
+<script src="https://www.gstatic.com/firebasejs/12.9.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.9.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore-compat.js"></script>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyCVIEe-CDyaNDTU9DuvxKMRPY4wH-6Rp-o",
+  authDomain: "iqihlo-es-teh.firebaseapp.com",
+  projectId: "iqihlo-es-teh",
+  storageBucket: "iqihlo-es-teh.firebasestorage.app",
+  messagingSenderId: "382120711455",
+  appId: "1:382120711455:web:5281431a89a3cf2de08c2a",
+  measurementId: "G-VGG6XWQ5GL"
+};
+
+firebase.initializeApp(firebaseConfig);
+
+const db = firebase.firestore();
+const auth = firebase.auth();
+</script>
+
 <script>
 'use strict';
 
@@ -1112,8 +1135,17 @@ function load(k,d){
  }
 }
 
-function save(k,v){
- localStorage.setItem(k,JSON.stringify(v));
+async function save(k,v){
+  localStorage.setItem(k,JSON.stringify(v));
+
+  try{
+    await db.collection('appData').doc(k).set({
+      value: v,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+  }catch(e){
+    console.error('Gagal menyimpan ke Firebase:',e);
+  }
 }
 
 function rupiah(n){
