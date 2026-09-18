@@ -1382,40 +1382,39 @@ function handleCloudAccounts(value){
 }
 
 async function loginSystem(){
-  const u = $('loginUser').value.trim().toLowerCase();
-  const p = $('loginPass').value;
+async function loginSystem(){
+
+  const u=$('loginUser').value.trim().toLowerCase();
+  const p=$('loginPass').value;
 
   if(!u || !p){
-    $('loginMsg').textContent = 'Username dan password wajib diisi.';
+    $('loginMsg').textContent='Username dan password wajib diisi.';
     return;
   }
 
-  $('loginMsg').textContent = 'Memproses login...';
+  $('loginMsg').textContent='Memproses login...';
 
-  try {
-    // Jangan paksa Firebase terlebih dahulu.
-    // Cek akun yang tersimpan di perangkat.
-    const a = accounts.find(x =>
-      x.u === u &&
-      x.p === p
+  try{
+
+    const a=accounts.find(x =>
+      x.u===u &&
+      x.p===p
     );
 
     if(!a){
-      $('loginMsg').textContent =
-        'Username atau password salah.';
+      $('loginMsg').textContent='Username atau password salah.';
       return;
     }
 
-    if(a.active === false){
-      $('loginMsg').textContent =
+    if(a.active===false){
+      $('loginMsg').textContent=
         'Akun ini sedang dinonaktifkan oleh Owner.';
       return;
     }
 
-    // Simpan sesi
-    session = {
+    session={
       ...a,
-      active: true
+      active:true
     };
 
     sessionStorage.setItem(
@@ -1423,27 +1422,34 @@ async function loginSystem(){
       JSON.stringify(session)
     );
 
-    $('loginMsg').textContent = '';
+    $('loginMsg').textContent='';
 
-    // Masuk ke aplikasi terlebih dahulu
+    // MASUKKAN USER KE APLIKASI TERLEBIH DAHULU
     applySession();
 
-    // Setelah berhasil masuk, coba hubungkan Firebase
+    // Firebase dicoba setelah berhasil masuk.
+    // Firebase tidak boleh menghalangi login.
     try{
-      if(window.IQIHLO_CLOUD){
+      if(
+        window.IQIHLO_CLOUD &&
+        typeof connectFirebaseForCurrentSession==='function'
+      ){
         await connectFirebaseForCurrentSession();
       }
     }catch(firebaseError){
       console.error(
-        'Firebase connection error:',
+        'Firebase gagal tersambung:',
         firebaseError
       );
     }
 
   }catch(e){
+
     console.error('Login error:',e);
-    $('loginMsg').textContent =
-      'Gagal login: ' + (e?.message || e);
+
+    $('loginMsg').textContent=
+      'Gagal login: '+(e?.message || e);
+
   }
 }
 
