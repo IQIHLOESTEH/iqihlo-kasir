@@ -3323,26 +3323,7 @@ async function toggleManagedAccount(index){
 
     renderAccounts();
 
-    alert(
-      'Akun '+a.u+' sekarang '+
-      (a.active?'AKTIF':'NONAKTIF')+
-      ' dan sudah disimpan ke Firebase.'
-    );
-
-  }catch(e){
-
-    console.error('Gagal menyimpan status akun:',e);
-
-    a.active=!statusBaru;
-
-    renderAccounts();
-
-    alert(
-      'GAGAL menyimpan status akun ke Firebase. '+
-      'Perubahan dibatalkan.'
-    );
-  }
-  }
+async function toggleManagedAccount(index){
 
   if(session?.r!=='OWNER'){
     alert('Hanya Owner yang dapat mengaktifkan atau menonaktifkan akun.');
@@ -3371,16 +3352,62 @@ async function toggleManagedAccount(index){
 
   if(!konfirmasi)return;
 
+  const statusLama=a.active;
+
   a.active=statusBaru;
 
-  save(KEYS.accounts,accounts);
+  try{
 
-  renderAccounts();
+    /*
+      Simpan ke Firebase jika koneksi Firebase tersedia.
+      Kalau Firebase belum tersedia, simpan lokal agar aplikasi
+      tidak error.
+    */
+    if(
+      window.IQIHLO_CLOUD &&
+      window.IQIHLO_CLOUD.user &&
+      window.IQIHLO_CLOUD.db
+    ){
 
-  alert(
-    'Akun '+a.u+' sekarang '+
-    (a.active?'AKTIF':'NONAKTIF')+'.'
-  );
+      await window.IQIHLO_CLOUD.db
+        .collection('app_data')
+        .doc(KEYS.accounts)
+        .set({
+          data:accounts,
+          updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+        },{
+          merge:true
+        });
+
+    }else{
+
+      save(KEYS.accounts,accounts);
+
+    }
+
+    renderAccounts();
+
+    alert(
+      'Akun '+a.u+' sekarang '+
+      (a.active?'AKTIF':'NONAKTIF')+
+      '.'
+    );
+
+  }catch(e){
+
+    console.error('Gagal menyimpan status akun:',e);
+
+    a.active=statusLama;
+
+    renderAccounts();
+
+    alert(
+      'GAGAL menyimpan perubahan akun ke Firebase.\n\n'+
+      (e?.message || 'Periksa koneksi Firebase dan Firestore Rules.')
+    );
+
+  }
+
 }
 function changeOwnerPassword(){
 
