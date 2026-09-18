@@ -803,8 +803,33 @@ button{
 
 <details class="details admin-only">
 <summary>📦 STOK / INVENTORI</summary>
+
 <div class="panel">
+
+<div class="formgrid">
+
+<input
+id="stockBarcodeInput"
+class="field full"
+placeholder="Scan barcode untuk tambah stok"
+autocomplete="off">
+
+<button
+class="primary"
+onclick="findStockBarcode()">
+📦 SCAN & TAMBAH STOK
+</button>
+
+</div>
+
+<div
+class="muted"
+style="margin-top:8px">
+Scan barcode produk, lalu stok produk tersebut otomatis bertambah 1.
+</div>
+
 <div id="stockList"></div>
+
 </div>
 </details>
 
@@ -2508,6 +2533,59 @@ function setStock(n,v){
  renderStock();
 }
 
+function addStockByBarcode(v){
+  v=String(v||'').trim();
+
+  if(!v){
+    alert('Barcode kosong.');
+    return;
+  }
+
+  const menuName=barcodes[v];
+
+  if(!menuName){
+    alert(
+      'Barcode belum terdaftar.\n\n' +
+      'Daftarkan barcode tersebut ke menu terlebih dahulu.'
+    );
+    return;
+  }
+
+  const menu=menus.find(
+    x=>x.n===menuName
+  );
+
+  if(!menu){
+    alert('Menu untuk barcode ini tidak ditemukan.');
+    return;
+  }
+
+  stock[menu.n]=(Number(stock[menu.n])||0)+1;
+
+  save(KEYS.stock,stock);
+  renderStock();
+
+  alert(
+    'STOK BERTAMBAH\n\n' +
+    menu.n +
+    ' +1\n' +
+    'Stok sekarang: ' +
+    stock[menu.n]
+  );
+}
+
+function findStockBarcode(){
+  const v=$('stockBarcodeInput').value.trim();
+
+  if(!v){
+    alert('Scan atau masukkan barcode terlebih dahulu.');
+    return;
+  }
+
+  addStockByBarcode(v);
+
+  $('stockBarcodeInput').value='';
+}  
 /* =========================
    BARCODE
 ========================= */
