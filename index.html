@@ -2927,7 +2927,46 @@ function renderAccounts(){
   `;
  }).join('');
                  }
+function toggleManagedAccount(index){
 
+  if(session?.r!=='OWNER'){
+    alert('Hanya Owner yang dapat mengaktifkan atau menonaktifkan akun.');
+    return;
+  }
+
+  const a=accounts[index];
+
+  if(!a){
+    alert('Akun tidak ditemukan.');
+    return;
+  }
+
+  if(a.u==='iqihloesteh' || a.r==='OWNER'){
+    alert('Akun Owner tidak dapat dinonaktifkan.');
+    return;
+  }
+
+  const statusBaru=a.active===false;
+
+  const konfirmasi=confirm(
+    statusBaru
+      ? 'Aktifkan akun '+a.u+'?'
+      : 'Nonaktifkan akun '+a.u+'?'
+  );
+
+  if(!konfirmasi)return;
+
+  a.active=statusBaru;
+
+  save(KEYS.accounts,accounts);
+
+  renderAccounts();
+
+  alert(
+    'Akun '+a.u+' sekarang '+
+    (a.active?'AKTIF':'NONAKTIF')+'.'
+  );
+}
 function changeOwnerPassword(){
 
  if(session?.r!=='OWNER'){
