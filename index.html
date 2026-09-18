@@ -2888,14 +2888,41 @@ function viewHistory(){
 function renderAccounts(){
  if(!$('accountList'))return;
 
- $('accountList').innerHTML=
-  accounts.map(x=>`
-   <div class="row">
-    <b>${esc(x.u)}</b>
-    — ${esc(x.r)}
+ $('accountList').innerHTML=accounts.map((x,i)=>{
+  const active=x.active!==false;
+  const isOwner=x.r==='OWNER';
+
+  return `
+   <div class="row" style="padding:12px 0">
+
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+
+      <div>
+        <b>${esc(x.u)}</b>
+        <div class="muted">
+          ${esc(x.r)} • ${active?'AKTIF':'NONAKTIF'}
+        </div>
+      </div>
+
+      ${
+        isOwner
+        ? '<span class="access-status on">OWNER</span>'
+        : `
+          <button
+            class="${active?'danger':'primary'}"
+            style="padding:9px 12px;min-width:120px"
+            onclick="toggleManagedAccount(${i})">
+            ${active?'NONAKTIFKAN':'AKTIFKAN'}
+          </button>
+        `
+      }
+
+    </div>
+
    </div>
-  `).join('');
-}
+  `;
+ }).join('');
+                 }
 
 function changeOwnerPassword(){
 
