@@ -1418,7 +1418,7 @@ async function loginSystem(){
    return;
   }
 
-  session={...a,active:true};
+  session={...a,active:a.active!==false};
   sessionStorage.setItem('iqihlo_session',JSON.stringify(session));
   $('loginMsg').textContent='';
   await connectFirebaseForCurrentSession();
