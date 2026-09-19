@@ -2660,8 +2660,7 @@ function addEmployee(){
  renderEmployees();
 }
 
-async function attendanceBiometric(){
-
+function attendanceBiometric(){
  if(!employees.length){
   alert('Tambahkan karyawan terlebih dahulu.');
   return;
@@ -2669,82 +2668,21 @@ async function attendanceBiometric(){
 
  const e=employees[0];
 
- if(!e)return;
+ if(window.AndroidBiometric &&
+    typeof AndroidBiometric.authenticateAttendance==='function'){
 
- // Jika WebAuthn belum didaftarkan,
- // lakukan pendaftaran sidik jari terlebih dahulu
- if(!e.webAuthnCredentialId){
+  AndroidBiometric.authenticateAttendance(
+   e.n,
+   'ABSEN'
+  );
 
-  if(!window.PublicKeyCredential ||
-     !navigator.credentials){
-
-   alert(
-    'Sidik jari Web tidak didukung oleh browser ini.'
-   );
-
-   return;
-  }
-
-  try{
-
-   const challenge=new Uint8Array(32);
-   crypto.getRandomValues(challenge);
-
-   const userId=new Uint8Array(16);
-   crypto.getRandomValues(userId);
-
-   const credential=
-    await navigator.credentials.create({
-
-     publicKey:{
-
-      challenge:challenge,
-
-      rp:{
-       name:'IQIHLO ES TEH',
-       id:location.hostname
-      },
-
-      user:{
-       id:userId,
-       name:e.n,
-       displayName:e.n
-      },
-
-      pubKeyCredParams:[
-       {
-        type:'public-key',
-        alg:-7
-       },
-       {
-        type:'public-key',
-        alg:-257
-       }
-      ],
-
-      authenticatorSelection:{
-function attendanceBiometric(){
-  if(!employees.length){
-    alert('Tambahkan karyawan terlebih dahulu.');
-    return;
-  }
-
-  const e=employees[0];
-
-  if(window.AndroidBiometric &&
-     typeof AndroidBiometric.authenticateAttendance==='function'){
-
-    AndroidBiometric.authenticateAttendance(
-      e.n,
-      'ABSEN'
-    );
-
-  }else{
-    alert(
-      'Sidik jari tersedia pada APK Android.'
-    );
-  }
+ }else{
+  alert(
+   'Sidik jari tersedia pada APK Android.'
+  );
+ }
 }
+
 function attendanceBiometricSuccess(){
  const e=employees[0];
 
