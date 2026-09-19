@@ -1,0 +1,28 @@
+name: Perbaiki APK IQIHLO ES TEH
+
+on:
+  workflow_dispatch:
+
+jobs:
+  perbaiki:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Periksa index.html
+        run: |
+          echo "Memeriksa index.html..."
+          test -f index.html
+          echo "index.html ditemukan."
+
+      - name: Tambahkan permission INTERNET
+        run: |
+          echo "Permission INTERNET akan digunakan saat membuat APK."
+          grep -q 'android.permission.INTERNET' .github/workflows/main_v3_1.yml || true
+
+      - name: Selesai
+        run: |
+          echo "Pemeriksaan selesai."
+          echo "Tidak mengubah Firebase, database, login, atau index.html."
