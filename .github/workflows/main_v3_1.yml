@@ -24,21 +24,16 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Setup Android SDK
+      - name: Setup Android SDK        
         uses: android-actions/setup-android@v3
-
-      - name: Install Android SDK
-        shell: bash
-        run: |
-          set -e
-          yes | sdkmanager --licenses >/dev/null 2>&1 || true
-          sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
+        with:
+          packages: 'platform-tools platforms;android-35 build-tools;35.0.0'
 
       - name: Create Android project
         shell: bash
         run: |
+          set -e   
           set -e
-
           rm -rf android
           mkdir -p android/app/src/main/java/com/iqihlo/esteh
           mkdir -p android/app/src/main/assets
