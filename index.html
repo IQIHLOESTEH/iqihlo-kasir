@@ -794,7 +794,9 @@ button{
 <input id="employeeName" class="field full" placeholder="Nama karyawan">
 <input id="employeeRole" class="field" placeholder="Jabatan">
 <button class="primary" onclick="addEmployee()">SIMPAN KARYAWAN</button>
-<button class="secondary" onclick="attendanceBiometric()">ABSEN SIDIK JARI</button>
+<button class="secondary" onclick="registerWebAuthnAttendance()">
+  🖐️ DAFTARKAN SIDIK JARI WEB
+</button>
 </div>
 <div id="employeeList"></div>
 <div id="attendanceHistory"></div>
@@ -2660,7 +2662,8 @@ function addEmployee(){
  renderEmployees();
 }
 
-function attendanceBiometric(){
+async function attendanceBiometric(){
+
  if(!employees.length){
   alert('Tambahkan karyawan terlebih dahulu.');
   return;
@@ -2668,20 +2671,190 @@ function attendanceBiometric(){
 
  const e=employees[0];
 
- if(window.AndroidBiometric &&
-    typeof AndroidBiometric.authenticateAttendance==='function'){
+ if(!e)return;
 
-  AndroidBiometric.authenticateAttendance(
-   e.n,
-   'ABSEN'
-  );
+ // Jika WebAuthn belum didaftarkan,
+ // lakukan pendaftaran sidik jari terlebih dahulu
+ if(!e.webAuthnCredentialId){
 
- }else{
-  alert(
-   'Sidik jari tersedia pada APK Android.'
-  );
+  if(!window.PublicKeyCredential ||
+     !navigator.credentials){
+
+   alert(
+    'Sidik jari Web tidak didukung oleh browser ini.'
+   );
+
+   return;
+  }
+
+  try{
+
+   const challenge=new Uint8Array(32);
+   crypto.getRandomValues(challenge);
+
+   const userId=new Uint8Array(16);
+   crypto.getRandomValues(userId);
+
+   const credential=
+    await navigator.credentials.create({
+
+     publicKey:{
+
+      challenge:challenge,
+
+      rp:{
+       name:'IQIHLO ES TEH',
+       id:location.hostname
+      },
+
+      user:{
+       id:userId,
+       name:e.n,
+       displayName:e.n
+      },
+
+      pubKeyCredParams:[
+       {
+        type:'public-key',
+        alg:-7
+       },
+       {
+        type:'public-key',
+        alg:-257
+       }
+      ],
+
+      authenticatorSelection:{
+       authenticatorAttachment:'platform',
+       userVerification:'required'
+      },
+
+      timeout:60000,
+
+      attestation:'none'
+     }
+
+    });
+
+   if(!credential){
+    alert('Pendaftaran sidik jari dibatalkan.');
+    return;
+   }
+
+   const bytes=
+    new Uint8Array(credential.rawId);
+
+   let binary='';
+
+   bytes.forEach(function(b){
+    binary+=String.fromCharCode(b);
+   });
+
+   e.webAuthnCredentialId=
+    btoa(binary)
+     .replace(/\+/g,'-')
+     .replace(/\//g,'_')
+     .replace(/=+$/,'');
+
+   save(KEYS.employees,employees);
+
+   alert(
+    'Sidik jari berhasil didaftarkan untuk ' +
+    e.n +
+    '. Tekan ABSEN SIDIK JARI sekali lagi.'
+   );
+
+   renderEmployees();
+
+   return;
+
+  }catch(err){
+
+   console.error(err);
+
+   alert(
+    'Pendaftaran sidik jari gagal: ' +
+    (err.message || err)
+   );
+
+   return;
+  }
  }
-}
+
+ // Verifikasi sidik jari yang sudah terdaftar
+ try{
+
+  const challenge=new Uint8Array(32);
+  crypto.getRandomValues(challenge);
+
+  const credential=
+   await navigator.credentials.get({
+
+    publicKey:{
+
+     challenge:challenge,
+
+     rpId:location.hostname,
+
+     allowCredentials:[
+      {
+       type:'public-key',
+
+       id:(function(){
+
+        const s=e.webAuthnCredentialId
+         .replace(/-/g,'+')
+         .replace(/_/g,'/');
+
+        const pad=s.length%4;
+
+        const padded=
+         s+(pad? '='.repeat(4-pad):'');
+
+        const binary=atob(padded);
+
+        const bytes=
+         new Uint8Array(binary.length);
+
+        for(
+         let i=0;
+         i<binary.length;
+         i++
+        ){
+         bytes[i]=binary.charCodeAt(i);
+        }
+
+        return bytes;
+
+       })()
+      }
+     ],
+
+     userVerification:'required',
+
+     timeout:60000
+    }
+
+   );
+
+  if(!credential){
+   throw new Error('Sidik jari tidak terverifikasi.');
+  }
+
+  attendanceBiometricSuccess();
+
+ }catch(err){
+
+  console.error(err);
+
+  alert(
+   'Verifikasi sidik jari gagal: ' +
+   (err.message || err)
+  );
+
+ }
+
+   }
 
 function attendanceBiometricSuccess(){
  const e=employees[0];
