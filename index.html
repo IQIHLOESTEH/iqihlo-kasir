@@ -3256,27 +3256,37 @@ function printReceipt(){
   buildReceipt(r);
 
  /*
-  AndroidPrinter dipakai jika APK
-  menyediakan bridge printer.
+  Jalur cetak kompatibel:
+  - AndroidPrint.print() = bridge dari versi web sebelumnya
+  - AndroidPrinter.printReceipt() = bridge APK terbaru
+  - window.print() = browser/web
  */
- if(window.AndroidPrinter &&
-    typeof AndroidPrinter.printReceipt==='function'){
-
+ if(window.AndroidPrint &&
+    typeof window.AndroidPrint.print==='function'){
   try{
-   AndroidPrinter.printReceipt(
+   window.AndroidPrint.print();
+   return;
+  }catch(e){
+   console.error('AndroidPrint.print:',e);
+  }
+ }
+
+ if(window.AndroidPrinter &&
+    typeof window.AndroidPrinter.printReceipt==='function'){
+  try{
+   window.AndroidPrinter.printReceipt(
     JSON.stringify(r)
    );
    return;
   }catch(e){
-   console.error(e);
+   console.error('AndroidPrinter.printReceipt:',e);
   }
  }
 
- /* Cetak langsung untuk WEB */
- if(typeof window.print === 'function'){
+ if(typeof window.print==='function'){
   window.print();
  }else{
-  alert('Fitur cetak tidak didukung browser ini.');
+  alert('Fitur cetak tidak didukung browser ini. Buka dengan Google Chrome.');
  }
 }
 
