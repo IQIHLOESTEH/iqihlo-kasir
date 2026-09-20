@@ -3245,75 +3245,27 @@ function buildReceipt(r){
   return lines.join('');
   }
 function printReceipt(){
-  const r=lastReceipt||tx[tx.length-1];
+ const r=lastReceipt||tx[tx.length-1];
 
-  if(!r){
-    alert('Belum ada transaksi untuk dicetak.');
-    return;
-  }
+ if(!r){
+  alert('Belum ada transaksi untuk dicetak.');
+  return;
+ }
 
-  const receipt=document.getElementById('receipt');
+ const receipt=$('receipt');
 
-  if(!receipt){
-    alert('Area struk tidak ditemukan.');
-    return;
-  }
+ if(!receipt){
+  alert('Area struk tidak ditemukan.');
+  return;
+ }
 
-  /* Dibuat langsung seperti mekanisme cetak file lama.
-     Tidak bergantung pada Android/APK atau helper lain. */
-  const safe=function(v){
-    return String(v==null?'':v)
-      .replace(/&/g,'&amp;')
-      .replace(/</g,'&lt;')
-      .replace(/>/g,'&gt;')
-      .replace(/"/g,'&quot;')
-      .replace(/'/g,'&#39;');
-  };
+ /* Gunakan struktur struk milik file baru agar seluruh data transaksi
+    tetap berasal dari tx/lastReceipt. */
+ receipt.innerHTML=buildReceipt(r);
 
-  const items=(r.items||[]).map(function(x){
-    const name=safe(x.n||'Item');
-    const qty=Number(x.q||1);
-    const price=Number(x.p||0);
-    const subtotal=price*qty;
-
-    return '<div class="rrow">'+
-      '<span class="rn">'+name+' x'+qty+'</span>'+
-      '<span class="rp">'+rupiah(subtotal)+'</span>'+
-    '</div>';
-  }).join('');
-
-  let payment='';
-
-  if(r.payment==='Cash'){
-    payment=
-      '<div class="rt">TUNAI: '+rupiah(r.cash||0)+'</div>'+
-      '<div class="rt">KEMBALI: '+rupiah(r.change||0)+'</div>';
-  }else{
-    payment=
-      '<div class="rt">PEMBAYARAN: '+safe(r.payment||'-')+'</div>';
-  }
-
-  receipt.innerHTML=
-    '<div class="rc">'+
-      '<div class="rh">IQIHLO ES TEH</div>'+
-      '<div class="rh">SEGARNYA BEDA!</div>'+
-      '<div>'+safe(new Date(r.date).toLocaleString('id-ID'))+'</div>'+
-      '<div class="rl"></div>'+
-      '<div class="rt">Pelanggan: '+safe(r.customer||'Umum')+'</div>'+
-      '<div class="rt">Kasir: '+safe(r.user||'-')+'</div>'+
-      '<div class="rl"></div>'+
-      items+
-      '<div class="rl"></div>'+
-      '<div class="rb">TOTAL: '+rupiah(r.total||0)+'</div>'+
-      payment+
-      '<div class="rl"></div>'+
-      '<div class="rt">TERIMA KASIH</div>'+
-      '<div class="rt">Instagram: iqihlo.esteh_id</div>'+
-      '<div class="rt">TikTok: iqihlo.es.teh</div>'+
-    '</div>';
-
-  /* WEB saja — langsung memanggil dialog cetak. */
-  window.print();
+ /* Mekanisme WEB V8: cetak halaman melalui browser.
+    Tidak memakai bridge APK. */
+ window.print();
 }
 
 function cetak(){
