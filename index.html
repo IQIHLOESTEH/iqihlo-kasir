@@ -3252,13 +3252,23 @@ function printReceipt(){
   return;
  }
 
- $('receipt').innerHTML=
-  buildReceipt(r);
+ const receipt=$('receipt');
+
+ if(!receipt){
+  alert('Area struk tidak ditemukan.');
+  return;
+ }
+
+ receipt.innerHTML=buildReceipt(r);
 
  /*
-  APK Android menggunakan bridge AndroidPrinter.
-  Jika bridge tersedia, jangan jatuh ke window.print()
-  karena itu tidak mencetak ke printer Bluetooth 58mm.
+  WEB:
+  Cetak langsung dari aksi tombol. Tidak memakai setTimeout,
+  karena pada beberapa browser Android pemanggilan print()
+  yang ditunda dapat diblokir.
+
+  APK:
+  Jika bridge AndroidPrinter tersedia, gunakan bridge tersebut.
  */
  if(window.AndroidPrinter &&
     typeof AndroidPrinter.printReceipt==='function'){
@@ -3275,10 +3285,11 @@ function printReceipt(){
   }
  }
 
- /* Fallback khusus browser/web */
- setTimeout(()=>{
+ if(typeof window.print==='function'){
   window.print();
- },100);
+ }else{
+  alert('Browser ini tidak mendukung pencetakan.');
+ }
 }
 
 function cetak(){
