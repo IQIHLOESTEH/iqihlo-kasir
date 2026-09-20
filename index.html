@@ -3245,26 +3245,70 @@ function buildReceipt(r){
   return lines.join('');
   }
 function printReceipt(){
-  const r=lastReceipt || (tx && tx.length ? tx[tx.length-1] : null);
+  const r = lastReceipt || (tx && tx.length ? tx[tx.length - 1] : null);
 
   if(!r){
     alert('Belum ada transaksi untuk dicetak.');
     return;
   }
 
-  const receipt=$('receipt');
+  const receipt = $('receipt');
 
   if(!receipt){
     alert('Area struk tidak ditemukan.');
     return;
   }
 
-  receipt.innerHTML=buildReceipt(r);
+  receipt.innerHTML = buildReceipt(r);
 
-  setTimeout(function(){
-    window.focus();
-    window.print();
-  },150);
+  const text = receipt.innerText.trim();
+
+  if(!text){
+    alert('Isi struk kosong.');
+    return;
+  }
+
+  fetch('http://localhost:9100/print',{
+    method:'POST',
+    headers:{
+      'Content-Type':'application/json'
+    },
+    body:JSON.stringify({
+      content:[
+        {
+          type:'text',
+          text:text,
+          align:'left',
+          bold:false,
+          size:1
+        },
+        {
+          type:'feed',
+          lines:3
+        }
+      ],
+      paperWidth:58,
+      cut:true,
+      reference:'IQIHLO ES TEH'
+    })
+  })
+  .then(async response=>{
+    const data=await response.json().catch(()=>({}));
+
+    if(!response.ok){
+      throw new Error(data.message || 'Cleanter gagal mencetak.');
+    }
+
+    alert('Struk berhasil dikirim ke printer.');
+  })
+  .catch(error=>{
+    console.error('Cleanter:',error);
+
+    alert(
+      'Tidak bisa mencetak.\n\n' +
+      'Pastikan Cleanter BERJALAN dan printer RPP02N TERHUBUNG.'
+    );
+  });
     }
 
 function cetak(){
