@@ -3143,7 +3143,7 @@ function showSuccess(r){
    STRUK 58 MM
 ========================= */
 
-async function printReceipt(){
+function printReceipt(){
   const lines=[];
 
   lines.push(
@@ -3395,32 +3395,49 @@ try{
   alert('Struk berhasil dikirim ke printer.');
 
 }catch(error){
-  console.error('Cleanter:',error);
+function printReceipt(){
+ const r=lastReceipt || (tx && tx.length ? tx[tx.length-1] : null);
 
-  alert(
-    'GAGAL MENCETAK.\n\n'+
-    'Pastikan Cleanter BERJALAN dan RPP02N TERHUBUNG.\n\n'+
-    'Error: '+error.message
-  );
-    }
-  .then(async response=>{
-    const data=await response.json().catch(()=>({}));
+ if(!r){
+  alert('Belum ada transaksi untuk dicetak.');
+  return;
+ }
 
-    if(!response.ok){
-      throw new Error(data.message || 'Cleanter gagal mencetak.');
-    }
+ const receipt=$('receipt');
 
-    alert('Struk berhasil dikirim ke printer.');
-  })
-  .catch(error=>{
-    console.error('Cleanter:',error);
+ if(!receipt){
+  alert('Area struk tidak ditemukan.');
+  return;
+ }
 
-    alert(
-      'Tidak bisa mencetak.\n\n' +
-      'Pastikan Cleanter BERJALAN dan printer RPP02N TERHUBUNG.'
-    );
-  });
-    }
+ receipt.innerHTML=buildReceipt(r);
+
+ if(window.AndroidPrint &&
+    typeof window.AndroidPrint.print==='function'){
+  try{
+   window.AndroidPrint.print();
+   return;
+  }catch(e){
+   console.error('AndroidPrint.print:',e);
+  }
+ }
+
+ if(window.AndroidPrinter &&
+    typeof window.AndroidPrinter.printReceipt==='function'){
+  try{
+   window.AndroidPrinter.printReceipt(JSON.stringify(r));
+   return;
+  }catch(e){
+   console.error('AndroidPrinter.printReceipt:',e);
+  }
+ }
+
+ if(typeof window.print==='function'){
+  window.print();
+ }else{
+  alert('Fitur cetak tidak didukung browser ini. Buka dengan Google Chrome.');
+ }
+}
 
 function cetak(){
  printReceipt();
