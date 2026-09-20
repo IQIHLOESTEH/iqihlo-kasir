@@ -3252,23 +3252,12 @@ function printReceipt(){
   return;
  }
 
- const receipt=$('receipt');
-
- if(!receipt){
-  alert('Area struk tidak ditemukan.');
-  return;
- }
-
- receipt.innerHTML=buildReceipt(r);
+ $('receipt').innerHTML=
+  buildReceipt(r);
 
  /*
-  WEB:
-  Cetak langsung dari aksi tombol. Tidak memakai setTimeout,
-  karena pada beberapa browser Android pemanggilan print()
-  yang ditunda dapat diblokir.
-
-  APK:
-  Jika bridge AndroidPrinter tersedia, gunakan bridge tersebut.
+  AndroidPrinter dipakai jika APK
+  menyediakan bridge printer.
  */
  if(window.AndroidPrinter &&
     typeof AndroidPrinter.printReceipt==='function'){
@@ -3279,16 +3268,15 @@ function printReceipt(){
    );
    return;
   }catch(e){
-   console.error('AndroidPrinter.printReceipt:',e);
-   alert('Printer gagal dipanggil: '+(e?.message||e));
-   return;
+   console.error(e);
   }
  }
 
- if(typeof window.print==='function'){
+ /* Cetak langsung untuk WEB */
+ if(typeof window.print === 'function'){
   window.print();
  }else{
-  alert('Browser ini tidak mendukung pencetakan.');
+  alert('Fitur cetak tidak didukung browser ini.');
  }
 }
 
