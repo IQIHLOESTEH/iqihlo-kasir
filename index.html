@@ -1413,7 +1413,36 @@ Scan barcode produk, lalu stok produk tersebut otomatis bertambah 1.
 </div>
 </div>
 
-<div id="receipt" class="receipt"></div>
+<div id="receipt" class="receipt"><div class="center">
+<b>IQIHLO ES TEH</b><br>
+SEGARNYA BEDA!<br>
+<b>STRUK PEMBELIAN</b>
+</div>
+
+<div class="line"></div>
+
+Nama: <span id="rnama"></span><br>
+Tanggal: <span id="rtgl"></span><br>
+Jam: <span id="rjam"></span><br>
+Bayar: <span id="rbayar"></span><br>
+Kasir: <span id="rkasir"></span>
+
+<div class="line"></div>
+
+<div id="ritem"></div>
+
+<div class="line"></div>
+
+<b>TOTAL: <span id="rtotal"></span></b>
+
+<div class="line"></div>
+
+<div class="center">
+TERIMA KASIH<br>
+SELAMAT MENIKMATI!<br><br>
+Instagram: @iqihlo.esteh_id<br>
+TikTok: @iqihlo.es.teh<br>
+</div></div>
 <script src="https://www.gstatic.com/firebasejs/12.9.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.9.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore-compat.js"></script>
@@ -3245,40 +3274,77 @@ function buildReceipt(r){
   return lines.join('');
   }
 function printReceipt(){
- const r=lastReceipt||tx[tx.length-1];
+  const r=lastReceipt||tx[tx.length-1];
 
- if(!r){
-  alert('Belum ada transaksi untuk dicetak.');
-  return;
- }
+  if(!r){
+    alert('Belum ada transaksi untuk dicetak.');
+    return;
+  }
 
- const receipt=$('receipt');
+  const names=(r.items||[]);
 
- if(!receipt){
-  alert('Area struk tidak ditemukan.');
-  return;
- }
+  if(!names.length){
+    alert('Tidak ada item pada transaksi.');
+    return;
+  }
 
- /* Gunakan struktur struk milik file baru agar seluruh data transaksi
-    tetap berasal dari tx/lastReceipt. */
- receipt.innerHTML=buildReceipt(r);
+  /* Adapter: struktur transaksi BARU -> struktur struk V8 */
+  const now=new Date(r.date||Date.now());
+  let h='';
 
- /* Mekanisme WEB V8: cetak halaman melalui browser.
-    Tidak memakai bridge APK. */
- window.print();
+  names.forEach(it=>{
+    const nama=it.n||it.nama||'Item';
+    const qty=Number(it.q||it.qty||1);
+    const price=Number(it.p||it.price||0);
+    const sub=Number(it.sub||price*qty);
+
+    h+=
+      '<div class="rline">'+
+        '<div class="rname">'+esc(nama)+' x'+qty+'</div>'+
+        '<div class="rprice">'+rupiah(sub)+'</div>'+
+      '</div>';
+  });
+
+  $('rnama').textContent=r.customer||'-';
+  $('rtgl').textContent=now.toLocaleDateString('id-ID');
+  $('rjam').textContent=now.toLocaleTimeString('id-ID');
+  $('rbayar').textContent=r.payment||'-';
+  $('rkasir').textContent=r.user||'-';
+  $('ritem').innerHTML=h;
+  $('rtotal').textContent=rupiah(r.total||0);
+
+  /*
+   * Jalur printer versi lama.
+   * Jika halaman sedang dijalankan di wrapper lama, AndroidPrint dipakai.
+   * Jika dibuka sebagai WEB biasa, browser print dipakai.
+   */
+  if(window.AndroidPrint &&
+     typeof window.AndroidPrint.print==='function'){
+    try{
+      window.AndroidPrint.print();
+      return;
+    }catch(e){
+      console.error('AndroidPrint gagal:',e);
+    }
+  }
+
+  if(typeof window.print==='function'){
+    window.print();
+    return;
+  }
+
+  alert('Fitur cetak tidak didukung browser ini.');
 }
 
 function cetak(){
- printReceipt();
+  printReceipt();
 }
 
 function cetakData(id){
- const r=tx.find(x=>x.id===id);
-
- if(!r)return;
-
- lastReceipt=r;
- printReceipt();
+  const r=tx.find(x=>x.id===id);
+  if(!r)return;
+  lastReceipt=r;
+  printReceipt();
 }
 
 /* =========================
