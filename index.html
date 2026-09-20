@@ -3252,41 +3252,62 @@ function printReceipt(){
   return;
  }
 
- $('receipt').innerHTML=
-  buildReceipt(r);
+ const receiptHtml=buildReceipt(r);
 
  /*
-  Jalur cetak kompatibel:
-  - AndroidPrint.print() = bridge dari versi web sebelumnya
-  - AndroidPrinter.printReceipt() = bridge APK terbaru
-  - window.print() = browser/web
+  CETAK WEB SAJA.
+  Tidak mengubah transaksi, Firebase, menu, stok, login,
+  atau struktur data. Membuka dokumen cetak khusus agar
+  browser tidak ikut mencetak dashboard/aplikasi.
  */
- if(window.AndroidPrint &&
-    typeof window.AndroidPrint.print==='function'){
-  try{
-   window.AndroidPrint.print();
-   return;
-  }catch(e){
-   console.error('AndroidPrint.print:',e);
-  }
- }
+ try{
+  const w=window.open('','_blank','width=420,height=700');
 
- if(window.AndroidPrinter &&
-    typeof window.AndroidPrinter.printReceipt==='function'){
-  try{
-   window.AndroidPrinter.printReceipt(
-    JSON.stringify(r)
-   );
+  if(!w){
+   alert('Jendela cetak diblokir browser. Izinkan pop-up untuk situs ini lalu coba lagi.');
    return;
-  }catch(e){
-   console.error('AndroidPrinter.printReceipt:',e);
   }
- }
 
- if(typeof window.print==='function'){
+  w.document.open();
+  w.document.write(`<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Struk IQIHLO ES TEH</title>
+<style>
+ @page{size:58mm auto;margin:0}
+ html,body{margin:0;padding:0;background:#fff;color:#000}
+ body{width:58mm;font-family:monospace;font-size:10px;font-weight:700;line-height:1.2}
+ #receipt{width:48mm;max-width:48mm;margin:0 auto;padding:0;box-sizing:border-box;overflow:visible}
+ #receipt *{box-sizing:border-box;max-width:100%}
+ @media print{
+  html,body{width:58mm!important;margin:0!important;padding:0!important}
+  #receipt{width:48mm!important;max-width:48mm!important;margin:0 auto!important}
+ }
+</style>
+</head>
+<body>
+<div id="receipt">${receiptHtml}</div>
+<script>
+window.addEventListener('load',function(){
+ setTimeout(function(){
+  window.focus();
   window.print();
- }else{
-  alert('Fitur cetak tidak didukung browser ini. Buka dengan Google Chrome.');
+ },150);
+});
+<\/script>
+</body>
+</html>`);
+  w.document.close();
+
+  /* Tutup jendela setelah dialog cetak selesai/dibatalkan. */
+  w.addEventListener('afterprint',function(){
+   setTimeout(function(){try{w.close()}catch(e){}},100);
+  });
+ }catch(e){
+  console.error('Cetak web:',e);
+  alert('Cetak web gagal dibuka. Coba izinkan pop-up untuk situs ini.');
  }
 }
 
