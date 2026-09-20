@@ -203,10 +203,9 @@ jobs:
 
               private void autentikasiAttendance(
                       String nama,
-                      String
-                            private void autentikasiAttendance(
-                      String nama,
                       String tipe) {
+                      
+                      
 
                   if (Build.VERSION.SDK_INT < 28) {
                       webView.evaluateJavascript(
