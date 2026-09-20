@@ -1413,36 +1413,7 @@ Scan barcode produk, lalu stok produk tersebut otomatis bertambah 1.
 </div>
 </div>
 
-<div id="receipt" class="receipt"><div class="center">
-<b>IQIHLO ES TEH</b><br>
-SEGARNYA BEDA!<br>
-<b>STRUK PEMBELIAN</b>
-</div>
-
-<div class="line"></div>
-
-Nama: <span id="rnama"></span><br>
-Tanggal: <span id="rtgl"></span><br>
-Jam: <span id="rjam"></span><br>
-Bayar: <span id="rbayar"></span><br>
-Kasir: <span id="rkasir"></span>
-
-<div class="line"></div>
-
-<div id="ritem"></div>
-
-<div class="line"></div>
-
-<b>TOTAL: <span id="rtotal"></span></b>
-
-<div class="line"></div>
-
-<div class="center">
-TERIMA KASIH<br>
-SELAMAT MENIKMATI!<br><br>
-Instagram: @iqihlo.esteh_id<br>
-TikTok: @iqihlo.es.teh<br>
-</div></div>
+<div id="receipt" class="receipt"></div>
 <script src="https://www.gstatic.com/firebasejs/12.9.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.9.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore-compat.js"></script>
@@ -3274,105 +3245,39 @@ function buildReceipt(r){
   return lines.join('');
   }
 function printReceipt(){
-  const r=lastReceipt||tx[tx.length-1];
+ const r=lastReceipt||tx[tx.length-1];
 
-  if(!r){
-    alert('Belum ada transaksi untuk dicetak.');
-    return;
-  }
+ if(!r){
+  alert('Belum ada transaksi untuk dicetak.');
+  return;
+ }
 
-  const receipt=document.getElementById('receipt');
-  if(!receipt){
-    alert('Area struk tidak ditemukan.');
-    return;
-  }
+ $('receipt').innerHTML=
+  buildReceipt(r);
 
-  receipt.innerHTML=buildReceipt(r);
+ /*
+  AndroidPrinter dipakai jika APK
+  menyediakan bridge printer.
+ */
+ if(window.AndroidPrinter &&
+    typeof AndroidPrinter.printReceipt==='function'){
 
-  /*
-   * URUTAN JALUR CETAK V9:
-   * 1. AndroidPrinter.printReceipt(data) untuk bridge printer versi lama
-   *    yang menerima data struk secara langsung.
-   * 2. AndroidPrint.print() untuk bridge web lama.
-   * 3. WEB murni: window.open -> window.print().
-   *
-   * Tidak ada perubahan pada transaksi/database/fungsi lain.
-   */
-  const payload={
-    customer:r.customer||'Umum',
-    payment:r.payment||r.pay||'-',
-    total:Number(r.total||0),
-    cash:Number(r.cash||0),
-    change:Number(r.change||0),
-    items:(r.items||[]).map(x=>({
-      n:x.n||x.name||'Item',
-      name:x.name||x.n||'Item',
-      q:Number(x.q||x.qty||1),
-      qty:Number(x.qty||x.q||1),
-      p:Number(x.p||x.price||0),
-      price:Number(x.price||x.p||0)
-    }))
-  };
-
-  if(window.AndroidPrinter &&
-     typeof window.AndroidPrinter.printReceipt==='function'){
-    try{
-      window.AndroidPrinter.printReceipt(JSON.stringify(payload));
-      return;
-    }catch(e){
-      console.error('AndroidPrinter.printReceipt gagal:',e);
-    }
-  }
-
-  if(window.AndroidPrint &&
-     typeof window.AndroidPrint.print==='function'){
-    try{
-      window.AndroidPrint.print();
-      return;
-    }catch(e){
-      console.error('AndroidPrint.print gagal:',e);
-    }
-  }
-
-  /*
-   * WEB murni: buka jendela cetak secara langsung dari aksi klik.
-   */
-  const printWindow=window.open('', '_blank');
-
-  if(printWindow){
-    const css=`
-      @page{size:58mm auto;margin:0}
-      *{box-sizing:border-box}
-      html,body{width:58mm;margin:0;padding:0;background:#fff}
-      body{font-family:monospace;font-size:10px;line-height:1.25;font-weight:700;color:#000}
-      .receipt{display:block!important;width:48mm!important;max-width:48mm!important;margin:0 auto!important;padding:0!important;overflow:visible!important}
-      .receipt *{max-width:100%}
-      .center{text-align:center}
-      .line,.rl{border-top:1px dashed #000;margin:4px 0}
-      .rline,.rr{display:flex;width:100%;align-items:flex-start}
-      .rname,.rn{flex:1;min-width:0;overflow-wrap:anywhere;word-break:break-word}
-      .rprice,.rp{margin-left:4px;white-space:nowrap;text-align:right}
-    `;
-
-    printWindow.document.open();
-    printWindow.document.write(
-      '<!doctype html><html><head><meta charset="utf-8">'+
-      '<title>IQIHLO ES TEH</title><style>'+css+'</style></head><body>'+
-      receipt.outerHTML+
-      '<script>window.onload=function(){window.focus();setTimeout(function(){window.print()},100)};<\/script>'+
-      '</body></html>'
-    );
-    printWindow.document.close();
-    return;
-  }
-
-  /* Jika popup diblokir browser, tetap gunakan dialog cetak utama. */
   try{
-    window.focus();
-    window.print();
+   AndroidPrinter.printReceipt(
+    JSON.stringify(r)
+   );
+   return;
   }catch(e){
-    alert('Jalur pencetakan tidak dapat dibuka: '+(e&&e.message?e.message:e));
+   console.error(e);
   }
+ }
+
+ /* Cetak langsung untuk WEB */
+ if(typeof window.print === 'function'){
+  window.print();
+ }else{
+  alert('Fitur cetak tidak didukung browser ini.');
+ }
 }
 
 function cetak(){
