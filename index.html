@@ -3143,7 +3143,7 @@ function showSuccess(r){
    STRUK 58 MM
 ========================= */
 
-function printReceipt(){
+function buildReceipt(r){
   const lines=[];
 
   lines.push(
@@ -3245,197 +3245,38 @@ function printReceipt(){
   return lines.join('');
   }
 function printReceipt(){
-  const r = lastReceipt || (tx && tx.length ? tx[tx.length - 1] : null);
-
-  if(!r){
-    alert('Belum ada transaksi untuk dicetak.');
-    return;
-  }
-
-  const receipt = $('receipt');
-
-  if(!receipt){
-    alert('Area struk tidak ditemukan.');
-    return;
-  }
-
-  receipt.innerHTML = buildReceipt(r);
-
-  const text = receipt.innerText.trim();
-
-  if(!text){
-    alert('Isi struk kosong.');
-    return;
-  }
-
-  const content=[
-  {
-    type:'text',
-    text:'IQIHLO ES TEH',
-    align:'center',
-    bold:true,
-    size:'large'
-  },
-  {
-    type:'text',
-    text:'SEGARNYA BEDA!',
-    align:'center',
-    bold:true
-  },
-  {
-    type:'text',
-    text:'STRUK PEMBELIAN',
-    align:'center',
-    bold:true
-  },
-  {type:'divider'},
-  {
-    type:'text',
-    text:'Pelanggan: '+(r.customer||'Umum')
-  },
-  {
-    type:'text',
-    text:'Kasir: '+(r.user||'-')
-  },
-  {
-    type:'text',
-    text:new Date(r.date).toLocaleString('id-ID')
-  },
-  {type:'divider'}
-];
-
-(r.items||[]).forEach(function(item){
-  const qty=Number(item.q||1);
-  const subtotal=Number(item.p||0)*qty;
-
-  content.push({
-    type:'row',
-    left:(item.n||'Item')+' x'+qty,
-    right:rupiah(subtotal)
-  });
-});
-
-content.push(
-  {type:'divider'},
-  {
-    type:'row',
-    left:'TOTAL',
-    right:rupiah(r.total),
-    bold:true
-  }
-);
-
-if(r.payment==='Cash'){
-  content.push(
-    {
-      type:'row',
-      left:'TUNAI',
-      right:rupiah(r.cash)
-    },
-    {
-      type:'row',
-      left:'KEMBALI',
-      right:rupiah(r.change)
-    }
-  );
-}else{
-  content.push({
-    type:'row',
-    left:'PEMBAYARAN',
-    right:r.payment||'-'
-  });
-}
-
-content.push(
-  {type:'divider'},
-  {
-    type:'text',
-    text:'TERIMA KASIH',
-    align:'center',
-    bold:true
-  },
-  {
-    type:'text',
-    text:'Instagram: iqihlo.esteh_id',
-    align:'center'
-  },
-  {
-    type:'text',
-    text:'TikTok: iqihlo.es.teh',
-    align:'center'
-  },
-  {type:'feed',lines:3}
-);
-
-try{
-  const response=await fetch('http://localhost:9100/print',{
-    method:'POST',
-    headers:{
-      'Content-Type':'application/json'
-    },
-    body:JSON.stringify({
-      content:content,
-      paperWidth:58,
-      cut:false,
-      reference:'IQIHLO ES TEH'
-    })
-  });
-
-  const data=await response.json().catch(()=>({}));
-
-  if(!response.ok){
-    throw new Error(
-      data.message ||
-      data.error ||
-      data.fix ||
-      'Cleanter gagal mencetak'
-    );
-  }
-
-  alert('Struk berhasil dikirim ke printer.');
-
-}catch(error){
-function printReceipt(){
- const r=lastReceipt || (tx && tx.length ? tx[tx.length-1] : null);
+ const r=lastReceipt||tx[tx.length-1];
 
  if(!r){
   alert('Belum ada transaksi untuk dicetak.');
   return;
  }
 
- const receipt=$('receipt');
+ $('receipt').innerHTML=
+  buildReceipt(r);
 
- if(!receipt){
-  alert('Area struk tidak ditemukan.');
-  return;
- }
-
- receipt.innerHTML=buildReceipt(r);
-
- if(window.AndroidPrint &&
-    typeof window.AndroidPrint.print==='function'){
-  try{
-   window.AndroidPrint.print();
-   return;
-  }catch(e){
-   console.error('AndroidPrint.print:',e);
-  }
- }
-
+ /*
+  AndroidPrinter dipakai jika APK
+  menyediakan bridge printer.
+ */
  if(window.AndroidPrinter &&
-    typeof window.AndroidPrinter.printReceipt==='function'){
+    typeof AndroidPrinter.printReceipt==='function'){
+
   try{
-   window.AndroidPrinter.printReceipt(JSON.stringify(r));
+   AndroidPrinter.printReceipt(
+    JSON.stringify(r)
+   );
    return;
   }catch(e){
-   console.error('AndroidPrinter.printReceipt:',e);
+   console.error(e);
   }
  }
 
- if(typeof window.print==='function'){
+ /* Cetak langsung untuk WEB */
+ if(typeof window.print === 'function'){
   window.print();
  }else{
-  alert('Fitur cetak tidak didukung browser ini. Buka dengan Google Chrome.');
+  alert('Fitur cetak tidak didukung browser ini.');
  }
 }
 
