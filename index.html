@@ -1413,7 +1413,36 @@ Scan barcode produk, lalu stok produk tersebut otomatis bertambah 1.
 </div>
 </div>
 
-<div id="receipt" class="receipt"></div>
+<div id="receipt" class="receipt"><div class="center">
+<b>IQIHLO ES TEH</b><br>
+SEGARNYA BEDA!<br>
+<b>STRUK PEMBELIAN</b>
+</div>
+
+<div class="line"></div>
+
+Nama: <span id="rnama"></span><br>
+Tanggal: <span id="rtgl"></span><br>
+Jam: <span id="rjam"></span><br>
+Bayar: <span id="rbayar"></span><br>
+Kasir: <span id="rkasir"></span>
+
+<div class="line"></div>
+
+<div id="ritem"></div>
+
+<div class="line"></div>
+
+<b>TOTAL: <span id="rtotal"></span></b>
+
+<div class="line"></div>
+
+<div class="center">
+TERIMA KASIH<br>
+SELAMAT MENIKMATI!<br><br>
+Instagram: @iqihlo.esteh_id<br>
+TikTok: @iqihlo.es.teh<br>
+</div></div>
 <script src="https://www.gstatic.com/firebasejs/12.9.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.9.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore-compat.js"></script>
@@ -3245,39 +3274,65 @@ function buildReceipt(r){
   return lines.join('');
   }
 function printReceipt(){
- const r=lastReceipt||tx[tx.length-1];
+  const r=lastReceipt||tx[tx.length-1];
 
- if(!r){
-  alert('Belum ada transaksi untuk dicetak.');
-  return;
- }
-
- $('receipt').innerHTML=
-  buildReceipt(r);
-
- /*
-  AndroidPrinter dipakai jika APK
-  menyediakan bridge printer.
- */
- if(window.AndroidPrinter &&
-    typeof AndroidPrinter.printReceipt==='function'){
-
-  try{
-   AndroidPrinter.printReceipt(
-    JSON.stringify(r)
-   );
-   return;
-  }catch(e){
-   console.error(e);
+  if(!r){
+    alert('Belum ada transaksi untuk dicetak.');
+    return;
   }
- }
 
- /* Cetak langsung untuk WEB */
- if(typeof window.print === 'function'){
-  window.print();
- }else{
-  alert('Fitur cetak tidak didukung browser ini.');
- }
+  const receipt=document.getElementById('receipt');
+  if(!receipt){
+    alert('Area struk tidak ditemukan.');
+    return;
+  }
+
+  /* Bangun struk yang sama sebelum memanggil printer. */
+  receipt.innerHTML=buildReceipt(r);
+
+  /*
+   * JALUR WEB/ANDROID LAMA
+   * -----------------------
+   * Versi lama memanggil AndroidPrint.print() terlebih dahulu,
+   * lalu window.print() sebagai jalur WEB.
+   *
+   * Jangan memakai window.open(): Chrome dapat memblokir popup
+   * dan akibatnya dialog pencetakan tidak pernah muncul.
+   */
+  if(window.AndroidPrint &&
+     typeof window.AndroidPrint.print==='function'){
+    try{
+      window.AndroidPrint.print();
+      return;
+    }catch(e){
+      console.error('AndroidPrint.print gagal:',e);
+    }
+  }
+
+  /*
+   * Jalur bridge printer APK V9. Data transaksi dikirim UTUH,
+   * bukan payload yang diubah bentuknya.
+   */
+  if(window.AndroidPrinter &&
+     typeof window.AndroidPrinter.printReceipt==='function'){
+    try{
+      window.AndroidPrinter.printReceipt(JSON.stringify(r));
+      return;
+    }catch(e){
+      console.error('AndroidPrinter.printReceipt gagal:',e);
+    }
+  }
+
+  /*
+   * JALUR WEB MURNI
+   * Langsung dari event klik tombol CETAK STRUK.
+   */
+  if(typeof window.print==='function'){
+    window.print();
+    return;
+  }
+
+  alert('Fitur cetak tidak tersedia di browser ini.');
 }
 
 function cetak(){
@@ -3285,11 +3340,13 @@ function cetak(){
 }
 
 function cetakData(id){
-  const r=tx.find(x=>String(x.id)===String(id));
+  const r=tx.find(x=>x.id===id);
+
   if(!r){
     alert('Transaksi tidak ditemukan.');
     return;
   }
+
   lastReceipt=r;
   printReceipt();
 }
