@@ -3252,63 +3252,17 @@ function printReceipt(){
   return;
  }
 
- const receiptHtml=buildReceipt(r);
+ const receipt=$('receipt');
 
- /*
-  CETAK WEB SAJA.
-  Tidak mengubah transaksi, Firebase, menu, stok, login,
-  atau struktur data. Membuka dokumen cetak khusus agar
-  browser tidak ikut mencetak dashboard/aplikasi.
- */
- try{
-  const w=window.open('','_blank','width=420,height=700');
-
-  if(!w){
-   alert('Jendela cetak diblokir browser. Izinkan pop-up untuk situs ini lalu coba lagi.');
-   return;
-  }
-
-  w.document.open();
-  w.document.write(`<!doctype html>
-<html lang="id">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Struk IQIHLO ES TEH</title>
-<style>
- @page{size:58mm auto;margin:0}
- html,body{margin:0;padding:0;background:#fff;color:#000}
- body{width:58mm;font-family:monospace;font-size:10px;font-weight:700;line-height:1.2}
- #receipt{width:48mm;max-width:48mm;margin:0 auto;padding:0;box-sizing:border-box;overflow:visible}
- #receipt *{box-sizing:border-box;max-width:100%}
- @media print{
-  html,body{width:58mm!important;margin:0!important;padding:0!important}
-  #receipt{width:48mm!important;max-width:48mm!important;margin:0 auto!important}
+ if(!receipt){
+  alert('Area struk tidak ditemukan.');
+  return;
  }
-</style>
-</head>
-<body>
-<div id="receipt">${receiptHtml}</div>
-<script>
-window.addEventListener('load',function(){
- setTimeout(function(){
-  window.focus();
-  window.print();
- },150);
-});
-<\/script>
-</body>
-</html>`);
-  w.document.close();
 
-  /* Tutup jendela setelah dialog cetak selesai/dibatalkan. */
-  w.addEventListener('afterprint',function(){
-   setTimeout(function(){try{w.close()}catch(e){}},100);
-  });
- }catch(e){
-  console.error('Cetak web:',e);
-  alert('Cetak web gagal dibuka. Coba izinkan pop-up untuk situs ini.');
- }
+ receipt.innerHTML=buildReceipt(r);
+
+ /* WEB: mekanisme cetak lama yang terbukti bekerja */
+ window.print();
 }
 
 function cetak(){
