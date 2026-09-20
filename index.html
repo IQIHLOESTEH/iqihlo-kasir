@@ -3245,50 +3245,27 @@ function buildReceipt(r){
   return lines.join('');
   }
 function printReceipt(){
- const r=lastReceipt||tx[tx.length-1];
+  const r=lastReceipt || (tx && tx.length ? tx[tx.length-1] : null);
 
- if(!r){
-  alert('Belum ada transaksi untuk dicetak.');
-  return;
- }
-
- $('receipt').innerHTML=
-  buildReceipt(r);
-
- /*
-  Jalur cetak kompatibel:
-  - AndroidPrint.print() = bridge dari versi web sebelumnya
-  - AndroidPrinter.printReceipt() = bridge APK terbaru
-  - window.print() = browser/web
- */
- if(window.AndroidPrint &&
-    typeof window.AndroidPrint.print==='function'){
-  try{
-   window.AndroidPrint.print();
-   return;
-  }catch(e){
-   console.error('AndroidPrint.print:',e);
+  if(!r){
+    alert('Belum ada transaksi untuk dicetak.');
+    return;
   }
- }
 
- if(window.AndroidPrinter &&
-    typeof window.AndroidPrinter.printReceipt==='function'){
-  try{
-   window.AndroidPrinter.printReceipt(
-    JSON.stringify(r)
-   );
-   return;
-  }catch(e){
-   console.error('AndroidPrinter.printReceipt:',e);
+  const receipt=$('receipt');
+
+  if(!receipt){
+    alert('Area struk tidak ditemukan.');
+    return;
   }
- }
 
- if(typeof window.print==='function'){
-  window.print();
- }else{
-  alert('Fitur cetak tidak didukung browser ini. Buka dengan Google Chrome.');
- }
-}
+  receipt.innerHTML=buildReceipt(r);
+
+  setTimeout(function(){
+    window.focus();
+    window.print();
+  },150);
+    }
 
 function cetak(){
  printReceipt();
