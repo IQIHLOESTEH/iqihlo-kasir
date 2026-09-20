@@ -917,6 +917,26 @@ button{
   .dash-cards{grid-template-columns:repeat(4,1fr)}
   .content{padding:16px}
 }
+
+.dash-bottom{display:grid;grid-template-columns:1.05fr 1.05fr 1fr;gap:10px;margin-top:10px}
+.cash-summary{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:9px}
+.cash-box{border-radius:11px;padding:9px 10px;background:#eef8f0;border:1px solid #d8eadb}
+.cash-box.out{background:#fff0ef;border-color:#f0d8d5}
+.cash-box span{display:block;font-size:9px;color:#786b61}
+.cash-box b{display:block;margin-top:3px;font-size:16px}
+.cash-box.out b{color:#c53c35}
+.shift-grid{display:grid;gap:7px}
+.shift-row{display:flex;justify-content:space-between;gap:8px;padding:7px 0;border-bottom:1px solid #f0e8df;font-size:10px}
+.shift-row span{color:#76685f}.shift-row b{font-size:10px}
+.shift-status{display:inline-flex;align-items:center;gap:5px;padding:4px 7px;border-radius:999px;background:#e8f7ec;color:#168344;font-size:9px;font-weight:900}
+.shift-dot{width:7px;height:7px;border-radius:50%;background:#25a95b}
+.finance-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+.finance-box{border-radius:11px;padding:9px 8px;background:#eef5fb;border:1px solid #dce8f2}
+.finance-box:nth-child(2){background:#fff0f0;border-color:#f0dada}.finance-box:nth-child(3){background:#edf8ef;border-color:#d8ebdb}.finance-box:nth-child(4){background:#f0f8ec;border-color:#dcebd5}
+.finance-box span{display:block;font-size:8px;color:#74675d}.finance-box b{display:block;font-size:13px;margin-top:4px}
+.finance-box:nth-child(2) b{color:#c43d37}.finance-box:nth-child(3) b{color:#1b8750}.finance-box:nth-child(4) b{color:#39843c}
+@media(max-width:620px){.dash-bottom{grid-template-columns:1fr}.finance-grid{grid-template-columns:repeat(2,1fr)}}
+
 </style>
 </head>
 <body><div id="loginScreen" class="login">
@@ -1015,6 +1035,40 @@ button{
     <div class="dash-panel">
       <div class="dp-head"><h3>Stok Bahan</h3><span class="muted">Perlu perhatian</span></div>
       <div id="dashStock" class="dash-stock"></div>
+    </div>
+  </div>
+
+
+  <div class="dash-bottom">
+    <div class="dash-panel">
+      <div class="dp-head"><h3>Shift Aktif</h3><span class="shift-status"><i class="shift-dot"></i><span id="dashShiftStatus">Aktif</span></span></div>
+      <div class="shift-grid">
+        <div class="shift-row"><span>Kasir</span><b id="dashShiftUser">-</b></div>
+        <div class="shift-row"><span>Mulai</span><b id="dashShiftStart">-</b></div>
+        <div class="shift-row"><span>Kas awal</span><b id="dashShiftOpening">Rp0</b></div>
+        <div class="shift-row"><span>Penjualan</span><b id="dashShiftSales">Rp0</b></div>
+        <div class="shift-row"><span>Kas seharusnya</span><b id="dashShiftExpected">Rp0</b></div>
+      </div>
+    </div>
+
+    <div class="dash-panel">
+      <div class="dp-head"><h3>Kas Masuk / Keluar</h3><span class="muted">Hari ini</span></div>
+      <div class="cash-summary">
+        <div class="cash-box"><span>Kas Masuk</span><b id="dashCashIn">Rp0</b></div>
+        <div class="cash-box out"><span>Kas Keluar</span><b id="dashCashOut">Rp0</b></div>
+      </div>
+      <div class="shift-row"><span>Penjualan tunai tercatat</span><b id="dashCashSales">Rp0</b></div>
+      <div class="shift-row"><span>Pengeluaran tercatat</span><b id="dashCashExpense">Rp0</b></div>
+    </div>
+
+    <div class="dash-panel">
+      <div class="dp-head"><h3>Ringkasan Keuangan</h3><span class="muted">Hari ini</span></div>
+      <div class="finance-grid">
+        <div class="finance-box"><span>Omset</span><b id="dashFinanceSales">Rp0</b></div>
+        <div class="finance-box"><span>HPP</span><b id="dashFinanceHpp">Rp0</b></div>
+        <div class="finance-box"><span>Laba</span><b id="dashFinanceProfit">Rp0</b></div>
+        <div class="finance-box"><span>Margin</span><b id="dashFinanceMargin">0%</b></div>
+      </div>
     </div>
   </div>
 
@@ -1681,6 +1735,7 @@ async function loginSystem(){
   }
 
   session={...a,active:true};
+  if(!sessionStorage.getItem('iqihlo_shift_start')) sessionStorage.setItem('iqihlo_shift_start',new Date().toISOString());
   sessionStorage.setItem('iqihlo_session',JSON.stringify(session));
   $('loginMsg').textContent='';
   await connectFirebaseForCurrentSession();
@@ -1704,6 +1759,7 @@ function ownerBiometricSuccess(){
  const a=accounts.find(x=>x.u==='iqihloesteh');
  if(a){
   session={...a};
+  if(!sessionStorage.getItem('iqihlo_shift_start')) sessionStorage.setItem('iqihlo_shift_start',new Date().toISOString());
   sessionStorage.setItem('iqihlo_session',JSON.stringify(session));
   applySession();
  }
@@ -1763,6 +1819,7 @@ function lockApp(){
 
  session=null;
  sessionStorage.removeItem('iqihlo_session');
+  sessionStorage.removeItem('iqihlo_shift_start');
 
  $('loginPass').value='';
  $('loginMsg').textContent='';
@@ -2870,6 +2927,7 @@ function renderDashboard(){
   if(!dash||!session)return;
 
   renderDashboardClock();
+  renderDashboardFinance();
 
   const today=dashboardTodayTransactions();
   const period=dashboardPeriodRecords();
@@ -2949,6 +3007,33 @@ function renderDashboard(){
       <div class="stock-bar"><div class="stock-fill ${cls}" style="width:${pct}%"></div></div>
     </div>`;
   }).join('') || '<div class="muted">Data stok belum tersedia.</div>';
+}
+
+
+function renderDashboardFinance(){
+  const today=dashboardTodayTransactions();
+  const sales=today.reduce((s,r)=>s+Number(r.total||0),0);
+  // Sistem saat ini belum memiliki ledger kas keluar/HPP per transaksi; jangan mengarang nilainya.
+  const cashOut=0;
+  const hpp=0;
+  const profit=sales-hpp;
+  const margin=sales?Math.round((profit/sales)*100):0;
+  const start=sessionStorage.getItem('iqihlo_shift_start');
+  const startText=start?new Date(start).toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}):'-';
+  const user=session?.u||'-';
+  $('dashShiftUser').textContent=user;
+  $('dashShiftStart').textContent=startText;
+  $('dashShiftOpening').textContent='Rp0';
+  $('dashShiftSales').textContent=rupiah(sales);
+  $('dashShiftExpected').textContent=rupiah(sales);
+  $('dashCashIn').textContent=rupiah(sales);
+  $('dashCashOut').textContent=rupiah(cashOut);
+  $('dashCashSales').textContent=rupiah(sales);
+  $('dashCashExpense').textContent=rupiah(cashOut);
+  $('dashFinanceSales').textContent=rupiah(sales);
+  $('dashFinanceHpp').textContent=rupiah(hpp);
+  $('dashFinanceProfit').textContent=rupiah(profit);
+  $('dashFinanceMargin').textContent=margin+'%';
 }
 
 function renderStats(){
