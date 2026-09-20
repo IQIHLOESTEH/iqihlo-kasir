@@ -3256,8 +3256,9 @@ function printReceipt(){
   buildReceipt(r);
 
  /*
-  AndroidPrinter dipakai jika APK
-  menyediakan bridge printer.
+  APK Android menggunakan bridge AndroidPrinter.
+  Jika bridge tersedia, jangan jatuh ke window.print()
+  karena itu tidak mencetak ke printer Bluetooth 58mm.
  */
  if(window.AndroidPrinter &&
     typeof AndroidPrinter.printReceipt==='function'){
@@ -3268,11 +3269,13 @@ function printReceipt(){
    );
    return;
   }catch(e){
-   console.error(e);
+   console.error('AndroidPrinter.printReceipt:',e);
+   alert('Printer gagal dipanggil: '+(e?.message||e));
+   return;
   }
  }
 
- /* Fallback browser */
+ /* Fallback khusus browser/web */
  setTimeout(()=>{
   window.print();
  },100);
