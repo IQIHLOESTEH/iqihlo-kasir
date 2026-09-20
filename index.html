@@ -3268,30 +3268,141 @@ function printReceipt(){
     return;
   }
 
-  fetch('http://localhost:9100/print',{
+  const content=[
+  {
+    type:'text',
+    text:'IQIHLO ES TEH',
+    align:'center',
+    bold:true,
+    size:'large'
+  },
+  {
+    type:'text',
+    text:'SEGARNYA BEDA!',
+    align:'center',
+    bold:true
+  },
+  {
+    type:'text',
+    text:'STRUK PEMBELIAN',
+    align:'center',
+    bold:true
+  },
+  {type:'divider'},
+  {
+    type:'text',
+    text:'Pelanggan: '+(r.customer||'Umum')
+  },
+  {
+    type:'text',
+    text:'Kasir: '+(r.user||'-')
+  },
+  {
+    type:'text',
+    text:new Date(r.date).toLocaleString('id-ID')
+  },
+  {type:'divider'}
+];
+
+(r.items||[]).forEach(function(item){
+  const qty=Number(item.q||1);
+  const subtotal=Number(item.p||0)*qty;
+
+  content.push({
+    type:'row',
+    left:(item.n||'Item')+' x'+qty,
+    right:rupiah(subtotal)
+  });
+});
+
+content.push(
+  {type:'divider'},
+  {
+    type:'row',
+    left:'TOTAL',
+    right:rupiah(r.total),
+    bold:true
+  }
+);
+
+if(r.payment==='Cash'){
+  content.push(
+    {
+      type:'row',
+      left:'TUNAI',
+      right:rupiah(r.cash)
+    },
+    {
+      type:'row',
+      left:'KEMBALI',
+      right:rupiah(r.change)
+    }
+  );
+}else{
+  content.push({
+    type:'row',
+    left:'PEMBAYARAN',
+    right:r.payment||'-'
+  });
+}
+
+content.push(
+  {type:'divider'},
+  {
+    type:'text',
+    text:'TERIMA KASIH',
+    align:'center',
+    bold:true
+  },
+  {
+    type:'text',
+    text:'Instagram: iqihlo.esteh_id',
+    align:'center'
+  },
+  {
+    type:'text',
+    text:'TikTok: iqihlo.es.teh',
+    align:'center'
+  },
+  {type:'feed',lines:3}
+);
+
+try{
+  const response=await fetch('http://localhost:9100/print',{
     method:'POST',
     headers:{
       'Content-Type':'application/json'
     },
     body:JSON.stringify({
-      content:[
-        {
-          type:'text',
-          text:text,
-          align:'left',
-          bold:false,
-          size:1
-        },
-        {
-          type:'feed',
-          lines:3
-        }
-      ],
+      content:content,
       paperWidth:58,
-      cut:true,
+      cut:false,
       reference:'IQIHLO ES TEH'
     })
-  })
+  });
+
+  const data=await response.json().catch(()=>({}));
+
+  if(!response.ok){
+    throw new Error(
+      data.message ||
+      data.error ||
+      data.fix ||
+      'Cleanter gagal mencetak'
+    );
+  }
+
+  alert('Struk berhasil dikirim ke printer.');
+
+}catch(error){
+  console.error('Cleanter:',error);
+
+  alert(
+    'GAGAL MENCETAK.\n\n'+
+    'Pastikan Cleanter BERJALAN dan RPP02N TERHUBUNG.\n\n'+
+    'Error: '+error.message
+  );
+    }
   .then(async response=>{
     const data=await response.json().catch(()=>({}));
 
