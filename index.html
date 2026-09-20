@@ -746,6 +746,177 @@ button{
   display:block;
   object-fit:contain;
 }
+
+/* =========================================================
+   DASHBOARD OWNER / ADMIN - tambahan, tidak mengubah POS
+========================================================= */
+.dashboard{
+  margin:12px;
+  padding:14px;
+  border-radius:20px;
+  background:
+    radial-gradient(circle at 90% 0%,#e8f5df 0,#e8f5df00 32%),
+    linear-gradient(145deg,#fffdf9,#f7f1e8);
+  border:1px solid #eadfd3;
+  box-shadow:0 6px 22px #0000000d;
+}
+.dashboard *{box-sizing:border-box}
+.dash-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:12px;
+}
+.dash-title{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.dash-logo{
+  width:44px;height:44px;border-radius:14px;
+  display:grid;place-items:center;
+  background:linear-gradient(145deg,#2f8f4e,#165b31);
+  color:#fff;font-size:23px;
+  box-shadow:0 5px 12px #1f6b3a33;
+}
+.dash-title h2{font-size:20px;margin:0;font-weight:900}
+.dash-title p{margin:2px 0 0;color:#7a6c61;font-size:11px}
+.dash-date{
+  background:#fff;border:1px solid #eadfd3;border-radius:12px;
+  padding:8px 10px;text-align:right;white-space:nowrap;
+  font-size:10px;color:#76685f;
+}
+.dash-date b{display:block;font-size:13px;color:#2a211c}
+.dash-cards{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:9px;
+}
+.dash-card{
+  min-height:84px;border-radius:15px;padding:11px 12px;
+  color:#fff;position:relative;overflow:hidden;
+  box-shadow:0 5px 14px #00000012;
+}
+.dash-card:after{
+  content:"";position:absolute;width:68px;height:68px;border-radius:50%;
+  right:-25px;top:-25px;background:#fff2;
+}
+.dash-card .dc-label{font-size:10px;opacity:.9;font-weight:700}
+.dash-card .dc-value{font-size:18px;font-weight:900;margin-top:5px}
+.dash-card .dc-sub{font-size:9px;margin-top:3px;opacity:.88}
+.dc-sales{background:linear-gradient(135deg,#159447,#0d6e37)}
+.dc-profit{background:linear-gradient(135deg,#a96a2b,#7d451a)}
+.dc-tx{background:linear-gradient(135deg,#277bd5,#165aa8)}
+.dc-item{background:linear-gradient(135deg,#7358dc,#5436b5)}
+.dash-grid{
+  display:grid;
+  grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);
+  gap:10px;margin-top:10px;
+}
+.dash-panel{
+  background:#fff;border:1px solid #eadfd3;border-radius:15px;
+  padding:12px;min-width:0;overflow:hidden;
+}
+.dash-panel h3{
+  margin:0;font-size:14px;font-weight:900;
+}
+.dash-panel .dp-head{
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+  margin-bottom:9px;
+}
+.dash-tabs{display:flex;gap:4px}
+.dash-tab{
+  border:1px solid #e5d9ce;background:#faf7f2;color:#6d5e53;
+  border-radius:9px;padding:6px 7px;font-size:9px;font-weight:800;
+}
+.dash-tab.on{background:#4b250f;color:#fff;border-color:#4b250f}
+.sales-total{font-size:21px;font-weight:900;margin:0 0 1px}
+.sales-growth{font-size:10px;color:#159447;font-weight:800;margin-bottom:9px}
+.dash-chart{
+  height:150px;display:flex;align-items:flex-end;gap:5px;
+  padding:8px 2px 0;border-bottom:1px solid #eee5dc;
+}
+.dbar-wrap{flex:1;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;min-width:0}
+.dbar{
+  width:min(22px,75%);border-radius:7px 7px 2px 2px;
+  background:linear-gradient(180deg,#71ce8d,#159447);
+  min-height:3px;position:relative;
+}
+.dbar:hover{filter:brightness(.96)}
+.dbar-label{font-size:8px;color:#85766b;margin-top:5px;white-space:nowrap}
+.dbar-tip{
+  position:absolute;bottom:calc(100% + 4px);left:50%;transform:translateX(-50%);
+  background:#2a211c;color:#fff;border-radius:7px;padding:4px 6px;
+  font-size:8px;white-space:nowrap;display:none;z-index:3;
+}
+.dbar:hover .dbar-tip{display:block}
+.donut{
+  width:128px;height:128px;border-radius:50%;margin:4px auto 9px;
+  position:relative;background:conic-gradient(#159447 0 40%,#f0b72f 40% 65%,#ef8d37 65% 82%,#df7182 82% 92%,#9aa9bf 92% 100%);
+}
+.donut:after{
+  content:"";position:absolute;inset:31px;border-radius:50%;background:#fff;
+}
+.donut-center{
+  position:absolute;inset:0;display:grid;place-items:center;text-align:center;
+  z-index:1;font-size:10px;color:#76685f;
+}
+.donut-center b{display:block;font-size:17px;color:#2a211c}
+.legend{display:grid;gap:6px}
+.legend-row{display:flex;align-items:center;gap:6px;font-size:10px}
+.legend-dot{width:9px;height:9px;border-radius:50%;flex:0 0 9px}
+.legend-row span:last-child{margin-left:auto;font-weight:900}
+.dash-lower{
+  display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:10px;
+}
+.dash-list{display:grid;gap:8px}
+.dash-item{
+  display:grid;grid-template-columns:42px minmax(0,1fr) auto;
+  align-items:center;gap:7px;padding:7px 0;border-bottom:1px solid #f0e8df;
+}
+.dash-thumb{
+  width:42px;height:42px;border-radius:10px;
+  background:linear-gradient(145deg,#fff5df,#f0d3a6);
+  display:grid;place-items:center;font-size:22px;overflow:hidden;
+}
+.dash-item b{font-size:10px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dash-item small{font-size:8px;color:#7b6d63}
+.dash-money{font-size:10px;font-weight:900;text-align:right}
+.dash-activity{display:grid;gap:0}
+.dash-act{
+  display:grid;grid-template-columns:10px 1fr auto;gap:7px;padding:7px 0;
+  border-bottom:1px solid #f0e8df;font-size:9px;
+}
+.dash-act i{width:8px;height:8px;border-radius:50%;background:#35a95c;margin-top:4px}
+.dash-act small{color:#89796d;font-size:8px}
+.dash-stock{display:grid;gap:9px}
+.stock-row{font-size:9px}
+.stock-row .sr-top{display:flex;justify-content:space-between;margin-bottom:4px}
+.stock-row b{font-size:10px}
+.stock-bar{height:7px;background:#f0ebe5;border-radius:8px;overflow:hidden}
+.stock-fill{height:100%;border-radius:8px;background:#e24d43}
+.stock-fill.ok{background:#55b875}
+.stock-fill.warn{background:#e4a72b}
+.dash-foot{
+  margin-top:10px;padding:9px 11px;border-radius:12px;
+  background:linear-gradient(90deg,#f0f7ed,#fff);
+  border:1px solid #dfead9;color:#58704f;font-size:10px;
+}
+.dashboard.kasir-hide{display:none}
+@media(max-width:620px){
+  .dash-grid{grid-template-columns:1fr}
+  .dash-lower{grid-template-columns:1fr}
+  .dash-head{align-items:flex-start}
+  .dash-date{font-size:8px}
+  .dash-date b{font-size:11px}
+}
+@media(min-width:760px){
+  .app{max-width:1180px}
+  .dashboard{margin:16px}
+  .dash-cards{grid-template-columns:repeat(4,1fr)}
+  .content{padding:16px}
+}
 </style>
 </head>
 <body><div id="loginScreen" class="login">
@@ -762,6 +933,96 @@ button{
 <header class="topbar">
 <div class="brand" style="margin-left:70px;"><div><h1>IQIHLO ES TEH</h1><small>Lebih dari Sekedar Minuman</small></div></div>
 <div class="userbox"><span class="role"><span id="currentUser">-</span> • <span id="currentRole">-</span></span><button class="topbtn topmenu" onclick="openMenu()" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);z-index:10;">☰</button><button class="topbtn" onclick="lockApp()">🔒</button><button class="topbtn" onclick="exitApp()">×</button></div></header>
+
+<section id="ownerDashboard" class="dashboard admin-only">
+  <div class="dash-head">
+    <div class="dash-title">
+      <div class="dash-logo">🍃</div>
+      <div>
+        <h2>Selamat Datang, <span id="dashUser">Owner</span>!</h2>
+        <p>Pantau bisnis IQIHLO ES TEH secara real-time</p>
+      </div>
+    </div>
+    <div class="dash-date">
+      <span id="dashDay">Hari ini</span>
+      <b id="dashClock">--:--</b>
+    </div>
+  </div>
+
+  <div class="dash-cards">
+    <div class="dash-card dc-sales">
+      <div class="dc-label">Penjualan Hari Ini</div>
+      <div class="dc-value" id="dashSales">Rp0</div>
+      <div class="dc-sub" id="dashSalesSub">Omzet transaksi hari ini</div>
+    </div>
+    <div class="dash-card dc-profit">
+      <div class="dc-label">Rata-rata Transaksi</div>
+      <div class="dc-value" id="dashAvg">Rp0</div>
+      <div class="dc-sub">Nilai rata-rata per transaksi</div>
+    </div>
+    <div class="dash-card dc-tx">
+      <div class="dc-label">Jumlah Transaksi</div>
+      <div class="dc-value" id="dashTx">0</div>
+      <div class="dc-sub">Transaksi tercatat hari ini</div>
+    </div>
+    <div class="dash-card dc-item">
+      <div class="dc-label">Menu Terjual</div>
+      <div class="dc-value" id="dashItems">0</div>
+      <div class="dc-sub">Total cup/item hari ini</div>
+    </div>
+  </div>
+
+  <div class="dash-grid">
+    <div class="dash-panel">
+      <div class="dp-head">
+        <div>
+          <h3>Grafik Penjualan</h3>
+          <div class="sales-total" id="dashChartTotal">Rp0</div>
+          <div class="sales-growth" id="dashChartNote">Hari ini</div>
+        </div>
+        <div class="dash-tabs">
+          <button class="dash-tab on" onclick="setDashboardPeriod('today',this)">Hari Ini</button>
+          <button class="dash-tab" onclick="setDashboardPeriod('7',this)">7 Hari</button>
+          <button class="dash-tab" onclick="setDashboardPeriod('30',this)">30 Hari</button>
+        </div>
+      </div>
+      <div id="dashChart" class="dash-chart"></div>
+    </div>
+
+    <div class="dash-panel">
+      <div class="dp-head">
+        <h3>Kategori Terlaris</h3>
+        <span class="muted">Hari ini</span>
+      </div>
+      <div id="dashDonut" class="donut">
+        <div class="donut-center"><div><b id="dashCatTotal">0</b>Transaksi</div></div>
+      </div>
+      <div id="dashLegend" class="legend"></div>
+    </div>
+  </div>
+
+  <div class="dash-lower">
+    <div class="dash-panel">
+      <div class="dp-head"><h3>Menu Terlaris</h3><span class="muted">Hari ini</span></div>
+      <div id="dashTopMenus" class="dash-list"></div>
+    </div>
+
+    <div class="dash-panel">
+      <div class="dp-head"><h3>Aktivitas Terbaru</h3><span class="muted">Transaksi</span></div>
+      <div id="dashActivity" class="dash-activity"></div>
+    </div>
+
+    <div class="dash-panel">
+      <div class="dp-head"><h3>Stok Bahan</h3><span class="muted">Perlu perhatian</span></div>
+      <div id="dashStock" class="dash-stock"></div>
+    </div>
+  </div>
+
+  <div class="dash-foot">
+    💡 Dashboard mengambil data langsung dari transaksi, menu, dan stok IQIHLO ES TEH yang sudah tersimpan. Menu kasir, database Firebase, printer, barcode, dan fitur lain tetap menggunakan sistem yang sekarang.
+  </div>
+</section>
+
 <main class="content">
 <section class="hello"><h2>Halo, <span id="helloUser">Kasir</span>!</h2><div class="muted">Selamat melayani hari ini 😊</div>
 <div class="stats"><div class="stat green">Penjualan Hari Ini<b id="todaySales">Rp0</b></div><div class="stat red">Jumlah Transaksi<b id="todayCount">0</b></div></div></section>
@@ -2487,6 +2748,209 @@ function cetakData(id){
    STATISTIK
 ========================= */
 
+
+/* =========================
+   DASHBOARD OWNER / ADMIN
+   Tambahan: hanya membaca data yang sudah ada
+========================= */
+let dashboardPeriod='today';
+
+function dashboardTodayTransactions(){
+  return tx.filter(x=>isToday(x.date));
+}
+
+function dashboardItems(records){
+  return records.reduce((sum,r)=>{
+    return sum + (r.items||[]).reduce((s,it)=>s+Number(it.q||0),0);
+  },0);
+}
+
+function dashboardMenuTotals(records){
+  const map={};
+  records.forEach(r=>{
+    (r.items||[]).forEach(it=>{
+      const n=it.n||'Menu';
+      const q=Number(it.q||0);
+      const subtotal=Number(it.p||0)*q;
+      if(!map[n]) map[n]={q:0,total:0};
+      map[n].q+=q;
+      map[n].total+=subtotal;
+    });
+  });
+  return map;
+}
+
+function dashboardCategoryTotals(records){
+  const map={};
+  records.forEach(r=>{
+    (r.items||[]).forEach(it=>{
+      const menu=menus.find(m=>m.n===it.n);
+      const cat=menu?.c||guessCat(it.n||'');
+      map[cat]=(map[cat]||0)+Number(it.q||0);
+    });
+  });
+  return map;
+}
+
+function dashboardPeriodRecords(){
+  const now=new Date();
+  if(dashboardPeriod==='today') return dashboardTodayTransactions();
+  const days=Number(dashboardPeriod);
+  const start=new Date(now);
+  start.setHours(0,0,0,0);
+  start.setDate(start.getDate()-(days-1));
+  return tx.filter(r=>new Date(r.date)>=start);
+}
+
+function setDashboardPeriod(period,btn){
+  dashboardPeriod=period;
+  document.querySelectorAll('.dash-tab').forEach(b=>b.classList.remove('on'));
+  if(btn)btn.classList.add('on');
+  renderDashboard();
+}
+
+function renderDashboardClock(){
+  const d=new Date();
+  const clock=$('dashClock');
+  const day=$('dashDay');
+  if(clock) clock.textContent=d.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  if(day) day.textContent=d.toLocaleDateString('id-ID',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
+}
+
+function renderDashboardChart(records){
+  const box=$('dashChart');
+  if(!box)return;
+
+  const now=new Date();
+  let points=[];
+
+  if(dashboardPeriod==='today'){
+    points=Array.from({length:12},(_,i)=>({
+      label:String(6+i*2).padStart(2,'0'),
+      value:0
+    }));
+    records.forEach(r=>{
+      const h=new Date(r.date).getHours();
+      const idx=Math.floor((h-6)/2);
+      if(idx>=0&&idx<12) points[idx].value+=Number(r.total||0);
+    });
+  }else{
+    const days=Number(dashboardPeriod);
+    points=Array.from({length:days},(_,i)=>{
+      const d=new Date(now);
+      d.setHours(0,0,0,0);
+      d.setDate(d.getDate()-(days-1-i));
+      return {
+        key:d.toISOString().slice(0,10),
+        label:days===7?d.toLocaleDateString('id-ID',{weekday:'short'}):String(d.getDate()),
+        value:0
+      };
+    });
+    records.forEach(r=>{
+      const key=new Date(r.date).toISOString().slice(0,10);
+      const p=points.find(x=>x.key===key);
+      if(p)p.value+=Number(r.total||0);
+    });
+  }
+
+  const max=Math.max(1,...points.map(p=>p.value));
+  box.innerHTML=points.map(p=>{
+    const height=p.value?Math.max(5,(p.value/max)*100):2;
+    return `<div class="dbar-wrap">
+      <div class="dbar" style="height:${height}%">
+        <span class="dbar-tip">${rupiah(p.value)}</span>
+      </div>
+      <div class="dbar-label">${esc(p.label)}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderDashboard(){
+  const dash=$('ownerDashboard');
+  if(!dash||!session)return;
+
+  renderDashboardClock();
+
+  const today=dashboardTodayTransactions();
+  const period=dashboardPeriodRecords();
+  const todaySales=today.reduce((s,r)=>s+Number(r.total||0),0);
+  const periodSales=period.reduce((s,r)=>s+Number(r.total||0),0);
+  const avg=today.length?todaySales/today.length:0;
+  const itemCount=dashboardItems(today);
+
+  $('dashUser').textContent=session.u||'Owner';
+  $('dashSales').textContent=rupiah(todaySales);
+  $('dashAvg').textContent=rupiah(Math.round(avg));
+  $('dashTx').textContent=today.length;
+  $('dashItems').textContent=itemCount;
+  $('dashChartTotal').textContent=rupiah(periodSales);
+  $('dashChartNote').textContent=
+    dashboardPeriod==='today'?'Hari ini':
+    dashboardPeriod==='7'?'7 hari terakhir':'30 hari terakhir';
+
+  renderDashboardChart(period);
+
+  /* Kategori */
+  const cats=dashboardCategoryTotals(today);
+  const catEntries=Object.entries(cats).sort((a,b)=>b[1]-a[1]);
+  const catTotal=catEntries.reduce((s,x)=>s+x[1],0);
+  $('dashCatTotal').textContent=catTotal;
+
+  const donutColors=['#159447','#f0b72f','#ef8d37','#df7182','#9aa9bf','#7a8fd3'];
+  let acc=0;
+  const stops=catEntries.slice(0,6).map((x,i)=>{
+    const pct=catTotal?(x[1]/catTotal)*100:0;
+    const start=acc; acc+=pct;
+    return `${donutColors[i]} ${start}% ${acc}%`;
+  });
+  if(acc<100)stops.push(`#e8e2da ${acc}% 100%`);
+  $('dashDonut').style.background=stops.length?`conic-gradient(${stops.join(',')})`:'#e8e2da';
+
+  $('dashLegend').innerHTML=catEntries.slice(0,5).map((x,i)=>{
+    const pct=catTotal?Math.round(x[1]/catTotal*100):0;
+    return `<div class="legend-row">
+      <i class="legend-dot" style="background:${donutColors[i]}"></i>
+      <span>${esc(x[0])}</span><span>${pct}%</span>
+    </div>`;
+  }).join('') || '<div class="muted">Belum ada transaksi hari ini.</div>';
+
+  /* Menu terlaris */
+  const mt=dashboardMenuTotals(today);
+  const top=Object.entries(mt).sort((a,b)=>b[1].q-a[1].q).slice(0,5);
+  $('dashTopMenus').innerHTML=top.map(([n,v])=>`
+    <div class="dash-item">
+      <div class="dash-thumb">🥤</div>
+      <div><b>${esc(n)}</b><small>${v.q} item terjual</small></div>
+      <div class="dash-money">${rupiah(v.total)}</div>
+    </div>
+  `).join('') || '<div class="muted">Belum ada penjualan hari ini.</div>';
+
+  /* Aktivitas */
+  $('dashActivity').innerHTML=tx.slice().sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,6).map(r=>`
+    <div class="dash-act">
+      <i></i>
+      <div><b>${esc(r.user||'Kasir')}</b> melakukan transaksi ${rupiah(r.total)}</div>
+      <small>${new Date(r.date).toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'})}</small>
+    </div>
+  `).join('') || '<div class="muted">Belum ada aktivitas.</div>';
+
+  /* Stok kritis: memakai nilai stok yang memang sudah ada */
+  const stockRows=menus.map(m=>({
+    n:m.n,
+    v:Number(stock[m.n]??0)
+  })).sort((a,b)=>a.v-b.v).slice(0,5);
+
+  $('dashStock').innerHTML=stockRows.map(x=>{
+    const maxStock=100;
+    const pct=Math.max(3,Math.min(100,(x.v/maxStock)*100));
+    const cls=x.v<=20?'':'ok';
+    return `<div class="stock-row">
+      <div class="sr-top"><b>${esc(x.n)}</b><span>${x.v}</span></div>
+      <div class="stock-bar"><div class="stock-fill ${cls}" style="width:${pct}%"></div></div>
+    </div>`;
+  }).join('') || '<div class="muted">Data stok belum tersedia.</div>';
+}
+
 function renderStats(){
  const a=tx.filter(x=>isToday(x.date));
 
@@ -2497,6 +2961,10 @@ function renderStats(){
 
  $('todayCount').textContent=
   a.length;
+
+ if(typeof renderDashboard==='function'){
+   renderDashboard();
+ }
 }
 
 /* =========================
@@ -3599,6 +4067,11 @@ document.addEventListener(
  ()=>{
   init();
   restoreSession();
+  setInterval(()=>{
+   if(session){
+    renderDashboardClock();
+   }
+  },1000);
  }
 );
 
