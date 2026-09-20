@@ -918,7 +918,7 @@ button{
   .content{padding:16px}
 }
 
-.dash-bottom{display:grid;grid-template-columns:1.05fr 1.05fr 1fr;gap:10px;margin-top:10px}
+.dash-bottom{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:10px}
 .cash-summary{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:9px}
 .cash-box{border-radius:11px;padding:9px 10px;background:#eef8f0;border:1px solid #d8eadb}
 .cash-box.out{background:#fff0ef;border-color:#f0d8d5}
@@ -928,6 +928,10 @@ button{
 .shift-grid{display:grid;gap:7px}
 .shift-row{display:flex;justify-content:space-between;gap:8px;padding:7px 0;border-bottom:1px solid #f0e8df;font-size:10px}
 .shift-row span{color:#76685f}.shift-row b{font-size:10px}
+.shift-opening-edit{display:flex;gap:6px;align-items:center;padding:7px 0;border-bottom:1px solid #f0e8df}
+.shift-opening-edit input{width:115px;min-width:0;border:1px solid #ddd2c8;border-radius:8px;padding:7px 8px;font-size:10px;font-weight:800;background:#fff}
+.shift-opening-edit button{border:0;border-radius:8px;padding:7px 9px;font-size:9px;font-weight:900;background:#5b2f16;color:#fff;cursor:pointer}
+.shift-opening-edit button:active{transform:scale(.98)}
 .shift-status{display:inline-flex;align-items:center;gap:5px;padding:4px 7px;border-radius:999px;background:#e8f7ec;color:#168344;font-size:9px;font-weight:900}
 .shift-dot{width:7px;height:7px;border-radius:50%;background:#25a95b}
 .finance-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
@@ -936,6 +940,7 @@ button{
 .finance-box span{display:block;font-size:8px;color:#74675d}.finance-box b{display:block;font-size:13px;margin-top:4px}
 .finance-box:nth-child(2) b{color:#c43d37}.finance-box:nth-child(3) b{color:#1b8750}.finance-box:nth-child(4) b{color:#39843c}
 @media(max-width:620px){.dash-bottom{grid-template-columns:1fr}.finance-grid{grid-template-columns:repeat(2,1fr)}}
+.void-count{display:inline-flex;align-items:center;gap:5px;padding:4px 7px;border-radius:999px;background:#fff2d9;color:#a56700;font-size:9px;font-weight:900}.void-count i{width:7px;height:7px;border-radius:50%;background:#f0a51c}.void-list{display:grid;gap:7px;max-height:250px;overflow:auto}.void-card{border:1px solid #f0ddd7;background:#fff8f7;border-radius:10px;padding:8px}.void-card b{font-size:10px}.void-card small{display:block;color:#7b6d63;font-size:8px;margin-top:2px}.void-meta{display:flex;justify-content:space-between;gap:6px;margin-top:5px;font-size:9px}.void-reason{margin-top:5px;color:#6d5d55;font-size:9px}.void-actions{display:flex;gap:5px;margin-top:7px}.void-actions button{flex:1;padding:6px;border:0;border-radius:7px;font-weight:800;font-size:9px}.void-reject{background:#f5dddd;color:#b42318}.void-approve{background:#dff3e4;color:#168344}.presence-list{display:grid;gap:5px;margin-top:8px}.presence-user{display:flex;align-items:center;justify-content:space-between;padding:6px 7px;border:1px solid #eee7df;border-radius:8px;background:#fff}.presence-user .who{display:flex;align-items:center;gap:6px;font-size:9px}.presence-user .dot{width:7px;height:7px;border-radius:50%;background:#26aa5c}.presence-user small{font-size:8px;color:#7b6d63}.presence-empty{font-size:9px;color:#8a7b70;padding:5px 0}
 
 </style>
 </head>
@@ -986,9 +991,9 @@ button{
       <div class="dc-sub">Transaksi tercatat hari ini</div>
     </div>
     <div class="dash-card dc-item">
-      <div class="dc-label">Menu Terjual</div>
-      <div class="dc-value" id="dashItems">0</div>
-      <div class="dc-sub">Total cup/item hari ini</div>
+      <div class="dc-label">Kasir Aktif</div>
+      <div class="dc-value" id="dashActive">0 / 4</div>
+      <div class="dc-sub" id="dashActiveSub">Tidak ada pengguna online</div>
     </div>
   </div>
 
@@ -1043,12 +1048,17 @@ button{
     <div class="dash-panel">
       <div class="dp-head"><h3>Shift Aktif</h3><span class="shift-status"><i class="shift-dot"></i><span id="dashShiftStatus">Aktif</span></span></div>
       <div class="shift-grid">
-        <div class="shift-row"><span>Kasir</span><b id="dashShiftUser">-</b></div>
+        <div class="shift-row"><span>Kasir utama</span><b id="dashShiftUser">-</b></div>
         <div class="shift-row"><span>Mulai</span><b id="dashShiftStart">-</b></div>
         <div class="shift-row"><span>Kas awal</span><b id="dashShiftOpening">Rp0</b></div>
+        <div class="shift-opening-edit">
+          <input id="dashShiftOpeningInput" type="number" min="0" step="1000" inputmode="numeric" placeholder="Masukkan kas awal" aria-label="Kas awal">
+          <button type="button" onclick="setShiftOpening()">Simpan Kas Awal</button>
+        </div>
         <div class="shift-row"><span>Penjualan</span><b id="dashShiftSales">Rp0</b></div>
         <div class="shift-row"><span>Kas seharusnya</span><b id="dashShiftExpected">Rp0</b></div>
       </div>
+      <div id="dashPresence" class="presence-list"></div>
     </div>
 
     <div class="dash-panel">
@@ -1059,6 +1069,11 @@ button{
       </div>
       <div class="shift-row"><span>Penjualan tunai tercatat</span><b id="dashCashSales">Rp0</b></div>
       <div class="shift-row"><span>Pengeluaran tercatat</span><b id="dashCashExpense">Rp0</b></div>
+    </div>
+
+    <div class="dash-panel">
+      <div class="dp-head"><h3>Permintaan Void</h3><span class="void-count"><i></i><span id="dashVoidCount">0 Menunggu</span></span></div>
+      <div id="dashVoidList" class="void-list"></div>
     </div>
 
     <div class="dash-panel">
@@ -1460,6 +1475,14 @@ const KEYS={
  printer:'iqihlo_printer_v7'
 };
 
+const PRESENCE_DOC='iqihlo_presence_v1';
+const VOID_DOC='iqihlo_void_v1';
+let presenceTimer=null;
+let presenceUnsub=null;
+let voidUnsub=null;
+let presenceData={};
+let voidRequests={};
+
 const DEFAULT_ACCOUNTS=[
   {u:'iqihloesteh',p:'Bakmimania2108',r:'OWNER'}
 ];
@@ -1608,6 +1631,139 @@ function guessCat(n){
  if(n.includes('Choc')||n==='Coklat')return'Chocolatos';
  if(n.includes('Latte')||['Mocacino','Creamy','Butterscotch'].includes(n))return'Goodday Latte';
  return'Goodday Biasa';
+}
+
+/* =========================
+   REALTIME PRESENCE & VOID
+========================= */
+function currentCloudUid(){
+  return window.IQIHLO_CLOUD?.auth?.currentUser?.uid||'';
+}
+
+async function updatePresence(remove=false){
+  const uid=currentCloudUid();
+  if(!uid || !window.IQIHLO_CLOUD?.db)return;
+  const ref=window.IQIHLO_CLOUD.db.collection('app_data').doc(PRESENCE_DOC);
+  const path='data.'+uid;
+  try{
+    if(remove){
+      await ref.update({[path]:firebase.firestore.FieldValue.delete(),updatedAt:firebase.firestore.FieldValue.serverTimestamp()});
+    }else{
+      const entry={u:session?.u||'-',r:session?.r||'KASIR',startedAt:sessionStorage.getItem('iqihlo_shift_start')||new Date().toISOString(),opening:Number(sessionStorage.getItem('iqihlo_shift_opening')||0),lastSeen:Date.now()};
+      try{
+        await ref.update({[path]:entry,updatedAt:firebase.firestore.FieldValue.serverTimestamp()});
+      }catch(e){
+        await ref.set({data:{[uid]:entry},updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
+      }
+    }
+  }catch(e){ console.error('Presence update failed:',e); }
+}
+
+function startPresence(){
+  stopPresence(false);
+  if(!session || !window.IQIHLO_CLOUD?.auth?.currentUser)return;
+  updatePresence(false);
+  presenceTimer=setInterval(()=>updatePresence(false),20000);
+  if(!presenceUnsub){
+    presenceUnsub=window.IQIHLO_CLOUD.db.collection('app_data').doc(PRESENCE_DOC).onSnapshot(snap=>{
+      presenceData=snap.exists?(snap.data()?.data||{}):{};
+      renderPresence();
+    },e=>console.error('Presence listener failed:',e));
+  }
+}
+
+function stopPresence(remove=true){
+  if(presenceTimer){clearInterval(presenceTimer);presenceTimer=null;}
+  if(remove && window.IQIHLO_CLOUD?.auth?.currentUser) updatePresence(true);
+  if(presenceUnsub){try{presenceUnsub();}catch(e){} presenceUnsub=null;}
+  if(remove){presenceData={};renderPresence();}
+}
+
+function renderPresence(){
+  const now=Date.now();
+  const active=Object.values(presenceData||{}).filter(x=>x&&Number(x.lastSeen||0)>now-75000);
+  const unique=active.filter((x,i,a)=>a.findIndex(y=>y.u===x.u)===i);
+  const count=Math.min(unique.length,4);
+  const el=$('dashActive');
+  const sub=$('dashActiveSub');
+  if(el)el.textContent=count+' / 4';
+  if(sub)sub.textContent=count?unique.map(x=>x.u).join(', '):'Tidak ada pengguna online';
+  const list=$('dashPresence');
+  if(!list)return;
+  list.innerHTML=unique.map(x=>`<div class="presence-user"><div class="who"><i class="dot"></i><b>${esc(x.u)}</b><small>${esc(x.r)}</small></div><small>Online</small></div>`).join('')||'<div class="presence-empty">Belum ada kasir/admin lain yang aktif.</div>';
+  const status=$('dashShiftStatus');
+  if(status)status.textContent=count?'Aktif':'Tidak aktif';
+}
+
+async function writeVoidMap(){
+  if(!window.IQIHLO_CLOUD?.db)return;
+  const ref=window.IQIHLO_CLOUD.db.collection('app_data').doc(VOID_DOC);
+  try{ await ref.set({data:voidRequests,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true}); }catch(e){console.error('Void sync failed:',e);}
+}
+
+function listenVoidRequests(){
+  if(voidUnsub)try{voidUnsub();}catch(e){}
+  voidUnsub=null;
+  if(!window.IQIHLO_CLOUD?.db)return;
+  voidUnsub=window.IQIHLO_CLOUD.db.collection('app_data').doc(VOID_DOC).onSnapshot(snap=>{
+    voidRequests=snap.exists?(snap.data()?.data||{}):{};
+    try{localStorage.setItem(VOID_DOC,JSON.stringify(voidRequests));}catch(e){}
+    renderVoidRequests();
+  },e=>console.error('Void listener failed:',e));
+}
+
+function renderVoidRequests(){
+  const list=$('dashVoidList');
+  const pending=Object.values(voidRequests||{}).filter(x=>x&&x.status==='pending').sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt));
+  const count=$('dashVoidCount');
+  if(count)count.textContent=pending.length+' Menunggu';
+  if(!list)return;
+  if(!pending.length){list.innerHTML='<div class="muted">Tidak ada permintaan void.</div>';return;}
+  list.innerHTML=pending.slice(0,5).map(v=>`<div class="void-card">
+    <b>#${esc(v.txId)} • ${rupiah(v.total)}</b>
+    <small>Kasir: ${esc(v.user||'-')} • ${new Date(v.createdAt).toLocaleString('id-ID',{hour:'2-digit',minute:'2-digit',day:'2-digit',month:'2-digit'})}</small>
+    <div class="void-reason">Alasan: ${esc(v.reason||'-')}</div>
+    <div class="void-actions">
+      <button class="void-reject" onclick="rejectVoid('${esc(v.id)}')">Tolak</button>
+      <button class="void-approve" onclick="approveVoid('${esc(v.id)}')">Otorisasi</button>
+    </div>
+  </div>`).join('');
+}
+
+async function requestVoid(id){
+  if(!session)return;
+  const r=tx.find(x=>String(x.id)===String(id));
+  if(!r)return;
+  const reason=prompt('Alasan permintaan void:', 'Salah memasukkan pesanan');
+  if(reason===null)return;
+  const reqId=String(Date.now())+'_'+Math.random().toString(36).slice(2,7);
+  voidRequests[reqId]={id:reqId,txId:r.id,total:r.total,user:session.u,role:session.r,reason:reason.trim()||'Tanpa alasan',status:'pending',createdAt:new Date().toISOString()};
+  try{localStorage.setItem(VOID_DOC,JSON.stringify(voidRequests));}catch(e){}
+  await writeVoidMap();
+  renderVoidRequests();
+  alert('Permintaan void dikirim ke Owner/Admin untuk otorisasi.');
+}
+
+async function approveVoid(id){
+  if(session?.r!=='OWNER'&&session?.r!=='ADMIN'){alert('Hanya Owner/Admin yang dapat mengotorisasi void.');return;}
+  const v=voidRequests[id];
+  if(!v||v.status!=='pending')return;
+  const r=tx.find(x=>String(x.id)===String(v.txId));
+  if(!r){v.status='approved';v.approvedBy=session.u;v.approvedAt=new Date().toISOString();await writeVoidMap();renderVoidRequests();return;}
+  if(!confirm('Otorisasi void transaksi '+rupiah(r.total)+' dari '+(r.user||'Kasir')+'?'))return;
+  tx=tx.filter(x=>String(x.id)!==String(v.txId));
+  save(KEYS.tx,tx);
+  v.status='approved';v.approvedBy=session.u;v.approvedAt=new Date().toISOString();
+  await writeVoidMap();
+  renderHistory();renderStats();renderReport();renderDashboard();
+}
+
+async function rejectVoid(id){
+  if(session?.r!=='OWNER'&&session?.r!=='ADMIN'){alert('Hanya Owner/Admin yang dapat menolak void.');return;}
+  const v=voidRequests[id];
+  if(!v||v.status!=='pending')return;
+  v.status='rejected';v.rejectedBy=session.u;v.rejectedAt=new Date().toISOString();
+  await writeVoidMap();renderVoidRequests();
 }
 
 /* =========================
@@ -1783,6 +1939,9 @@ function applySession(){
 
  applyRole();
  renderStats();
+ startPresence();
+ listenVoidRequests();
+ renderVoidRequests();
 }
 
 function restoreSession(){
@@ -1809,6 +1968,8 @@ function restoreSession(){
 
 function lockApp(){
  stopBarcodeCamera();
+ stopPresence(true);
+ if(voidUnsub){try{voidUnsub();}catch(e){} voidUnsub=null;}
 
  if(window.IQIHLO_CLOUD){
   window.IQIHLO_CLOUD.listeners?.forEach(u=>{try{u();}catch(e){}});
@@ -1820,6 +1981,7 @@ function lockApp(){
  session=null;
  sessionStorage.removeItem('iqihlo_session');
   sessionStorage.removeItem('iqihlo_shift_start');
+ sessionStorage.removeItem('iqihlo_shift_opening');
 
  $('loginPass').value='';
  $('loginMsg').textContent='';
@@ -3010,12 +3172,33 @@ function renderDashboard(){
 }
 
 
+function getShiftOpening(){
+  return Math.max(0,Number(sessionStorage.getItem('iqihlo_shift_opening')||0));
+}
+
+async function setShiftOpening(){
+  if(!session)return;
+  const input=$('dashShiftOpeningInput');
+  const value=Number(input?.value||0);
+  if(!Number.isFinite(value)||value<0){
+    alert('Masukkan kas awal yang valid.');
+    return;
+  }
+  sessionStorage.setItem('iqihlo_shift_opening',String(Math.round(value)));
+  await updatePresence(false);
+  renderDashboardFinance();
+  if(input)input.value='';
+  alert('Kas awal tersimpan: '+rupiah(value));
+}
+
 function renderDashboardFinance(){
   const today=dashboardTodayTransactions();
   const sales=today.reduce((s,r)=>s+Number(r.total||0),0);
-  // Sistem saat ini belum memiliki ledger kas keluar/HPP per transaksi; jangan mengarang nilainya.
+  const cashSales=today.filter(r=>String(r.payment||'Cash').toLowerCase()==='cash').reduce((s,r)=>s+Number(r.total||0),0);
+  // Ledger kas masuk/keluar belum memiliki sumber terpisah pada versi ini.
   const cashOut=0;
   const hpp=0;
+  const opening=getShiftOpening();
   const profit=sales-hpp;
   const margin=sales?Math.round((profit/sales)*100):0;
   const start=sessionStorage.getItem('iqihlo_shift_start');
@@ -3023,12 +3206,12 @@ function renderDashboardFinance(){
   const user=session?.u||'-';
   $('dashShiftUser').textContent=user;
   $('dashShiftStart').textContent=startText;
-  $('dashShiftOpening').textContent='Rp0';
-  $('dashShiftSales').textContent=rupiah(sales);
-  $('dashShiftExpected').textContent=rupiah(sales);
-  $('dashCashIn').textContent=rupiah(sales);
+  $('dashShiftOpening').textContent=rupiah(opening);
+  $('dashShiftSales').textContent=rupiah(cashSales);
+  $('dashShiftExpected').textContent=rupiah(opening+cashSales+cashOut);
+  $('dashCashIn').textContent=rupiah(cashSales);
   $('dashCashOut').textContent=rupiah(cashOut);
-  $('dashCashSales').textContent=rupiah(sales);
+  $('dashCashSales').textContent=rupiah(cashSales);
   $('dashCashExpense').textContent=rupiah(cashOut);
   $('dashFinanceSales').textContent=rupiah(sales);
   $('dashFinanceHpp').textContent=rupiah(hpp);
@@ -3695,6 +3878,8 @@ function renderHistory(){
      onclick="deleteTransaction(${x.id})">
      🗑 Hapus
     </button>
+
+    ${session?.r!=='OWNER' ? `<button class="secondary" style="margin-top:6px" onclick="requestVoid(${x.id})">↩ Ajukan Void</button>` : ''}
    </div>
   `).join('')||
   '<div class="muted">Belum ada transaksi.</div>';
@@ -4162,5 +4347,8 @@ document.addEventListener(
 
 </script>
 
+<script>
+window.addEventListener('beforeunload',()=>{try{if(session) updatePresence(true);}catch(e){}});
+</script>
 </body>
 </html>
