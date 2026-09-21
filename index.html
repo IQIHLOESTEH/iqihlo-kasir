@@ -3244,7 +3244,7 @@ function buildReceipt(r){
 
   return lines.join('');
   }
-function printReceipt(){
+async function printReceipt(){
  const r=lastReceipt||tx[tx.length-1];
 
  if(!r){
@@ -3252,31 +3252,90 @@ function printReceipt(){
   return;
  }
 
- $('receipt').innerHTML=
-  buildReceipt(r);
-
- /*
-  AndroidPrinter dipakai jika APK
-  menyediakan bridge printer.
- */
- if(window.AndroidPrinter &&
-    typeof AndroidPrinter.printReceipt==='function'){
-
-  try{
-   AndroidPrinter.printReceipt(
-    JSON.stringify(r)
-   );
-   return;
-  }catch(e){
-   console.error(e);
-  }
+ const receipt=$('receipt');
+ if(receipt){
+  receipt.innerHTML=buildReceipt(r);
  }
 
- /* Cetak langsung untuk WEB */
- if(typeof window.print === 'function'){
-  window.print();
- }else{
-  alert('Fitur cetak tidak didukung browser ini.');
+ /*
+  JALUR PRINTER YANG MEMANG DIPAKAI VERSI LAMA:
+  Cleanter menerima POST ke localhost:9100/print.
+  Jangan memakai AndroidPrint/AndroidPrinter di sini karena
+  halaman web IQIHLO ES TEH sebelumnya mencetak melalui Cleanter.
+ */
+ const items=r.items||[];
+ if(!items.length){
+  alert('Tidak ada item pada transaksi.');
+  return;
+ }
+
+ const content=[
+  {type:'text',text:'IQIHLO ES TEH',align:'center',bold:true,size:'large'},
+  {type:'text',text:'SEGARNYA BEDA!',align:'center',bold:true},
+  {type:'text',text:'STRUK PEMBELIAN',align:'center',bold:true},
+  {type:'divider'},
+  {type:'text',text:'Pelanggan: '+(r.customer||'Umum')},
+  {type:'text',text:'Tanggal: '+new Date(r.date||Date.now()).toLocaleDateString('id-ID')},
+  {type:'text',text:'Jam: '+new Date(r.date||Date.now()).toLocaleTimeString('id-ID')},
+  {type:'text',text:'Kasir: '+(r.user||'-')},
+  {type:'text',text:'Pembayaran: '+(r.payment||'-')},
+  {type:'divider'}
+ ];
+
+ items.forEach(it=>{
+  const nama=it.n||it.nama||'Item';
+  const qty=Number(it.q||it.qty||1);
+  const price=Number(it.p||it.price||0);
+  const subtotal=Number(it.sub||it.subtotal||price*qty);
+  content.push({
+   type:'row',
+   left:nama+' x'+qty,
+   right:rupiah(subtotal)
+  });
+ });
+
+ content.push(
+  {type:'divider'},
+  {type:'row',left:'TOTAL',right:rupiah(Number(r.total||0)),bold:true}
+ );
+
+ if(r.payment==='Cash'){
+  content.push(
+   {type:'row',left:'TUNAI',right:rupiah(Number(r.cash||0))},
+   {type:'row',left:'KEMBALI',right:rupiah(Number(r.change||0))}
+  );
+ }
+
+ content.push(
+  {type:'divider'},
+  {type:'text',text:'TERIMA KASIH',align:'center',bold:true},
+  {type:'text',text:'SELAMAT MENIKMATI!',align:'center'},
+  {type:'text',text:'Instagram: @iqihlo.esteh_id',align:'center'},
+  {type:'text',text:'TikTok: @iqihlo.es.teh',align:'center'},
+  {type:'feed',lines:3}
+ );
+
+ try{
+  const res=await fetch('http://localhost:9100/print',{
+   method:'POST',
+   headers:{'Content-Type':'application/json'},
+   body:JSON.stringify({paperWidth:58,cut:false,content:content})
+  });
+
+  const result=await res.json().catch(()=>({}));
+
+  if(!res.ok){
+   throw new Error(result.error||result.fix||'Printer tidak terhubung.');
+  }
+
+  alert('STRUK BERHASIL DIKIRIM KE PRINTER.');
+ }catch(e){
+  console.error('Cetak:',e);
+  alert(
+   'GAGAL MENCETAK.\n\n'+
+   'Pastikan Cleanter BERJALAN dan RPP02N TERHUBUNG.\n\n'+
+   'Error: '+(e.message||e)
+  );
  }
 }
 
