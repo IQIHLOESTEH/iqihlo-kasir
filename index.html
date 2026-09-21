@@ -1413,7 +1413,36 @@ Scan barcode produk, lalu stok produk tersebut otomatis bertambah 1.
 </div>
 </div>
 
-<div id="receipt" class="receipt"></div>
+<div id="receipt" class="receipt"><div class="center">
+<b>IQIHLO ES TEH</b><br>
+SEGARNYA BEDA!<br>
+<b>STRUK PEMBELIAN</b>
+</div>
+
+<div class="line"></div>
+
+Nama: <span id="rnama"></span><br>
+Tanggal: <span id="rtgl"></span><br>
+Jam: <span id="rjam"></span><br>
+Bayar: <span id="rbayar"></span><br>
+Kasir: <span id="rkasir"></span>
+
+<div class="line"></div>
+
+<div id="ritem"></div>
+
+<div class="line"></div>
+
+<b>TOTAL: <span id="rtotal"></span></b>
+
+<div class="line"></div>
+
+<div class="center">
+TERIMA KASIH<br>
+SELAMAT MENIKMATI!<br><br>
+Instagram: @iqihlo.esteh_id<br>
+TikTok: @iqihlo.es.teh<br>
+</div></div>
 <script src="https://www.gstatic.com/firebasejs/12.9.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.9.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore-compat.js"></script>
@@ -3062,63 +3091,76 @@ function checkout(){
  }
 
  const total=totalCart();
- const cash=Number(
-  $('cashReceived').value||0
- );
+ const cash=Number($('cashReceived').value||0);
 
  if(payment==='Cash'&&cash<total){
-  alert(
-   'Uang diterima kurang.\nTotal: '+rupiah(total)
-  );
+  alert('Uang diterima kurang.\nTotal: '+rupiah(total));
   return;
  }
 
- /* Kurangi stok */
- cart.forEach(item=>{
-  stock[item.n]=Math.max(
-   0,
-   Number(stock[item.n]||0)-item.q
-  );
- });
-
- save(KEYS.stock,stock);
+ const items=cart.map(x=>({...x}));
+ const customer=(prompt('Nama pelanggan:','Umum')||'Umum').trim();
 
  const rec={
   id:Date.now(),
   date:new Date().toISOString(),
   user:session?.u||'Kasir',
-customer:(prompt('Nama pelanggan:','Umum')||'Umum').trim(),
+  customer,
   payment,
   total,
   cash,
-  change:payment==='Cash'
-   ?cash-total
-   :0,
-  items:cart.map(x=>({...x}))
+  change:payment==='Cash'?cash-total:0,
+  items
  };
 
- tx.push(rec);
+ /* Simpan transaksi lebih dulu. Error penyimpanan/cloud
+    tidak boleh menghentikan alur WEB sampai tombol cetak. */
+ try{
+  if(!Array.isArray(tx)) tx=[];
+  tx.push(rec);
+  lastReceipt=rec;
+  localStorage.setItem(KEYS.tx,JSON.stringify(tx));
+ }catch(e){
+  console.error('Penyimpanan transaksi:',e);
+  lastReceipt=rec;
+ }
 
- save(KEYS.tx,tx);
+ /* Tampilkan hasil transaksi SEGERA setelah Oke. */
+ try{
+  $('successTotal').textContent=rupiah(rec.total);
+  closeCart();
+  $('successModal').classList.remove('hidden');
+ }catch(e){
+  console.error('Tampilan successModal:',e);
+ }
 
- lastReceipt=rec;
+ /* Proses pendukung dijalankan setelah modal cetak sudah tersedia.
+    Error di sini tidak boleh membatalkan tombol CETAK STRUK. */
+ try{
+  cart.forEach(item=>{
+   stock[item.n]=Math.max(0,Number(stock[item.n]||0)-item.q);
+  });
+  save(KEYS.stock,stock);
+ }catch(e){
+  console.error('Penyimpanan stok:',e);
+ }
 
  cart=[];
+ try{$('cashReceived').value='';}catch(e){}
 
- $('cashReceived').value='';
+ try{renderCart();}catch(e){console.error('renderCart:',e);}
+ try{renderStats();}catch(e){console.error('renderStats:',e);}
+ try{renderStock();}catch(e){console.error('renderStock:',e);}
+ try{renderHistory();}catch(e){console.error('renderHistory:',e);}
+ try{renderReport();}catch(e){console.error('renderReport:',e);}
 
- closeCart();
-
- renderCart();
- renderStats();
- renderStock();
- renderHistory();
- renderReport();
-
- $('successTotal').textContent=
-  rupiah(rec.total);
-
- $('successModal').classList.remove('hidden');
+ try{
+  if(window.IQIHLO_CLOUD&&typeof window.IQIHLO_CLOUD.save==='function'){
+   window.IQIHLO_CLOUD.save(KEYS.tx,tx);
+  }
+ }catch(e){
+  console.error('Sinkronisasi transaksi:',e);
+ }
 }
 
 function simpanTransaksi(){
@@ -3244,112 +3286,46 @@ function buildReceipt(r){
 
   return lines.join('');
   }
-async function printReceipt(){
- const r=lastReceipt||tx[tx.length-1];
+function printReceipt(){
+  const r=lastReceipt || tx[tx.length-1];
 
- if(!r){
-  alert('Belum ada transaksi untuk dicetak.');
-  return;
- }
-
- const receipt=$('receipt');
- if(receipt){
-  receipt.innerHTML=buildReceipt(r);
- }
-
- /*
-  JALUR PRINTER YANG MEMANG DIPAKAI VERSI LAMA:
-  Cleanter menerima POST ke localhost:9100/print.
-  Jangan memakai AndroidPrint/AndroidPrinter di sini karena
-  halaman web IQIHLO ES TEH sebelumnya mencetak melalui Cleanter.
- */
- const items=r.items||[];
- if(!items.length){
-  alert('Tidak ada item pada transaksi.');
-  return;
- }
-
- const content=[
-  {type:'text',text:'IQIHLO ES TEH',align:'center',bold:true,size:'large'},
-  {type:'text',text:'SEGARNYA BEDA!',align:'center',bold:true},
-  {type:'text',text:'STRUK PEMBELIAN',align:'center',bold:true},
-  {type:'divider'},
-  {type:'text',text:'Pelanggan: '+(r.customer||'Umum')},
-  {type:'text',text:'Tanggal: '+new Date(r.date||Date.now()).toLocaleDateString('id-ID')},
-  {type:'text',text:'Jam: '+new Date(r.date||Date.now()).toLocaleTimeString('id-ID')},
-  {type:'text',text:'Kasir: '+(r.user||'-')},
-  {type:'text',text:'Pembayaran: '+(r.payment||'-')},
-  {type:'divider'}
- ];
-
- items.forEach(it=>{
-  const nama=it.n||it.nama||'Item';
-  const qty=Number(it.q||it.qty||1);
-  const price=Number(it.p||it.price||0);
-  const subtotal=Number(it.sub||it.subtotal||price*qty);
-  content.push({
-   type:'row',
-   left:nama+' x'+qty,
-   right:rupiah(subtotal)
-  });
- });
-
- content.push(
-  {type:'divider'},
-  {type:'row',left:'TOTAL',right:rupiah(Number(r.total||0)),bold:true}
- );
-
- if(r.payment==='Cash'){
-  content.push(
-   {type:'row',left:'TUNAI',right:rupiah(Number(r.cash||0))},
-   {type:'row',left:'KEMBALI',right:rupiah(Number(r.change||0))}
-  );
- }
-
- content.push(
-  {type:'divider'},
-  {type:'text',text:'TERIMA KASIH',align:'center',bold:true},
-  {type:'text',text:'SELAMAT MENIKMATI!',align:'center'},
-  {type:'text',text:'Instagram: @iqihlo.esteh_id',align:'center'},
-  {type:'text',text:'TikTok: @iqihlo.es.teh',align:'center'},
-  {type:'feed',lines:3}
- );
-
- try{
-  const res=await fetch('http://localhost:9100/print',{
-   method:'POST',
-   headers:{'Content-Type':'application/json'},
-   body:JSON.stringify({paperWidth:58,cut:false,content:content})
-  });
-
-  const result=await res.json().catch(()=>({}));
-
-  if(!res.ok){
-   throw new Error(result.error||result.fix||'Printer tidak terhubung.');
+  if(!r){
+    alert('Belum ada transaksi untuk dicetak.');
+    return;
   }
 
-  alert('STRUK BERHASIL DIKIRIM KE PRINTER.');
- }catch(e){
-  console.error('Cetak:',e);
-  alert(
-   'GAGAL MENCETAK.\n\n'+
-   'Pastikan Cleanter BERJALAN dan RPP02N TERHUBUNG.\n\n'+
-   'Error: '+(e.message||e)
-  );
- }
+  const receipt=$('receipt');
+  if(!receipt){
+    alert('Area struk tidak ditemukan.');
+    return;
+  }
+
+  receipt.innerHTML=buildReceipt(r);
+
+  // Jalur WEB langsung seperti versi lama: panggil dialog cetak browser.
+  setTimeout(function(){
+    try{
+      window.focus();
+      window.print();
+    }catch(e){
+      console.error('WEB PRINT ERROR:',e);
+      alert('Pencetakan WEB gagal dibuka: '+(e&&e.message?e.message:e));
+    }
+  },150);
 }
 
 function cetak(){
- printReceipt();
+  printReceipt();
 }
 
 function cetakData(id){
- const r=tx.find(x=>x.id===id);
-
- if(!r)return;
-
- lastReceipt=r;
- printReceipt();
+  const r=tx.find(x=>String(x.id)===String(id));
+  if(!r){
+    alert('Transaksi tidak ditemukan.');
+    return;
+  }
+  lastReceipt=r;
+  printReceipt();
 }
 
 /* =========================
