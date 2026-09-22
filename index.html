@@ -3108,63 +3108,76 @@ function checkout(){
  }
 
  const total=totalCart();
- const cash=Number(
-  $('cashReceived').value||0
- );
+ const cash=Number($('cashReceived').value||0);
 
  if(payment==='Cash'&&cash<total){
-  alert(
-   'Uang diterima kurang.\nTotal: '+rupiah(total)
-  );
+  alert('Uang diterima kurang.\nTotal: '+rupiah(total));
   return;
  }
 
- /* Kurangi stok */
- cart.forEach(item=>{
-  stock[item.n]=Math.max(
-   0,
-   Number(stock[item.n]||0)-item.q
-  );
- });
-
- save(KEYS.stock,stock);
+ const items=cart.map(x=>({...x}));
+ const customer=(prompt('Nama pelanggan:','Umum')||'Umum').trim();
 
  const rec={
   id:Date.now(),
   date:new Date().toISOString(),
   user:session?.u||'Kasir',
-customer:(prompt('Nama pelanggan:','Umum')||'Umum').trim(),
+  customer,
   payment,
   total,
   cash,
-  change:payment==='Cash'
-   ?cash-total
-   :0,
-  items:cart.map(x=>({...x}))
+  change:payment==='Cash'?cash-total:0,
+  items
  };
 
- tx.push(rec);
+ /* Simpan transaksi lebih dulu. Error penyimpanan/cloud
+    tidak boleh menghentikan alur WEB sampai tombol cetak. */
+ try{
+  if(!Array.isArray(tx)) tx=[];
+  tx.push(rec);
+  lastReceipt=rec;
+  localStorage.setItem(KEYS.tx,JSON.stringify(tx));
+ }catch(e){
+  console.error('Penyimpanan transaksi:',e);
+  lastReceipt=rec;
+ }
 
- save(KEYS.tx,tx);
+ /* Tampilkan hasil transaksi SEGERA setelah Oke. */
+ try{
+  $('successTotal').textContent=rupiah(rec.total);
+  closeCart();
+  $('successModal').classList.remove('hidden');
+ }catch(e){
+  console.error('Tampilan successModal:',e);
+ }
 
- lastReceipt=rec;
+ /* Proses pendukung dijalankan setelah modal cetak sudah tersedia.
+    Error di sini tidak boleh membatalkan tombol CETAK STRUK. */
+ try{
+  cart.forEach(item=>{
+   stock[item.n]=Math.max(0,Number(stock[item.n]||0)-item.q);
+  });
+  save(KEYS.stock,stock);
+ }catch(e){
+  console.error('Penyimpanan stok:',e);
+ }
 
  cart=[];
+ try{$('cashReceived').value='';}catch(e){}
 
- $('cashReceived').value='';
+ try{renderCart();}catch(e){console.error('renderCart:',e);}
+ try{renderStats();}catch(e){console.error('renderStats:',e);}
+ try{renderStock();}catch(e){console.error('renderStock:',e);}
+ try{renderHistory();}catch(e){console.error('renderHistory:',e);}
+ try{renderReport();}catch(e){console.error('renderReport:',e);}
 
- closeCart();
-
- renderCart();
- renderStats();
- renderStock();
- renderHistory();
- renderReport();
-
- $('successTotal').textContent=
-  rupiah(rec.total);
-
- $('successModal').classList.remove('hidden');
+ try{
+  if(window.IQIHLO_CLOUD&&typeof window.IQIHLO_CLOUD.save==='function'){
+   window.IQIHLO_CLOUD.save(KEYS.tx,tx);
+  }
+ }catch(e){
+  console.error('Sinkronisasi transaksi:',e);
+ }
 }
 
 function simpanTransaksi(){
@@ -3291,68 +3304,51 @@ function buildReceipt(r){
   return lines.join('');
   }
 function printReceipt(){
-  const r=lastReceipt||tx[tx.length-1];
+ const r=lastReceipt||tx[tx.length-1];
 
-  if(!r){
-    alert('Belum ada transaksi untuk dicetak.');
-    return;
+ if(!r){
+  alert('Belum ada transaksi untuk dicetak.');
+  return;
+ }
+
+ $('receipt').innerHTML=
+  buildReceipt(r);
+
+ /*
+  AndroidPrinter dipakai jika APK
+  menyediakan bridge printer.
+ */
+ if(window.AndroidPrinter &&
+    typeof AndroidPrinter.printReceipt==='function'){
+
+  try{
+   AndroidPrinter.printReceipt(
+    JSON.stringify(r)
+   );
+   return;
+  }catch(e){
+   console.error(e);
   }
+ }
 
-  const receipt=document.getElementById('receipt');
-  if(!receipt){
-    alert('Area struk tidak ditemukan.');
-    return;
-  }
-
-  /* Bangun struk yang sama sebelum memanggil printer. */
-  receipt.innerHTML=buildReceipt(r);
-
-  /*
-   * JALUR WEB/ANDROID LAMA
-   * Versi lama memanggil AndroidPrint.print() terlebih dahulu.
-   * Jangan memakai window.open(): popup dapat diblokir browser.
-   */
-  if(window.AndroidPrint &&
-     typeof window.AndroidPrint.print==='function'){
-    try{
-      window.AndroidPrint.print();
-      return;
-    }catch(e){
-      console.error('AndroidPrint.print gagal:',e);
-    }
-  }
-
-  /* Jalur bridge printer APK: kirim transaksi UTUH. */
-  if(window.AndroidPrinter &&
-     typeof window.AndroidPrinter.printReceipt==='function'){
-    try{
-      window.AndroidPrinter.printReceipt(JSON.stringify(r));
-      return;
-    }catch(e){
-      console.error('AndroidPrinter.printReceipt gagal:',e);
-    }
-  }
-
-  /* WEB murni: langsung dari aksi klik CETAK STRUK. */
-  if(typeof window.print==='function'){
-    window.print();
-    return;
-  }
-
-  alert('Fitur cetak tidak tersedia di browser ini.');
+ /* Fallback browser */
+ setTimeout(()=>{
+  window.print();
+ },100);
 }
 
 function cetak(){
- printReceipt();
+  printReceipt();
 }
 
 function cetakData(id){
- const r=tx.find(x=>x.id===id);
-
- if(!r)return;
-
- lastReceipt=r;
- printReceipt();
+  const r=tx.find(x=>String(x.id)===String(id));
+  if(!r){
+    alert('Transaksi tidak ditemukan.');
+    return;
+  }
+  lastReceipt=r;
+  printReceipt();
 }
 
 /* =========================
