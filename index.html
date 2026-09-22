@@ -962,6 +962,28 @@ button{
 
 .salary-card{border:1px solid #eadfd3;background:#fffdf9;border-radius:11px;padding:9px;margin-top:8px}
 .salary-card b{font-size:11px}.salary-meta{display:flex;justify-content:space-between;gap:7px;flex-wrap:wrap;color:#76685f;font-size:9px;margin-top:4px}.salary-actions{display:flex;gap:6px;margin-top:7px}.salary-actions button{flex:1;border:0;border-radius:8px;padding:7px;font-size:9px;font-weight:900;cursor:pointer}.salary-pay{background:#dff3e4;color:#176b38}.salary-del{background:#f7e3df;color:#a8322a}.salary-paid{background:#edf5ee;border-color:#d7eadb}.salary-badge{display:inline-block;padding:3px 6px;border-radius:999px;font-size:8px;font-weight:900;background:#fff0d4;color:#8a5a00}.salary-badge.paid{background:#dff3e4;color:#176b38}
+
+/* =========================================================
+   IQIHLO PREMIUM OWNER DASHBOARD — TAMBAHAN AMAN
+   Hanya menambah tampilan/analitik dashboard.
+   Tidak mengganti mesin login, cetak, kasir, Firebase, stok,
+   barcode, absen, backup/restore, void, atau fitur lama.
+========================================================= */
+body.iq-owner-focus .content{display:none !important}
+body.iq-owner-focus #ownerDashboard{display:block !important}
+.iq-owner-focus-note{margin:0 0 12px;padding:9px 12px;border:1px solid #e8ddd1;border-radius:12px;background:linear-gradient(135deg,#fffaf4,#f3f8ef);color:#5f5147;font-size:10px}
+#iqOwnerPulse{margin-top:12px;display:grid;grid-template-columns:1.25fr .75fr;gap:10px}
+.iq-pulse-card,.iq-alert-card,.iq-mini-card{border:1px solid #e8ddd1;border-radius:16px;background:linear-gradient(145deg,#fffdf9,#f7f2eb);box-shadow:0 5px 18px rgba(72,45,28,.06)}
+.iq-pulse-card{padding:14px}.iq-pulse-top{display:flex;justify-content:space-between;gap:12px;align-items:center}.iq-pulse-title{font-size:12px;font-weight:950;color:#4c2b18}.iq-pulse-sub{font-size:8px;color:#88786c;margin-top:3px}
+.iq-score{min-width:72px;height:72px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#e9f5e9;border:5px solid #cfe8d1;color:#23723c}.iq-score strong{font-size:20px;line-height:1}.iq-score span{font-size:7px;font-weight:900;margin-top:3px}
+.iq-pulse-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:12px}.iq-kpi{padding:8px;border-radius:10px;background:#fff;border:1px solid #eee5dc}.iq-kpi span{display:block;font-size:7px;color:#8b7d72}.iq-kpi b{display:block;font-size:10px;margin-top:3px;color:#4b3425}
+.iq-alert-card{padding:12px}.iq-card-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:7px}.iq-card-head b{font-size:10px;color:#4b3425}.iq-card-head span{font-size:7px;color:#8b7d72}
+.iq-alert{display:flex;gap:7px;align-items:flex-start;padding:7px 0;border-bottom:1px solid #eee6dd;font-size:8px;color:#5e5148}.iq-alert:last-child{border-bottom:0}.iq-alert-dot{width:7px;height:7px;border-radius:50%;margin-top:2px;flex:0 0 auto;background:#e1a329}.iq-alert-dot.red{background:#c9574d}.iq-alert-dot.green{background:#3b9b62}
+#iqOwnerInsightGrid{margin-top:10px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}.iq-mini-card{padding:11px}.iq-mini-title{font-size:9px;font-weight:950;color:#4b3425;margin-bottom:7px}.iq-mini-value{font-size:15px;font-weight:950;color:#4c2b18}.iq-mini-muted{font-size:7px;color:#8b7d72;margin-top:3px}.iq-progress{height:8px;border-radius:99px;background:#e9e3dc;overflow:hidden;margin-top:8px}.iq-progress>i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#4c2b18,#6f9a58)}
+.iq-top-list{display:grid;gap:5px}.iq-top-row{display:flex;justify-content:space-between;gap:8px;font-size:8px;padding:5px 0;border-bottom:1px solid #eee6dd}.iq-top-row:last-child{border-bottom:0}.iq-top-row b{color:#4b3425}.iq-action-btn{border:0;border-radius:9px;padding:7px 9px;background:#4c2b18;color:#fff;font-weight:900;font-size:8px;cursor:pointer}.iq-action-btn.secondary{background:#eee7df;color:#5b4a3e}.iq-target-edit{margin-top:7px;display:flex;gap:5px}.iq-target-edit button{flex:1}
+@media(max-width:800px){#iqOwnerPulse{grid-template-columns:1fr}#iqOwnerInsightGrid{grid-template-columns:1fr 1fr}.iq-pulse-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:520px){#iqOwnerInsightGrid{grid-template-columns:1fr}.iq-pulse-top{align-items:flex-start}}
+
 </style>
 </head>
 <body><div id="loginScreen" class="login">
@@ -1116,6 +1138,51 @@ button{
   <div class="dash-foot">
     💡 Dashboard mengambil data langsung dari transaksi, menu, dan stok IQIHLO ES TEH yang sudah tersimpan. Menu kasir, database Firebase, printer, barcode, dan fitur lain tetap menggunakan sistem yang sekarang.
   </div>
+
+  <div class="iq-owner-focus-note">
+    👑 <b>MODE OWNER</b> — Dashboard menjadi pusat kendali usaha. Fitur operasional tetap tersedia melalui menu dan tidak dihapus.
+  </div>
+
+  <section id="iqOwnerPulse" aria-label="IQIHLO Business Pulse">
+    <div class="iq-pulse-card">
+      <div class="iq-pulse-top">
+        <div><div class="iq-pulse-title">IQIHLO BUSINESS PULSE</div><div class="iq-pulse-sub" id="iqPulseStatus">Menganalisis kondisi usaha hari ini…</div></div>
+        <div class="iq-score"><strong id="iqPulseScore">—</strong><span id="iqPulseScoreLabel">MENUNGGU DATA</span></div>
+      </div>
+      <div class="iq-pulse-grid">
+        <div class="iq-kpi"><span>Omzet</span><b id="iqPulseSales">Rp0</b></div>
+        <div class="iq-kpi"><span>Laba*</span><b id="iqPulseProfit">Rp0</b></div>
+        <div class="iq-kpi"><span>Transaksi</span><b id="iqPulseTx">0</b></div>
+        <div class="iq-kpi"><span>Kasir Aktif</span><b id="iqPulseActive">0</b></div>
+      </div>
+      <div class="iq-pulse-sub" style="margin-top:8px">*Laba mengikuti data pengeluaran yang sudah tersedia; HPP belum dihitung jika menu belum memiliki data HPP.</div>
+    </div>
+    <div class="iq-alert-card">
+      <div class="iq-card-head"><b>🎯 PUSAT PERHATIAN</b><span id="iqAlertCount">0 hal</span></div>
+      <div id="iqAlertList"></div>
+    </div>
+  </section>
+
+  <section id="iqOwnerInsightGrid">
+    <div class="iq-mini-card">
+      <div class="iq-mini-title">🎯 TARGET HARI INI</div>
+      <div class="iq-mini-value" id="iqTargetText">Rp1.500.000</div>
+      <div class="iq-mini-muted" id="iqTargetMeta">Belum ada transaksi</div>
+      <div class="iq-progress"><i id="iqTargetBar" style="width:0%"></i></div>
+      <div class="iq-target-edit"><button class="iq-action-btn" type="button" onclick="setIqihloOwnerTarget()">Atur Target</button></div>
+    </div>
+    <div class="iq-mini-card">
+      <div class="iq-mini-title">🔥 JAM EMAS</div>
+      <div class="iq-mini-value" id="iqPeakHour">—</div>
+      <div class="iq-mini-muted" id="iqPeakHourMeta">Belum ada transaksi hari ini</div>
+    </div>
+    <div class="iq-mini-card">
+      <div class="iq-mini-title">🏆 MENU PALING MENGHASILKAN</div>
+      <div class="iq-top-list" id="iqTopProfitLike"></div>
+      <div class="iq-mini-muted">Urutan berdasarkan omzet dan jumlah terjual dari transaksi yang sudah ada.</div>
+    </div>
+  </section>
+
 </section>
 
 <main class="content">
@@ -1413,36 +1480,7 @@ Scan barcode produk, lalu stok produk tersebut otomatis bertambah 1.
 </div>
 </div>
 
-<div id="receipt" class="receipt"><div class="center">
-<b>IQIHLO ES TEH</b><br>
-SEGARNYA BEDA!<br>
-<b>STRUK PEMBELIAN</b>
-</div>
-
-<div class="line"></div>
-
-Nama: <span id="rnama"></span><br>
-Tanggal: <span id="rtgl"></span><br>
-Jam: <span id="rjam"></span><br>
-Bayar: <span id="rbayar"></span><br>
-Kasir: <span id="rkasir"></span>
-
-<div class="line"></div>
-
-<div id="ritem"></div>
-
-<div class="line"></div>
-
-<b>TOTAL: <span id="rtotal"></span></b>
-
-<div class="line"></div>
-
-<div class="center">
-TERIMA KASIH<br>
-SELAMAT MENIKMATI!<br><br>
-Instagram: @iqihlo.esteh_id<br>
-TikTok: @iqihlo.es.teh<br>
-</div></div>
+<div id="receipt" class="receipt"></div>
 <script src="https://www.gstatic.com/firebasejs/12.9.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.9.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore-compat.js"></script>
@@ -1585,7 +1623,7 @@ let presenceData={};
 let voidRequests={};
 
 const DEFAULT_ACCOUNTS=[
-  {u:'iqihloesteh',p:'Bakmimania2108',r:'OWNER'}
+  {u:'iqihloesteh',p:'',r:'OWNER',active:true,email:'iqihloesteh@gmail.com'}
 ];
 
 let accounts=[];
@@ -2097,7 +2135,7 @@ function initAccounts(){
  // Pastikan Owner bawaan tersedia tanpa mengaktifkan kembali akun lain.
  let owner=accounts.find(x=>x.u==='iqihloesteh');
  if(!owner){
-  owner={u:'iqihloesteh',p:'Bakmimania2108',r:'OWNER',active:true,email:'iqihloesteh@gmail.com'};
+  owner={u:'iqihloesteh',p:'',r:'OWNER',active:true,email:'iqihloesteh@gmail.com'};
   accounts.push(owner);
  }else{
   owner.r='OWNER';
@@ -2240,7 +2278,10 @@ function applySession(){
  $('loginScreen').classList.toggle('hidden',logged);
  $('app').classList.toggle('hidden',!logged);
 
- if(!logged)return;
+ if(!logged){
+  document.body.classList.remove('iq-owner-focus');
+  return;
+ }
 
  $('currentUser').textContent=session.u;
  $('currentRole').textContent=session.r;
@@ -2327,6 +2368,8 @@ function applyRole(){
  document.querySelectorAll('.owner-only').forEach(e=>{
   e.style.display=r==='OWNER'?'block':'none';
  });
+
+ document.body.classList.toggle('iq-owner-focus',r==='OWNER');
 }
 
 function openMenu(){
@@ -2484,6 +2527,7 @@ function goHomeFromMenu(){
 
   closeMenu();
   hideFeatures();
+  if(session?.r==='OWNER') document.body.classList.add('iq-owner-focus');
 
   window.scrollTo({
     top:0,
@@ -2495,6 +2539,7 @@ function goHomeFromMenu(){
 function goFeatureFromMenu(keyword){
 
   closeMenu();
+  if(session?.r==='OWNER') document.body.classList.remove('iq-owner-focus');
 
   const features = document.querySelector('.features');
 
@@ -2757,135 +2802,105 @@ function setCat(c){
 function renderMenus(){
  const a=menus.filter(m=>m.c===category);
 
- function ilustrasi(n){
+ /*
+   ILUSTRASI MINUMAN — hanya tampilan.
+   Tidak menyentuh harga, stok, transaksi, login, Firebase, atau cetak.
+   Setiap kartu menu selalu mempunyai gambar minuman yang jelas.
+ */
+ function ilustrasi(n, index){
    const x=(n||'').toLowerCase();
+   const uid='drink_'+index+'_'+String(n||'menu').replace(/[^a-z0-9]/gi,'').slice(0,12);
 
+   // ES TEH: gelas bening, teh cokelat, es batu, embun, lemon, daun teh dan sedotan.
+   if(x.includes('teh')){
+     return `
+     <svg viewBox="0 0 220 150" class="drink-img" role="img" aria-label="Gambar es teh">
+       <defs>
+         <linearGradient id="${uid}_tea" x1="0" y1="0" x2="0" y2="1">
+           <stop offset="0" stop-color="#c98235"/>
+           <stop offset=".48" stop-color="#9b4d20"/>
+           <stop offset="1" stop-color="#5b2411"/>
+         </linearGradient>
+         <linearGradient id="${uid}_glass" x1="0" y1="0" x2="1" y2="1">
+           <stop offset="0" stop-color="#ffffff" stop-opacity=".72"/>
+           <stop offset=".55" stop-color="#ffffff" stop-opacity=".18"/>
+           <stop offset="1" stop-color="#d9eef2" stop-opacity=".42"/>
+         </linearGradient>
+       </defs>
+       <ellipse cx="110" cy="137" rx="58" ry="8" fill="#3c251b" opacity=".16"/>
+       <path d="M139 46 L174 10" stroke="#d6322d" stroke-width="6" stroke-linecap="round"/>
+       <path d="M174 10 L196 10" stroke="#d6322d" stroke-width="6" stroke-linecap="round"/>
+       <path d="M78 45 Q57 20 76 12 Q91 28 78 45Z" fill="#4da942"/>
+       <path d="M91 44 Q95 15 113 18 Q111 36 91 44Z" fill="#69bf4e"/>
+       <path d="M61 51 L69 120 Q110 137 151 120 L159 51Z" fill="url(#${uid}_glass)" stroke="#9cb0ae" stroke-width="3"/>
+       <path d="M65 63 L72 117 Q110 131 148 117 L155 63Z" fill="url(#${uid}_tea)"/>
+       <ellipse cx="110" cy="62" rx="45" ry="11" fill="#6b2b13" stroke="#54200e" stroke-width="2"/>
+       <g fill="#eafaff" fill-opacity=".72" stroke="#ffffff" stroke-opacity=".75" stroke-width="1.5">
+         <rect x="72" y="53" width="25" height="21" rx="5" transform="rotate(-12 72 53)"/>
+         <rect x="98" y="55" width="25" height="21" rx="5" transform="rotate(9 98 55)"/>
+         <rect x="124" y="51" width="24" height="20" rx="5" transform="rotate(-7 124 51)"/>
+       </g>
+       <circle cx="70" cy="82" r="2.7" fill="#fff" opacity=".7"/><circle cx="150" cy="91" r="2.7" fill="#fff" opacity=".65"/>
+       <path d="M77 78 L82 108" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity=".6"/>
+       <path d="M143 80 L140 108" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".35"/>
+       <circle cx="49" cy="54" r="17" fill="#f7c94a" stroke="#df9f21" stroke-width="2"/>
+       <path d="M49 37 A17 17 0 0 0 49 71 A17 17 0 0 0 49 37Z" fill="#ffd968"/>
+       <path d="M43 42 Q51 48 55 57" fill="none" stroke="#fff4b0" stroke-width="2"/>
+     </svg>`;
+   }
+
+   // ES JERUK: tetap berbentuk minuman dingin dengan jeruk yang terlihat jelas.
    if(x.includes('jeruk')){
      return `
-     <svg viewBox="0 0 180 120" class="drink-img">
-       <defs>
-         <linearGradient id="oj" x1="0" y1="0" x2="0" y2="1">
-           <stop offset="0" stop-color="#ffd96a"/>
-           <stop offset="1" stop-color="#f28b18"/>
-         </linearGradient>
-       </defs>
-       <ellipse cx="90" cy="105" rx="47" ry="7" fill="#0002"/>
-       <path d="M55 38 L63 98 Q90 108 117 98 L125 38Z"
-             fill="url(#oj)" stroke="#d87512" stroke-width="3"/>
-       <path d="M55 38 Q90 28 125 38 Q90 49 55 38Z"
-             fill="#fff9" stroke="#d87512" stroke-width="3"/>
-       <circle cx="42" cy="42" r="17" fill="#ff9d19"/>
-       <path d="M42 25 A17 17 0 0 0 42 59 A17 17 0 0 0 42 25"
-             fill="#ffd35c"/>
-       <path d="M109 27 L136 5" stroke="#7b4a24" stroke-width="4"/>
-       <path d="M132 9 Q146 1 153 8 Q143 17 132 9"
-             fill="#4cae45"/>
-       <circle cx="72" cy="61" r="3" fill="#fff8"/>
-       <circle cx="91" cy="74" r="3" fill="#fff8"/>
+     <svg viewBox="0 0 220 150" class="drink-img" role="img" aria-label="Gambar es jeruk">
+       <defs><linearGradient id="${uid}_orange" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#ffd85c"/><stop offset="1" stop-color="#ee8612"/></linearGradient></defs>
+       <ellipse cx="110" cy="137" rx="58" ry="8" fill="#3c251b" opacity=".16"/>
+       <path d="M139 47 L175 10" stroke="#d6322d" stroke-width="6" stroke-linecap="round"/><path d="M175 10 L196 10" stroke="#d6322d" stroke-width="6" stroke-linecap="round"/>
+       <path d="M78 45 Q57 20 76 12 Q91 28 78 45Z" fill="#4da942"/><path d="M91 44 Q95 15 113 18 Q111 36 91 44Z" fill="#69bf4e"/>
+       <path d="M61 51 L69 120 Q110 137 151 120 L159 51Z" fill="#ffffff38" stroke="#9cb0ae" stroke-width="3"/>
+       <path d="M65 63 L72 117 Q110 131 148 117 L155 63Z" fill="url(#${uid}_orange)"/>
+       <ellipse cx="110" cy="62" rx="45" ry="11" fill="#fff8df" stroke="#db8b17" stroke-width="2"/>
+       <g fill="#eafaff" fill-opacity=".72" stroke="#fff" stroke-opacity=".75"><rect x="73" y="52" width="24" height="20" rx="5" transform="rotate(-12 73 52)"/><rect x="100" y="54" width="24" height="20" rx="5" transform="rotate(9 100 54)"/><rect x="126" y="51" width="22" height="19" rx="5" transform="rotate(-7 126 51)"/></g>
+       <circle cx="49" cy="54" r="18" fill="#ff9f19" stroke="#df7c0d" stroke-width="2"/><path d="M49 36 A18 18 0 0 0 49 72 A18 18 0 0 0 49 36Z" fill="#ffd15a"/>
+       <path d="M77 79 L82 108" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity=".6"/>
      </svg>`;
    }
 
-   if(x.includes('goodday') || x.includes('kopi')){
+   // Kopi / minuman cokelat.
+   if(x.includes('kopi') || x.includes('goodday') || x.includes('chocolat')){
      return `
-     <svg viewBox="0 0 180 120" class="drink-img">
-       <defs>
-         <linearGradient id="cf" x1="0" y1="0" x2="0" y2="1">
-           <stop offset="0" stop-color="#9b6139"/>
-           <stop offset="1" stop-color="#3e1d12"/>
-         </linearGradient>
-       </defs>
-       <ellipse cx="90" cy="105" rx="48" ry="7" fill="#0002"/>
-       <path d="M54 39 L62 98 Q90 108 118 98 L126 39Z"
-             fill="url(#cf)" stroke="#6b3820" stroke-width="3"/>
-       <ellipse cx="90" cy="39" rx="36" ry="10"
-                fill="#d8a77b" stroke="#6b3820" stroke-width="3"/>
-       <ellipse cx="90" cy="40" rx="29" ry="6" fill="#fff4df"/>
-       <path d="M63 37 Q72 25 82 37 Q90 22 99 37 Q110 24 118 38"
-             fill="none" stroke="#f7dfbd" stroke-width="7"/>
-       <path d="M113 29 L142 5" stroke="#7b4a24" stroke-width="4"/>
-       <path d="M138 9 Q150 2 157 10 Q147 18 138 9"
-             fill="#4cae45"/>
-       <rect x="69" y="55" width="42" height="3" rx="2" fill="#fff4"/>
+     <svg viewBox="0 0 220 150" class="drink-img" role="img" aria-label="Gambar minuman dingin cokelat">
+       <defs><linearGradient id="${uid}_coffee" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#a86a3e"/><stop offset="1" stop-color="#3d1c12"/></linearGradient></defs>
+       <ellipse cx="110" cy="137" rx="58" ry="8" fill="#3c251b" opacity=".16"/>
+       <path d="M139 47 L175 10" stroke="#d6322d" stroke-width="6" stroke-linecap="round"/><path d="M175 10 L196 10" stroke="#d6322d" stroke-width="6" stroke-linecap="round"/>
+       <path d="M61 51 L69 120 Q110 137 151 120 L159 51Z" fill="#ffffff38" stroke="#9cb0ae" stroke-width="3"/>
+       <path d="M65 62 L72 117 Q110 131 148 117 L155 62Z" fill="url(#${uid}_coffee)"/>
+       <ellipse cx="110" cy="62" rx="45" ry="11" fill="#ead0b8" stroke="#6d3a21" stroke-width="2"/>
+       <g fill="#fff" fill-opacity=".7"><rect x="73" y="51" width="24" height="20" rx="5" transform="rotate(-12 73 51)"/><rect x="101" y="53" width="23" height="20" rx="5" transform="rotate(8 101 53)"/><rect x="126" y="51" width="22" height="19" rx="5" transform="rotate(-6 126 51)"/></g>
+       <path d="M77 78 L82 108" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity=".55"/>
      </svg>`;
    }
 
-   if(x.includes('nutrisari')){
-     return `
-     <svg viewBox="0 0 180 120" class="drink-img">
-       <defs>
-         <linearGradient id="ns" x1="0" y1="0" x2="0" y2="1">
-           <stop offset="0" stop-color="#ffe45d"/>
-           <stop offset="1" stop-color="#f39a12"/>
-         </linearGradient>
-       </defs>
-       <ellipse cx="90" cy="105" rx="47" ry="7" fill="#0002"/>
-       <path d="M55 38 L63 98 Q90 108 117 98 L125 38Z"
-             fill="url(#ns)" stroke="#dc7d0b" stroke-width="3"/>
-       <ellipse cx="90" cy="38" rx="35" ry="9"
-                fill="#fff8df" stroke="#dc7d0b" stroke-width="3"/>
-       <circle cx="76" cy="60" r="4" fill="#fff8"/>
-       <circle cx="96" cy="76" r="4" fill="#fff8"/>
-       <circle cx="106" cy="55" r="3" fill="#fff8"/>
-       <path d="M112 29 L139 4" stroke="#7b4a24" stroke-width="4"/>
-       <path d="M136 8 Q149 1 156 9 Q147 17 136 8"
-             fill="#4cae45"/>
-       <path d="M68 30 Q90 19 112 30" fill="none"
-             stroke="#ffffff" stroke-width="3" opacity=".8"/>
-     </svg>`;
-   }
-
-   /* ES TEH + semua minuman lain */
+   // Fallback untuk MENU APA PUN: gambar es teh yang jelas agar tidak ada kartu tanpa gambar.
    return `
-   <svg viewBox="0 0 180 120" class="drink-img">
-     <defs>
-       <linearGradient id="tea" x1="0" y1="0" x2="0" y2="1">
-         <stop offset="0" stop-color="#d88938"/>
-         <stop offset="1" stop-color="#6d2e13"/>
-       </linearGradient>
-     </defs>
-
-     <ellipse cx="90" cy="106" rx="48" ry="7" fill="#0002"/>
-
-     <!-- gelas -->
-     <path d="M52 35 L61 98 Q90 109 119 98 L128 35Z"
-           fill="#ffffff30" stroke="#bcae9f" stroke-width="3"/>
-
-     <!-- teh -->
-     <path d="M57 50 L63 96 Q90 104 117 96 L123 50Z"
-           fill="url(#tea)"/>
-
-     <!-- es batu -->
-     <g fill="#fff8" stroke="#ffffff80" stroke-width="1">
-       <rect x="65" y="48" width="18" height="15" rx="4"
-             transform="rotate(-10 65 48)"/>
-       <rect x="88" y="51" width="18" height="16" rx="4"
-             transform="rotate(8 88 51)"/>
-       <rect x="105" y="44" width="16" height="15" rx="4"
-             transform="rotate(-7 105 44)"/>
-     </g>
-
-     <!-- sedotan -->
-     <path d="M105 45 L132 8" stroke="#c73528" stroke-width="5"
-           stroke-linecap="round"/>
-     <path d="M132 8 L151 8" stroke="#c73528" stroke-width="5"
-           stroke-linecap="round"/>
-
-     <!-- daun -->
-     <path d="M73 38 Q55 18 72 11 Q84 24 73 38Z"
-           fill="#3f9d3f"/>
-     <path d="M83 38 Q85 13 101 15 Q101 32 83 38Z"
-           fill="#56b84c"/>
-
-     <!-- highlight gelas -->
-     <path d="M65 65 L69 91" stroke="#fff" stroke-width="4"
-           stroke-linecap="round" opacity=".65"/>
+   <svg viewBox="0 0 220 150" class="drink-img" role="img" aria-label="Gambar es teh">
+     <defs><linearGradient id="${uid}_tea" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#d18a3d"/><stop offset="1" stop-color="#64280f"/></linearGradient></defs>
+     <ellipse cx="110" cy="137" rx="58" ry="8" fill="#3c251b" opacity=".16"/>
+     <path d="M139 47 L175 10" stroke="#d6322d" stroke-width="6" stroke-linecap="round"/><path d="M175 10 L196 10" stroke="#d6322d" stroke-width="6" stroke-linecap="round"/>
+     <path d="M78 45 Q57 20 76 12 Q91 28 78 45Z" fill="#4da942"/><path d="M91 44 Q95 15 113 18 Q111 36 91 44Z" fill="#69bf4e"/>
+     <path d="M61 51 L69 120 Q110 137 151 120 L159 51Z" fill="#ffffff38" stroke="#9cb0ae" stroke-width="3"/>
+     <path d="M65 63 L72 117 Q110 131 148 117 L155 63Z" fill="url(#${uid}_tea)"/>
+     <ellipse cx="110" cy="63" rx="45" ry="11" fill="#6b2b13" stroke="#54200e" stroke-width="2"/>
+     <g fill="#eafaff" fill-opacity=".72" stroke="#fff" stroke-opacity=".75"><rect x="73" y="52" width="24" height="20" rx="5" transform="rotate(-12 73 52)"/><rect x="100" y="54" width="24" height="20" rx="5" transform="rotate(8 100 54)"/><rect x="126" y="51" width="22" height="19" rx="5" transform="rotate(-6 126 51)"/></g>
+     <circle cx="49" cy="54" r="18" fill="#f7c94a" stroke="#df9f21" stroke-width="2"/>
+     <path d="M77 78 L82 108" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity=".6"/>
    </svg>`;
  }
 
- $('menu').innerHTML=a.map(m=>`
-   <button class="menu" onclick='addCart(${JSON.stringify(m.n)})'>
+ $('menu').innerHTML=a.map((m,index)=>`
+   <button class="menu" onclick='addCart(${JSON.stringify(m.n)})' aria-label='Tambah ${esc(m.n)} ke keranjang'>
      <div class="cup">
-       ${ilustrasi(m.n)}
+       ${ilustrasi(m.n,index)}
      </div>
      <b>${esc(m.n)}</b>
      <small>${rupiah(m.p)}</small>
@@ -3091,76 +3106,63 @@ function checkout(){
  }
 
  const total=totalCart();
- const cash=Number($('cashReceived').value||0);
+ const cash=Number(
+  $('cashReceived').value||0
+ );
 
  if(payment==='Cash'&&cash<total){
-  alert('Uang diterima kurang.\nTotal: '+rupiah(total));
+  alert(
+   'Uang diterima kurang.\nTotal: '+rupiah(total)
+  );
   return;
  }
 
- const items=cart.map(x=>({...x}));
- const customer=(prompt('Nama pelanggan:','Umum')||'Umum').trim();
+ /* Kurangi stok */
+ cart.forEach(item=>{
+  stock[item.n]=Math.max(
+   0,
+   Number(stock[item.n]||0)-item.q
+  );
+ });
+
+ save(KEYS.stock,stock);
 
  const rec={
   id:Date.now(),
   date:new Date().toISOString(),
   user:session?.u||'Kasir',
-  customer,
+customer:(prompt('Nama pelanggan:','Umum')||'Umum').trim(),
   payment,
   total,
   cash,
-  change:payment==='Cash'?cash-total:0,
-  items
+  change:payment==='Cash'
+   ?cash-total
+   :0,
+  items:cart.map(x=>({...x}))
  };
 
- /* Simpan transaksi lebih dulu. Error penyimpanan/cloud
-    tidak boleh menghentikan alur WEB sampai tombol cetak. */
- try{
-  if(!Array.isArray(tx)) tx=[];
-  tx.push(rec);
-  lastReceipt=rec;
-  localStorage.setItem(KEYS.tx,JSON.stringify(tx));
- }catch(e){
-  console.error('Penyimpanan transaksi:',e);
-  lastReceipt=rec;
- }
+ tx.push(rec);
 
- /* Tampilkan hasil transaksi SEGERA setelah Oke. */
- try{
-  $('successTotal').textContent=rupiah(rec.total);
-  closeCart();
-  $('successModal').classList.remove('hidden');
- }catch(e){
-  console.error('Tampilan successModal:',e);
- }
+ save(KEYS.tx,tx);
 
- /* Proses pendukung dijalankan setelah modal cetak sudah tersedia.
-    Error di sini tidak boleh membatalkan tombol CETAK STRUK. */
- try{
-  cart.forEach(item=>{
-   stock[item.n]=Math.max(0,Number(stock[item.n]||0)-item.q);
-  });
-  save(KEYS.stock,stock);
- }catch(e){
-  console.error('Penyimpanan stok:',e);
- }
+ lastReceipt=rec;
 
  cart=[];
- try{$('cashReceived').value='';}catch(e){}
 
- try{renderCart();}catch(e){console.error('renderCart:',e);}
- try{renderStats();}catch(e){console.error('renderStats:',e);}
- try{renderStock();}catch(e){console.error('renderStock:',e);}
- try{renderHistory();}catch(e){console.error('renderHistory:',e);}
- try{renderReport();}catch(e){console.error('renderReport:',e);}
+ $('cashReceived').value='';
 
- try{
-  if(window.IQIHLO_CLOUD&&typeof window.IQIHLO_CLOUD.save==='function'){
-   window.IQIHLO_CLOUD.save(KEYS.tx,tx);
-  }
- }catch(e){
-  console.error('Sinkronisasi transaksi:',e);
- }
+ closeCart();
+
+ renderCart();
+ renderStats();
+ renderStock();
+ renderHistory();
+ renderReport();
+
+ $('successTotal').textContent=
+  rupiah(rec.total);
+
+ $('successModal').classList.remove('hidden');
 }
 
 function simpanTransaksi(){
@@ -3287,45 +3289,52 @@ function buildReceipt(r){
   return lines.join('');
   }
 function printReceipt(){
-  const r=lastReceipt || tx[tx.length-1];
+ const r=lastReceipt||tx[tx.length-1];
 
-  if(!r){
-    alert('Belum ada transaksi untuk dicetak.');
-    return;
+ if(!r){
+  alert('Belum ada transaksi untuk dicetak.');
+  return;
+ }
+
+ $('receipt').innerHTML=
+  buildReceipt(r);
+
+ /*
+  AndroidPrinter dipakai jika APK
+  menyediakan bridge printer.
+ */
+ if(window.AndroidPrinter &&
+    typeof AndroidPrinter.printReceipt==='function'){
+
+  try{
+   AndroidPrinter.printReceipt(
+    JSON.stringify(r)
+   );
+   return;
+  }catch(e){
+   console.error(e);
   }
+ }
 
-  const receipt=$('receipt');
-  if(!receipt){
-    alert('Area struk tidak ditemukan.');
-    return;
-  }
-
-  receipt.innerHTML=buildReceipt(r);
-
-  // Jalur WEB langsung seperti versi lama: panggil dialog cetak browser.
-  setTimeout(function(){
-    try{
-      window.focus();
-      window.print();
-    }catch(e){
-      console.error('WEB PRINT ERROR:',e);
-      alert('Pencetakan WEB gagal dibuka: '+(e&&e.message?e.message:e));
-    }
-  },150);
+ /* Cetak langsung untuk WEB */
+ if(typeof window.print === 'function'){
+  window.print();
+ }else{
+  alert('Fitur cetak tidak didukung browser ini.');
+ }
 }
 
 function cetak(){
-  printReceipt();
+ printReceipt();
 }
 
 function cetakData(id){
-  const r=tx.find(x=>String(x.id)===String(id));
-  if(!r){
-    alert('Transaksi tidak ditemukan.');
-    return;
-  }
-  lastReceipt=r;
-  printReceipt();
+ const r=tx.find(x=>x.id===id);
+
+ if(!r)return;
+
+ lastReceipt=r;
+ printReceipt();
 }
 
 /* =========================
@@ -3449,6 +3458,63 @@ function renderDashboardChart(records){
   }).join('');
 }
 
+function getIqihloOwnerTarget(){
+  const n=Number(localStorage.getItem('iqihlo_owner_target')||1500000);
+  return Number.isFinite(n)&&n>0?n:1500000;
+}
+
+function setIqihloOwnerTarget(){
+  if(session?.r!=='OWNER'){alert('Pengaturan target hanya untuk Owner.');return;}
+  const value=Number(prompt('Target omzet harian IQIHLO ES TEH:',String(getIqihloOwnerTarget())));
+  if(!Number.isFinite(value)||value<=0)return;
+  localStorage.setItem('iqihlo_owner_target',String(Math.round(value)));
+  renderDashboard();
+}
+
+function renderDashboardEnhancement(){
+  if(session?.r!=='OWNER')return;
+  const today=dashboardTodayTransactions();
+  const sales=today.reduce((s,x)=>s+Number(x.total||0),0);
+  const txCount=today.length;
+  const target=getIqihloOwnerTarget();
+  const cashOut=typeof salaryTodayExpense==='function'?salaryTodayExpense():0;
+  const profit=sales-cashOut;
+  const pending=tx.filter(x=>String(x.voidStatus||'').toUpperCase()==='PENDING').length;
+  const lowStock=menus.map(m=>({name:m.n,val:Number(stock?.[m.n]??0)})).filter(x=>x.val<=20).sort((a,b)=>a.val-b.val).slice(0,5);
+  const activeUsers=typeof presence==='object'&&presence?Object.values(presence).filter(x=>x&&x.active!==false).length:0;
+
+  if(txCount===0){
+    $('iqPulseScore').textContent='—';$('iqPulseScoreLabel').textContent='MENUNGGU DATA';$('iqPulseStatus').textContent='Belum ada transaksi hari ini.';
+  }else{
+    let score=70; const progress=Math.min(100,(sales/target)*100);
+    if(progress>=100)score+=15;else if(progress>=75)score+=8;else if(progress>=50)score+=3;
+    if(pending===0)score+=5;else score-=Math.min(15,pending*5);
+    if(lowStock.length===0)score+=5;else score-=Math.min(10,lowStock.length*2);
+    if(activeUsers>0)score+=5;
+    score=Math.max(0,Math.min(100,score));
+    $('iqPulseScore').textContent=String(score);$('iqPulseScoreLabel').textContent=score>=85?'SEHAT':score>=70?'STABIL':'PERLU PERHATIAN';
+    $('iqPulseStatus').textContent=score>=85?'Operasional terlihat sehat hari ini.':score>=70?'Operasional stabil, tetapi ada beberapa hal yang perlu dipantau.':'Ada beberapa hal yang perlu segera diperiksa Owner.';
+  }
+  $('iqPulseSales').textContent=rupiah(sales);$('iqPulseProfit').textContent=rupiah(profit);$('iqPulseTx').textContent=String(txCount);$('iqPulseActive').textContent=String(activeUsers);
+
+  const alerts=[];
+  if(pending>0)alerts.push({c:'red',text:`${pending} permintaan void menunggu persetujuan Owner.`,action:"goFeatureFromMenu('VOID')"});
+  lowStock.slice(0,3).forEach(x=>alerts.push({c:x.val<=5?'red':'',text:`Stok ${x.name} tinggal ${x.val}.`,action:"goFeatureFromMenu('STOK')"}));
+  if(txCount===0)alerts.push({c:'green',text:'Belum ada transaksi hari ini. Data akan muncul otomatis saat kasir bertransaksi.',action:''});
+  $('iqAlertCount').textContent=alerts.length+' hal';
+  $('iqAlertList').innerHTML=alerts.map(a=>`<div class="iq-alert"><i class="iq-alert-dot ${a.c||''}"></i><div style="flex:1">${esc(a.text)}</div>${a.action?`<button class="iq-action-btn secondary" type="button" onclick="${a.action}">Lihat</button>`:''}</div>`).join('');
+
+  const pct=Math.min(100,Math.round((sales/target)*100));
+  $('iqTargetText').textContent=rupiah(target);$('iqTargetMeta').textContent=txCount?`${rupiah(sales)} tercapai • ${pct}%`:'Belum ada transaksi';$('iqTargetBar').style.width=pct+'%';
+
+  const hours={}; today.forEach(r=>{const h=new Date(r.date).getHours();hours[h]=(hours[h]||0)+Number(r.total||0);});
+  const peak=Object.entries(hours).sort((a,b)=>b[1]-a[1])[0];
+  if(peak){const h=Number(peak[0]);$('iqPeakHour').textContent=String(h).padStart(2,'0')+':00–'+String((h+1)%24).padStart(2,'0')+':00';$('iqPeakHourMeta').textContent=rupiah(peak[1])+' omzet pada jam tersibuk';}else{$('iqPeakHour').textContent='—';$('iqPeakHourMeta').textContent='Belum ada transaksi hari ini';}
+
+  const mt=dashboardMenuTotals(today);const top=Object.entries(mt).sort((a,b)=>b[1].total-a[1].total).slice(0,3);
+  $('iqTopProfitLike').innerHTML=top.length?top.map(([n,v],i)=>`<div class="iq-top-row"><span>${i+1}. ${esc(n)}</span><b>${rupiah(v.total)}</b></div>`).join(''):'<div class="iq-mini-muted">Belum ada data penjualan.</div>';
+}
+
 function renderDashboard(){
   const dash=$('ownerDashboard');
   if(!dash||!session)return;
@@ -3537,6 +3603,7 @@ function renderDashboard(){
   }).join('') || '<div class="muted">Data stok belum tersedia.</div>';
 }
 
+  renderDashboardEnhancement();
 
 function getShiftOpening(){
   return Math.max(0,Number(sessionStorage.getItem('iqihlo_shift_opening')||0));
