@@ -37,7 +37,7 @@ main{padding:14px 14px 0}
 .cart{position:fixed;left:50%;transform:translateX(-50%);bottom:10px;width:min(736px,calc(100% - 20px));z-index:70;background:#181715;color:#fff;border-radius:21px;padding:10px 11px 10px 14px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 15px 45px #0004}
 .cart small{color:#c9c3bd}.cart strong{display:block;font-size:21px;margin-top:1px}.cart button{border:0;background:linear-gradient(135deg,#ffd044,#ff9c00);color:#1b1815;border-radius:15px;padding:13px 16px;font-weight:950}
 .modal{position:fixed;inset:0;background:#0008;z-index:100;display:flex;align-items:flex-end;justify-content:center}.sheet{width:min(760px,100%);max-height:90vh;overflow:auto;background:#fffaf4;border-radius:26px 26px 0 0;padding:18px 16px 26px}.sheethead{display:flex;justify-content:space-between;align-items:center}.sheet h2{margin:0}.close{width:38px;height:38px;border:0;border-radius:12px;background:#eee5dc;font-size:20px}.summary{background:#fff;border:1px solid var(--line);border-radius:17px;padding:12px;margin:12px 0}.sumline{display:flex;justify-content:space-between;padding:4px 0}.grand{font-size:20px;font-weight:950;border-top:1px dashed #ddd0c2;margin-top:7px;padding-top:9px}.pay{width:100%;border:1px solid #ded0c1;background:#fff;border-radius:13px;padding:12px}.primary{width:100%;margin-top:10px;border:0;background:#1b1815;color:#fff;border-radius:15px;padding:14px;font-weight:950}.orders{display:grid;gap:9px}.order{background:#fff;border:1px solid var(--line);border-radius:16px;padding:12px}.badge{display:inline-block;border-radius:999px;padding:5px 9px;background:#fff0d4;font-size:11px;font-weight:900}.muted{color:var(--muted)}
-.hidden{display:none!important}
+.hidden{display:none!important}.ratingbox{margin-top:9px;padding:10px;border-radius:13px;background:#fffaf3;border:1px solid #f0dfc8}.stars{display:flex;gap:4px;margin:7px 0}.starbtn{border:0;background:transparent;padding:2px;font-size:27px;color:#c9c9c9;cursor:pointer}.starbtn.on{color:#ff9b21}.review{width:100%;padding:10px;border:1px solid #ded0c1;border-radius:11px;background:#fff;resize:vertical}.ratebtn{border:0;background:#1b1815;color:#fff;border-radius:11px;padding:10px 12px;font-weight:900;width:100%}
 @media(min-width:650px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}.pic{height:145px}}
 </style>
 </head>
@@ -87,7 +87,7 @@ main{padding:14px 14px 0}
 const firebaseConfig={apiKey:"AIzaSyCVIeE-CDyaNDTU9DuvxKMRPY4wH-6Rp-o",authDomain:"iqihlo-es-teh.firebaseapp.com",projectId:"iqihlo-es-teh",storageBucket:"iqihlo-es-teh.firebasestorage.app",messagingSenderId:"382120711455",appId:"1:382120711455:web:5281431a89a3cf2de08c2a",measurementId:"G-VGG6XWQ5GL"};
 firebase.initializeApp(firebaseConfig);const auth=firebase.auth(),db=firebase.firestore();
 const FALLBACK=[['Es Teh',3000,'Es Teh'],['Es Jeruk Peras',5000,'Es Teh'],['Mocacino',5000,'Kopi Susu'],['Vanilla Latte',5000,'Kopi Susu'],['Coolant',5000,'Nutrisari'],['Chococino',5000,'Kopi Susu'],['Carebian Nut',5000,'Nutrisari'],['Mangga',4000,'Nutrisari'],['Jeruk Peras',4000,'Es Jeruk Peras'],['Cincau',4000,'Susu'],['Milky Orange',4000,'Nutrisari'],['Putih',5000,'Susu'],['Coklat',5000,'Susu'],['Matcha',5000,'Susu'],['Milo',5000,'Susu'],['Teh Tarik Maxtea',5000,'Teh Tarik Maxtea'],['Tora Bika Creamy',5000,'Kopi Susu'],['Indocafe',5000,'Kopi Susu'],['White Coffee',5000,'Kopi Susu'],['Kopi Kapal Api',3000,'Kopi Hitam'],['Kopi ABC',3000,'Kopi Hitam'],['Creamy',5000,'Goodday Latte'],['Butterscotch',5000,'Goodday Latte'],['Original',5000,'Goodday Latte'],['Air Putih Es',2000,'Air Putih'],['Air Putih Panas',2000,'Air Putih']];
-let menus=FALLBACK.map(x=>({n:x[0],p:x[1],c:x[2]})),cart={},uid=null,category='Semua',deliverySettings={storeLat:-6.991491,storeLng:110.377281,maxKm:8,zones:[{maxKm:2,fee:3000},{maxKm:4,fee:5000},{maxKm:6,fee:8000},{maxKm:8,fee:10000}]},customerCoords=null;
+let menus=FALLBACK.map(x=>({n:x[0],p:x[1],c:x[2]})),cart={},uid=null,category='Semua',deliverySettings={storeLat:null,storeLng:null,maxKm:8,zones:[{maxKm:2,fee:3000},{maxKm:4,fee:5000},{maxKm:6,fee:8000},{maxKm:8,fee:10000}]},customerCoords=null;
 const rp=n=>new Intl.NumberFormat('id-ID',{style:'currency',currency:'IDR',maximumFractionDigits:0}).format(Number(n)||0);
 const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 function cats(){const list=['Semua',...Array.from(new Set(menus.map(m=>m.c).filter(Boolean)))];document.querySelector('#cats').innerHTML=list.map(c=>`<button class="cat ${c===category?'active':''}" onclick="setCat(${JSON.stringify(c)})">${esc(c)}</button>`).join('')}
@@ -117,20 +117,7 @@ async function syncMenus(){
  try{const snap=await db.collection('app_data').doc('iqihlo_menus_v7').get();if(snap.exists&&Array.isArray(snap.data()?.data)&&snap.data().data.length){menus=snap.data().data.map(m=>({n:m.n,p:Number(m.p)||0,c:m.c||'Lainnya',img:m.img||''}));category='Semua';cats();render()}}catch(e){console.warn('Menu cloud belum bisa dibaca',e)}
 }
 async function syncDelivery(){
- try{
-  const snap=await db.collection('app_data').doc('iqihlo_delivery_settings_v1').get();
-  if(snap.exists&&snap.data()?.data) deliverySettings=Object.assign(deliverySettings,snap.data().data);
- }catch(e){console.warn('Delivery settings lama belum tersedia',e)}
- try{
-  const store=await db.collection('app_data').doc('iqihlo_accounts_v7').collection('store_settings').doc('main').get();
-  if(store.exists){
-   const d=store.data()||{};
-   if(Number.isFinite(Number(d.latitude))) deliverySettings.storeLat=Number(d.latitude);
-   if(Number.isFinite(Number(d.longitude))) deliverySettings.storeLng=Number(d.longitude);
-   if(d.Address && !deliverySettings.storeAddress) deliverySettings.storeAddress=String(d.Address);
-   if(d.address && !deliverySettings.storeAddress) deliverySettings.storeAddress=String(d.address);
-  }
- }catch(e){console.warn('Koordinat toko belum tersedia',e)}
+ try{const snap=await db.collection('app_data').doc('iqihlo_delivery_settings_v1').get();if(snap.exists&&snap.data()?.data)deliverySettings=Object.assign(deliverySettings,snap.data().data)}catch(e){console.warn('Delivery settings belum tersedia',e)}
 }
 function openCheckout(){if(!Object.keys(cart).length)return alert('Keranjang masih kosong.');document.querySelector('#modal').classList.remove('hidden');updateCheckout()}
 function closeCheckout(){document.querySelector('#modal').classList.add('hidden')}
@@ -156,11 +143,14 @@ async function checkout(){
  if(!name||!phone||!address)return alert('Nama, nomor HP, dan alamat wajib diisi.');
  if(!customerCoords||deliverySettings.storeLat==null||deliverySettings.storeLng==null)return alert('Ambil lokasi terlebih dahulu agar ongkir dapat dihitung.');
  if(x.fee===null)return alert('Alamat berada di luar jangkauan delivery.');
- const ref=await db.collection('orders').add({customerUid:uid,name,phone,address,payment,items:x.items,subtotal:x.sub,deliveryFee:x.fee,distanceKm:Number(x.km.toFixed(2)),total:x.sub+x.fee,customerLat:customerCoords.lat,customerLng:customerCoords.lng,status:'BARU',courierUid:null,courierName:null,createdAt:firebase.firestore.FieldValue.serverTimestamp(),updatedAt:firebase.firestore.FieldValue.serverTimestamp()});
- cart={};render();closeCheckout();alert('Pesanan berhasil dikirim. Nomor: '+ref.id.slice(-8).toUpperCase());loadOrders()
+ const ref=await db.collection('orders').add({customerUid:uid,name,phone,address,payment,items:x.items,subtotal:x.sub,deliveryFee:x.fee,distanceKm:Number(x.km.toFixed(2)),total:x.sub+x.fee,customerLat:customerCoords.lat,customerLng:customerCoords.lng,status:'BARU',courierUid:null,courierName:null,kasirStatus:'BARU',kasirProcessedAt:null,createdAt:firebase.firestore.FieldValue.serverTimestamp(),updatedAt:firebase.firestore.FieldValue.serverTimestamp()});
+ try{await db.collection('activity').add({type:'ORDER_NEW',orderId:ref.id,userUid:uid,userName:name,role:'PELANGGAN',detail:'Pelanggan membuat pesanan online',createdAt:firebase.firestore.FieldValue.serverTimestamp()})}catch(e){console.warn('Activity order gagal',e)}cart={};render();closeCheckout();alert('Pesanan berhasil dikirim. Nomor: '+ref.id.slice(-8).toUpperCase());loadOrders()
 }
-async function loadOrders(){if(!uid)return;const el=document.querySelector('#orders');try{const snap=await db.collection('orders').where('customerUid','==',uid).orderBy('createdAt','desc').limit(10).get();document.querySelector('#orderCount').textContent=snap.size+' pesanan';el.innerHTML=snap.empty?'<div class="empty">Belum ada pesanan.</div>':snap.docs.map(d=>{const o=d.data();return `<div class="order"><span class="badge">${esc(o.status||'BARU')}</span><br><b>${esc(d.id.slice(-8).toUpperCase())}</b> • ${rp(o.total||0)}<br><span class="muted">${esc(o.distanceKm??'-')} km • ongkir ${rp(o.deliveryFee||0)}</span></div>`}).join('')}catch(e){el.innerHTML='<div class="empty">Riwayat pesanan belum dapat dimuat.</div>'}}
-auth.signInAnonymously().then(c=>{uid=c.user.uid;Promise.all([syncMenus(),syncDelivery(),loadOrders()])}).catch(e=>console.error(e));
+async function loadOrders(){if(!uid)return;const el=document.querySelector('#orders');try{const snap=await db.collection('orders').where('customerUid','==',uid).limit(20).get();const docs=snap.docs.sort((a,b)=>(b.data().createdAt?.seconds||0)-(a.data().createdAt?.seconds||0));document.querySelector('#orderCount').textContent=docs.length+' pesanan';el.innerHTML=!docs.length?'<div class="empty">Belum ada pesanan.</div>':docs.map(d=>{const o=d.data();const rating=o.courierRating?`<div class="muted">⭐ Rating kurir: ${esc(o.courierRating)}/5${o.courierReview?` • ${esc(o.courierReview)}`:''}</div>`:'';const rate=(o.status==='SELESAI'&&o.courierUid&&!o.courierRating)?`<div class="ratingbox"><b>Beri penilaian kurir</b><div class="stars" id="stars_${d.id}">${[1,2,3,4,5].map(n=>`<button class="starbtn" onclick="setRating('${d.id}',${n})">★</button>`).join('')}</div><textarea class="review" id="review_${d.id}" rows="2" placeholder="Komentar untuk kurir (opsional)"></textarea><br><button class="ratebtn" onclick="submitRating('${d.id}')">KIRIM RATING</button></div>`:'';return `<div class="order"><span class="badge">${esc(o.status||'BARU')}</span><br><b>${esc(d.id.slice(-8).toUpperCase())}</b> • ${rp(o.total||0)}<br><span class="muted">${esc(o.distanceKm??'-')} km • ongkir ${rp(o.deliveryFee||0)}${o.courierName?` • Kurir: ${esc(o.courierName)}`:''}</span>${rating}${rate}</div>`}).join('')}catch(e){el.innerHTML='<div class="empty">Riwayat pesanan belum dapat dimuat.</div>'}}
+let selectedRatings={};
+function setRating(id,n){selectedRatings[id]=n;const box=document.querySelector('#stars_'+id);if(box)box.innerHTML=[1,2,3,4,5].map(x=>`<button class="starbtn ${x<=n?'on':''}" onclick="setRating('${id}',${x})">★</button>`).join('')}
+async function submitRating(id){const rating=selectedRatings[id];if(!rating)return alert('Pilih bintang terlebih dahulu.');const review=(document.querySelector('#review_'+id)?.value||'').trim();if(!confirm(`Kirim rating ${rating} bintang untuk kurir?`))return;try{await db.collection('orders').doc(id).update({courierRating:rating,courierReview:review,courierRatedAt:firebase.firestore.FieldValue.serverTimestamp(),updatedAt:firebase.firestore.FieldValue.serverTimestamp()});alert('Terima kasih. Rating kurir berhasil dikirim.');delete selectedRatings[id];await loadOrders()}catch(e){alert('Rating gagal dikirim: '+(e.message||e))}}
+auth.signInAnonymously().then(c=>{uid=c.user.uid;Promise.all([syncMenus(),syncDelivery(),loadOrders()]);setInterval(loadOrders,15000)}).catch(e=>console.error(e));
 cats();render();
 </script>
 </body>
