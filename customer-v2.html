@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#ff8a00">
+<title>IQIHLO ES TEH — Pesan Antar</title>
+<style>
+:root{
+ --orange:#ff8a00;--orange2:#ffb300;--cream:#fff8ee;--ink:#211a16;--muted:#766b63;
+ --line:#eadfd2;--card:#fff;--dark:#171513;--green:#159447;--red:#c43b2e
+}
+*{box-sizing:border-box}html,body{margin:0;background:#f1ece6;color:var(--ink);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+button,input,textarea,select{font:inherit}button{cursor:pointer;touch-action:manipulation}
+body{min-height:100vh}.app{max-width:760px;margin:auto;min-height:100vh;background:var(--cream);padding-bottom:108px}
+.top{position:sticky;top:0;z-index:50;background:rgba(255,250,244,.95);backdrop-filter:blur(16px);border-bottom:1px solid var(--line);padding:13px 16px 11px}
+.brand{font-weight:950;font-size:22px;letter-spacing:-.6px}.sub{color:var(--muted);font-size:12px;margin-top:2px}
+main{padding:14px 14px 0}
+.hero{border-radius:26px;padding:22px 20px;background:linear-gradient(135deg,#ffd45b,#ff7d20);color:#fff;box-shadow:0 15px 35px #f28a302b;overflow:hidden;position:relative}
+.hero:after{content:"🧋";position:absolute;right:12px;bottom:-17px;font-size:82px;opacity:.18;transform:rotate(-8deg)}
+.hero h1{margin:0 0 6px;font-size:30px;line-height:1.05}.hero p{margin:0;max-width:75%;font-size:14px;line-height:1.45}
+.section{margin-top:19px}.head{display:flex;align-items:end;justify-content:space-between;margin-bottom:10px}.head h2{margin:0;font-size:20px}.head small{color:var(--muted)}
+.cats{display:flex;gap:8px;overflow:auto;padding:2px 1px 5px;scrollbar-width:none}.cats::-webkit-scrollbar{display:none}
+.cat{flex:0 0 auto;border:1px solid var(--line);background:#fff;border-radius:999px;padding:9px 14px;font-weight:850;color:#6e625a}.cat.active{background:#1b1815;color:#fff;border-color:#1b1815}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
+.card{background:#fff;border:1px solid var(--line);border-radius:21px;padding:9px;box-shadow:0 5px 18px #6e4a2210;overflow:hidden}
+.pic{height:132px;border-radius:16px;background:linear-gradient(145deg,#fff2cf,#fff);display:flex;align-items:center;justify-content:center;overflow:hidden}
+.pic img{width:100%;height:100%;object-fit:cover;display:block}.svgpic{width:100%;height:100%}
+.cardbody{padding:10px 4px 4px}.name{font-weight:900;font-size:15px;line-height:1.2;min-height:37px}.price{font-weight:900;margin-top:5px}.stock{font-size:11px;color:var(--muted);margin-top:2px}
+.addrow{display:flex;align-items:center;justify-content:space-between;margin-top:9px}.qty{display:flex;align-items:center;gap:6px}.qty button{width:34px;height:34px;border-radius:11px;border:0;background:#ff7d0b;color:#fff;font-size:21px;font-weight:900}.qty span{min-width:22px;text-align:center;font-weight:900}
+.plus{width:38px;height:38px;border-radius:13px;background:#1b1815;color:#fff;border:0;font-size:22px;font-weight:900}
+.empty{padding:22px;text-align:center;color:var(--muted);background:#fff;border:1px dashed var(--line);border-radius:18px}
+.info{background:#fff;border:1px solid var(--line);border-radius:20px;padding:14px}.notice{font-size:12px;color:var(--muted);line-height:1.45}
+.form{display:grid;gap:9px}.field{width:100%;border:1px solid #ded0c1;background:#fff;border-radius:13px;padding:12px 13px;outline:none}.field:focus{border-color:#ff9a2b;box-shadow:0 0 0 3px #ff9a2b20}
+.locrow{display:flex;gap:8px}.locrow .field{min-width:0}.locbtn{border:0;background:#1b1815;color:#fff;border-radius:13px;padding:0 13px;font-weight:850;white-space:nowrap}
+.deliverybox{background:#fff7e5;border:1px solid #f5d596;border-radius:15px;padding:11px;font-size:13px;line-height:1.5}.deliverybox b{font-size:15px}
+.cart{position:fixed;left:50%;transform:translateX(-50%);bottom:10px;width:min(736px,calc(100% - 20px));z-index:70;background:#181715;color:#fff;border-radius:21px;padding:10px 11px 10px 14px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 15px 45px #0004}
+.cart small{color:#c9c3bd}.cart strong{display:block;font-size:21px;margin-top:1px}.cart button{border:0;background:linear-gradient(135deg,#ffd044,#ff9c00);color:#1b1815;border-radius:15px;padding:13px 16px;font-weight:950}
+.modal{position:fixed;inset:0;background:#0008;z-index:100;display:flex;align-items:flex-end;justify-content:center}.sheet{width:min(760px,100%);max-height:90vh;overflow:auto;background:#fffaf4;border-radius:26px 26px 0 0;padding:18px 16px 26px}.sheethead{display:flex;justify-content:space-between;align-items:center}.sheet h2{margin:0}.close{width:38px;height:38px;border:0;border-radius:12px;background:#eee5dc;font-size:20px}.summary{background:#fff;border:1px solid var(--line);border-radius:17px;padding:12px;margin:12px 0}.sumline{display:flex;justify-content:space-between;padding:4px 0}.grand{font-size:20px;font-weight:950;border-top:1px dashed #ddd0c2;margin-top:7px;padding-top:9px}.pay{width:100%;border:1px solid #ded0c1;background:#fff;border-radius:13px;padding:12px}.primary{width:100%;margin-top:10px;border:0;background:#1b1815;color:#fff;border-radius:15px;padding:14px;font-weight:950}.orders{display:grid;gap:9px}.order{background:#fff;border:1px solid var(--line);border-radius:16px;padding:12px}.badge{display:inline-block;border-radius:999px;padding:5px 9px;background:#fff0d4;font-size:11px;font-weight:900}.muted{color:var(--muted)}
+.hidden{display:none!important}
+@media(min-width:650px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}.pic{height:145px}}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top"><div class="brand">IQIHLO ES TEH</div><div class="sub">Pesan dari rumah • diantar ke alamat</div></header>
+<main>
+<section class="hero"><h1>Haus? Tinggal Pesan.</h1><p>Pilih minuman, gorengan, atau jajanan. Kami siapkan dan antar ke alamatmu.</p></section>
+
+<section class="section">
+ <div class="head"><h2>Mau pesan apa?</h2><small id="menuHint">Pilih kategori</small></div>
+ <div id="cats" class="cats"></div>
+</section>
+
+<section class="section">
+ <div id="menu" class="grid"></div>
+</section>
+
+<section class="section">
+ <div class="head"><h2>Pesanan saya</h2><small id="orderCount"></small></div>
+ <div id="orders" class="orders"><div class="empty">Belum ada pesanan.</div></div>
+</section>
+</main>
+<div class="cart"><div><small><span id="qty">0</span> item • ongkir dihitung saat checkout</small><strong id="total">Rp0</strong></div><button onclick="openCheckout()">PESAN SEKARANG</button></div>
+</div>
+
+<div id="modal" class="modal hidden" onclick="if(event.target===this)closeCheckout()">
+<div class="sheet">
+ <div class="sheethead"><h2>Konfirmasi Pesanan</h2><button class="close" onclick="closeCheckout()">×</button></div>
+ <div id="summary" class="summary"></div>
+ <div class="form">
+  <input id="name" class="field" placeholder="Nama penerima">
+  <input id="phone" class="field" inputmode="tel" placeholder="Nomor WhatsApp / HP">
+  <div class="locrow"><input id="address" class="field" placeholder="Alamat lengkap + patokan rumah"><button class="locbtn" onclick="useLocation()">📍 Lokasi</button></div>
+  <div id="locationStatus" class="notice">Tekan “Lokasi” agar jarak pengantaran dapat dihitung. Jika tidak tersedia, masukkan alamat dan admin/kurir dapat mengonfirmasi.</div>
+  <select id="payment" class="pay"><option value="COD">COD — Bayar saat diterima</option><option value="QRIS">QRIS</option><option value="TRANSFER">Transfer</option></select>
+ </div>
+ <div id="deliveryBox" class="deliverybox" style="margin-top:10px">Ongkir belum dihitung.</div>
+ <button class="primary" onclick="checkout()">KIRIM PESANAN</button>
+</div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/12.9.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.9.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore-compat.js"></script>
+<script>
+const firebaseConfig={apiKey:"AIzaSyCVIeE-CDyaNDTU9DuvxKMRPY4wH-6Rp-o",authDomain:"iqihlo-es-teh.firebaseapp.com",projectId:"iqihlo-es-teh",storageBucket:"iqihlo-es-teh.firebasestorage.app",messagingSenderId:"382120711455",appId:"1:382120711455:web:5281431a89a3cf2de08c2a",measurementId:"G-VGG6XWQ5GL"};
+firebase.initializeApp(firebaseConfig);const auth=firebase.auth(),db=firebase.firestore();
+const FALLBACK=[['Es Teh',3000,'Es Teh'],['Es Jeruk Peras',5000,'Es Teh'],['Mocacino',5000,'Kopi Susu'],['Vanilla Latte',5000,'Kopi Susu'],['Coolant',5000,'Nutrisari'],['Chococino',5000,'Kopi Susu'],['Carebian Nut',5000,'Nutrisari'],['Mangga',4000,'Nutrisari'],['Jeruk Peras',4000,'Es Jeruk Peras'],['Cincau',4000,'Susu'],['Milky Orange',4000,'Nutrisari'],['Putih',5000,'Susu'],['Coklat',5000,'Susu'],['Matcha',5000,'Susu'],['Milo',5000,'Susu'],['Teh Tarik Maxtea',5000,'Teh Tarik Maxtea'],['Tora Bika Creamy',5000,'Kopi Susu'],['Indocafe',5000,'Kopi Susu'],['White Coffee',5000,'Kopi Susu'],['Kopi Kapal Api',3000,'Kopi Hitam'],['Kopi ABC',3000,'Kopi Hitam'],['Creamy',5000,'Goodday Latte'],['Butterscotch',5000,'Goodday Latte'],['Original',5000,'Goodday Latte'],['Air Putih Es',2000,'Air Putih'],['Air Putih Panas',2000,'Air Putih']];
+let menus=FALLBACK.map(x=>({n:x[0],p:x[1],c:x[2]})),cart={},uid=null,category='Semua',deliverySettings={storeLat:null,storeLng:null,maxKm:8,zones:[{maxKm:2,fee:3000},{maxKm:4,fee:5000},{maxKm:6,fee:8000},{maxKm:8,fee:10000}]},customerCoords=null;
+const rp=n=>new Intl.NumberFormat('id-ID',{style:'currency',currency:'IDR',maximumFractionDigits:0}).format(Number(n)||0);
+const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+function cats(){const list=['Semua',...Array.from(new Set(menus.map(m=>m.c).filter(Boolean)))];document.querySelector('#cats').innerHTML=list.map(c=>`<button class="cat ${c===category?'active':''}" onclick="setCat(${JSON.stringify(c)})">${esc(c)}</button>`).join('')}
+function setCat(c){category=c;cats();render()}
+function illustration(m){
+ const n=(m.n||'').toLowerCase(), c=(m.c||'').toLowerCase();
+ let bg='#ffd66b', body='#a85b22', accent='#ff8b00', icon='🥤';
+ if(c.includes('gorengan')||/bakwan|tahu|tempe|risol|pisang|cireng|ubi|bakso/.test(n)){bg='#ffe0a8';body='#c96b16';accent='#8d4a13';icon='🍢'}
+ else if(c.includes('jajan')||c.includes('jajanan')||/roti|donat|kue|kerupuk|snack|wafer/.test(n)){bg='#ffd4e5';body='#b33c62';accent='#ff8b2c';icon='🍩'}
+ else if(n.includes('kopi')||c.includes('kopi')||n.includes('goodday')){bg='#ead2bc';body='#6d351d';accent='#c08b55';icon='☕'}
+ else if(n.includes('jeruk')||c.includes('nutri')){bg='#ffe47b';body='#f19a17';accent='#6db83e';icon='🍊'}
+ const id='g'+Math.random().toString(36).slice(2);
+ return `<svg class="svgpic" viewBox="0 0 300 190" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="${id}" x1="0" y1="0" x2="1" y2="1"><stop stop-color="${bg}"/><stop offset="1" stop-color="#fff"/></linearGradient></defs><rect width="300" height="190" rx="24" fill="url(#${id})"/><ellipse cx="150" cy="165" rx="62" ry="9" fill="#0002"/><rect x="102" y="56" width="96" height="99" rx="18" fill="${body}" stroke="#fff" stroke-width="5"/><ellipse cx="150" cy="57" rx="49" ry="14" fill="#fff8" stroke="${accent}" stroke-width="4"/><path d="M167 48 L213 12" stroke="${accent}" stroke-width="7" stroke-linecap="round"/><text x="150" y="121" text-anchor="middle" font-size="42">${icon}</text></svg>`
+}
+function pic(m){if(m.img){return `<img src="${esc(m.img)}" alt="${esc(m.n)}" onerror="this.outerHTML=illustration(${JSON.stringify(m).replace(/</g,'\\u003c')})">`}return illustration(m)}
+function render(){
+ const list=menus.filter(m=>category==='Semua'||m.c===category);
+ document.querySelector('#menu').innerHTML=list.length?list.map((m)=>{
+  const i=menus.indexOf(m),q=cart[i]||0;
+  return `<article class="card"><div class="pic">${pic(m)}</div><div class="cardbody"><div class="name">${esc(m.n)}</div><div class="price">${rp(m.p)}</div><div class="stock">${q?'Dipilih '+q+' • ':''}Siap dipesan</div><div class="addrow"><div class="qty"><button onclick="add(${i},-1)">−</button><span>${q}</span><button onclick="add(${i},1)">+</button></div><button class="plus" onclick="add(${i},1)">+</button></div></div></article>`
+ }).join(''):'<div class="empty" style="grid-column:1/-1">Belum ada menu di kategori ini. Owner dapat menambahkannya dari kotak KELOLA MENU.</div>';
+ const q=Object.values(cart).reduce((a,b)=>a+b,0),t=menus.reduce((s,m,i)=>s+(cart[i]||0)*Number(m.p),0);
+ document.querySelector('#qty').textContent=q;document.querySelector('#total').textContent=rp(t);
+}
+function add(i,d){cart[i]=Math.max(0,(cart[i]||0)+d);if(!cart[i])delete cart[i];render();if(!document.querySelector('#modal').classList.contains('hidden'))updateCheckout()}
+async function syncMenus(){
+ try{const snap=await db.collection('app_data').doc('iqihlo_menus_v7').get();if(snap.exists&&Array.isArray(snap.data()?.data)&&snap.data().data.length){menus=snap.data().data.map(m=>({n:m.n,p:Number(m.p)||0,c:m.c||'Lainnya',img:m.img||''}));category='Semua';cats();render()}}catch(e){console.warn('Menu cloud belum bisa dibaca',e)}
+}
+async function syncDelivery(){
+ try{const snap=await db.collection('app_data').doc('iqihlo_delivery_settings_v1').get();if(snap.exists&&snap.data()?.data)deliverySettings=Object.assign(deliverySettings,snap.data().data)}catch(e){console.warn('Delivery settings belum tersedia',e)}
+}
+function openCheckout(){if(!Object.keys(cart).length)return alert('Keranjang masih kosong.');document.querySelector('#modal').classList.remove('hidden');updateCheckout()}
+function closeCheckout(){document.querySelector('#modal').classList.add('hidden')}
+function hav(a,b,c,d){const R=6371,rad=x=>x*Math.PI/180,la=rad(c-a),lo=rad(d-b),x=Math.sin(la/2)**2+Math.cos(rad(a))*Math.cos(rad(c))*Math.sin(lo/2)**2;return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x))}
+function feeFor(km){for(const z of (deliverySettings.zones||[]).slice().sort((a,b)=>a.maxKm-b.maxKm)){if(km<=Number(z.maxKm))return Number(z.fee)||0}return null}
+function updateCheckout(){
+ const items=Object.entries(cart).filter(([i,q])=>q>0).map(([i,q])=>({name:menus[i].n,price:Number(menus[i].p),qty:q}));
+ const sub=items.reduce((s,x)=>s+x.price*x.qty,0),f=document.querySelector('#deliveryBox');
+ let fee=0,km=null;
+ if(customerCoords&&deliverySettings.storeLat!=null&&deliverySettings.storeLng!=null){km=hav(Number(deliverySettings.storeLat),Number(deliverySettings.storeLng),customerCoords.lat,customerCoords.lng);fee=feeFor(km);f.innerHTML=fee===null?`<b>Di luar jangkauan</b><br>Maksimal pengantaran ${deliverySettings.maxKm} km.`:`<b>Jarak ${km.toFixed(1)} km</b><br>Ongkir: <b>${rp(fee)}</b><br>Tidak ada minimal pembelian.`}
+ else f.innerHTML='<b>Ongkir belum dihitung.</b><br>Tekan 📍 Lokasi agar sistem menghitung jarak dari toko.';
+ document.querySelector('#summary').innerHTML=items.map(x=>`<div class="sumline"><span>${esc(x.name)} × ${x.qty}</span><b>${rp(x.price*x.qty)}</b></div>`).join('')+`<div class="sumline"><span>Subtotal</span><b>${rp(sub)}</b></div><div class="sumline"><span>Ongkir</span><b>${fee===null?'—':rp(fee)}</b></div><div class="sumline grand"><span>Total</span><b>${fee===null?'—':rp(sub+fee)}</b></div>`;
+ return {items,sub,fee,km}
+}
+function useLocation(){
+ if(!navigator.geolocation)return alert('HP ini tidak menyediakan lokasi.');
+ document.querySelector('#locationStatus').textContent='Mengambil lokasi… izinkan akses lokasi jika diminta.';
+ navigator.geolocation.getCurrentPosition(pos=>{customerCoords={lat:pos.coords.latitude,lng:pos.coords.longitude};document.querySelector('#locationStatus').textContent='Lokasi berhasil diambil.';updateCheckout()},err=>{document.querySelector('#locationStatus').textContent='Lokasi tidak dapat diambil. Pastikan GPS aktif dan izin lokasi diberikan.';alert('Lokasi tidak berhasil diambil.')},{enableHighAccuracy:true,timeout:10000,maximumAge:60000})
+}
+async function checkout(){
+ const x=updateCheckout();if(!x.items.length)return alert('Keranjang kosong.');
+ const name=document.querySelector('#name').value.trim(),phone=document.querySelector('#phone').value.trim(),address=document.querySelector('#address').value.trim(),payment=document.querySelector('#payment').value;
+ if(!name||!phone||!address)return alert('Nama, nomor HP, dan alamat wajib diisi.');
+ if(!customerCoords||deliverySettings.storeLat==null||deliverySettings.storeLng==null)return alert('Ambil lokasi terlebih dahulu agar ongkir dapat dihitung.');
+ if(x.fee===null)return alert('Alamat berada di luar jangkauan delivery.');
+ const ref=await db.collection('orders').add({customerUid:uid,name,phone,address,payment,items:x.items,subtotal:x.sub,deliveryFee:x.fee,distanceKm:Number(x.km.toFixed(2)),total:x.sub+x.fee,customerLat:customerCoords.lat,customerLng:customerCoords.lng,status:'BARU',courierUid:null,courierName:null,createdAt:firebase.firestore.FieldValue.serverTimestamp(),updatedAt:firebase.firestore.FieldValue.serverTimestamp()});
+ cart={};render();closeCheckout();alert('Pesanan berhasil dikirim. Nomor: '+ref.id.slice(-8).toUpperCase());loadOrders()
+}
+async function loadOrders(){if(!uid)return;const el=document.querySelector('#orders');try{const snap=await db.collection('orders').where('customerUid','==',uid).orderBy('createdAt','desc').limit(10).get();document.querySelector('#orderCount').textContent=snap.size+' pesanan';el.innerHTML=snap.empty?'<div class="empty">Belum ada pesanan.</div>':snap.docs.map(d=>{const o=d.data();return `<div class="order"><span class="badge">${esc(o.status||'BARU')}</span><br><b>${esc(d.id.slice(-8).toUpperCase())}</b> • ${rp(o.total||0)}<br><span class="muted">${esc(o.distanceKm??'-')} km • ongkir ${rp(o.deliveryFee||0)}</span></div>`}).join('')}catch(e){el.innerHTML='<div class="empty">Riwayat pesanan belum dapat dimuat.</div>'}}
+auth.signInAnonymously().then(c=>{uid=c.user.uid;Promise.all([syncMenus(),syncDelivery(),loadOrders()])}).catch(e=>console.error(e));
+cats();render();
+</script>
+</body>
+</html>
