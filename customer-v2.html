@@ -87,7 +87,7 @@ main{padding:14px 14px 0}
 const firebaseConfig={apiKey:"AIzaSyCVIeE-CDyaNDTU9DuvxKMRPY4wH-6Rp-o",authDomain:"iqihlo-es-teh.firebaseapp.com",projectId:"iqihlo-es-teh",storageBucket:"iqihlo-es-teh.firebasestorage.app",messagingSenderId:"382120711455",appId:"1:382120711455:web:5281431a89a3cf2de08c2a",measurementId:"G-VGG6XWQ5GL"};
 firebase.initializeApp(firebaseConfig);const auth=firebase.auth(),db=firebase.firestore();
 const FALLBACK=[['Es Teh',3000,'Es Teh'],['Es Jeruk Peras',5000,'Es Teh'],['Mocacino',5000,'Kopi Susu'],['Vanilla Latte',5000,'Kopi Susu'],['Coolant',5000,'Nutrisari'],['Chococino',5000,'Kopi Susu'],['Carebian Nut',5000,'Nutrisari'],['Mangga',4000,'Nutrisari'],['Jeruk Peras',4000,'Es Jeruk Peras'],['Cincau',4000,'Susu'],['Milky Orange',4000,'Nutrisari'],['Putih',5000,'Susu'],['Coklat',5000,'Susu'],['Matcha',5000,'Susu'],['Milo',5000,'Susu'],['Teh Tarik Maxtea',5000,'Teh Tarik Maxtea'],['Tora Bika Creamy',5000,'Kopi Susu'],['Indocafe',5000,'Kopi Susu'],['White Coffee',5000,'Kopi Susu'],['Kopi Kapal Api',3000,'Kopi Hitam'],['Kopi ABC',3000,'Kopi Hitam'],['Creamy',5000,'Goodday Latte'],['Butterscotch',5000,'Goodday Latte'],['Original',5000,'Goodday Latte'],['Air Putih Es',2000,'Air Putih'],['Air Putih Panas',2000,'Air Putih']];
-let menus=FALLBACK.map(x=>({n:x[0],p:x[1],c:x[2]})),cart={},uid=null,category='Semua',deliverySettings={storeLat:null,storeLng:null,maxKm:8,zones:[{maxKm:2,fee:3000},{maxKm:4,fee:5000},{maxKm:6,fee:8000},{maxKm:8,fee:10000}]},customerCoords=null;
+let menus=FALLBACK.map(x=>({n:x[0],p:x[1],c:x[2]})),cart={},uid=null,category='Semua',deliverySettings={storeLat:-6.991491,storeLng:110.377281,maxKm:8,zones:[{maxKm:2,fee:3000},{maxKm:4,fee:5000},{maxKm:6,fee:8000},{maxKm:8,fee:10000}]},customerCoords=null;
 const rp=n=>new Intl.NumberFormat('id-ID',{style:'currency',currency:'IDR',maximumFractionDigits:0}).format(Number(n)||0);
 const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 function cats(){const list=['Semua',...Array.from(new Set(menus.map(m=>m.c).filter(Boolean)))];document.querySelector('#cats').innerHTML=list.map(c=>`<button class="cat ${c===category?'active':''}" onclick="setCat(${JSON.stringify(c)})">${esc(c)}</button>`).join('')}
@@ -117,7 +117,20 @@ async function syncMenus(){
  try{const snap=await db.collection('app_data').doc('iqihlo_menus_v7').get();if(snap.exists&&Array.isArray(snap.data()?.data)&&snap.data().data.length){menus=snap.data().data.map(m=>({n:m.n,p:Number(m.p)||0,c:m.c||'Lainnya',img:m.img||''}));category='Semua';cats();render()}}catch(e){console.warn('Menu cloud belum bisa dibaca',e)}
 }
 async function syncDelivery(){
- try{const snap=await db.collection('app_data').doc('iqihlo_delivery_settings_v1').get();if(snap.exists&&snap.data()?.data)deliverySettings=Object.assign(deliverySettings,snap.data().data)}catch(e){console.warn('Delivery settings belum tersedia',e)}
+ try{
+  const snap=await db.collection('app_data').doc('iqihlo_delivery_settings_v1').get();
+  if(snap.exists&&snap.data()?.data) deliverySettings=Object.assign(deliverySettings,snap.data().data);
+ }catch(e){console.warn('Delivery settings lama belum tersedia',e)}
+ try{
+  const store=await db.collection('app_data').doc('iqihlo_accounts_v7').collection('store_settings').doc('main').get();
+  if(store.exists){
+   const d=store.data()||{};
+   if(Number.isFinite(Number(d.latitude))) deliverySettings.storeLat=Number(d.latitude);
+   if(Number.isFinite(Number(d.longitude))) deliverySettings.storeLng=Number(d.longitude);
+   if(d.Address && !deliverySettings.storeAddress) deliverySettings.storeAddress=String(d.Address);
+   if(d.address && !deliverySettings.storeAddress) deliverySettings.storeAddress=String(d.address);
+  }
+ }catch(e){console.warn('Koordinat toko belum tersedia',e)}
 }
 function openCheckout(){if(!Object.keys(cart).length)return alert('Keranjang masih kosong.');document.querySelector('#modal').classList.remove('hidden');updateCheckout()}
 function closeCheckout(){document.querySelector('#modal').classList.add('hidden')}
