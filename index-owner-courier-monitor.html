@@ -1017,6 +1017,7 @@ body.iq-owner-focus #ownerDashboard{display:block !important}
     <div class="iqcm-kpi"><small>Rating</small><b id="iqcmRating">—</b></div>
   </div>
   <div class="iqcm-grid">
+    <div class="iqcm-box"><h4>Pesanan Baru Pelanggan</h4><div id="iqcmNewOrders" class="iqcm-list"><div class="muted">Memuat...</div></div></div>
     <div class="iqcm-box"><h4>Transaksi Kurir</h4><div id="iqcmOrders" class="iqcm-list"><div class="muted">Memuat...</div></div></div>
     <div class="iqcm-box"><h4>Aktivitas Terbaru</h4><div id="iqcmActivity" class="iqcm-list"><div class="muted">Memuat...</div></div></div>
   </div>
@@ -4904,6 +4905,7 @@ window.addEventListener('beforeunload',()=>{try{if(session) updatePresence(true)
       const rated=courierOrders.filter(o=>Number(o.courierRating)>0);
       const avg=rated.length?rated.reduce((s,o)=>s+Number(o.courierRating),0)/rated.length:0;
       e('iqcmNew').textContent=fresh.length;e('iqcmProcess').textContent=proc.length;e('iqcmDeliver').textContent=del.length;e('iqcmRating').textContent=avg?avg.toFixed(1)+' ★':'—';
+       e('iqcmNewOrders').innerHTML=fresh.slice(0,30).map(o=>`<div class="iqcm-row"><b>#${esc2(o.id.slice(-8).toUpperCase())} • ${esc2(o.name||'Pelanggan')}</b> <span class="iqcm-status">BARU</span><div class="iqcm-meta">${esc2(o.phone||'-')} • ${rp2(o.total)}<br>${esc2(o.address||'-')}<br>${ts(o.createdAt)}</div></div>`).join('')||'<div class="muted">Tidak ada pesanan baru.</div>';
       e('iqcmOrders').innerHTML=courierOrders.slice(0,30).map(o=>`<div class="iqcm-row"><b>#${esc2(o.id.slice(-8).toUpperCase())} • ${esc2(o.courierName||'Kurir')}</b> <span class="iqcm-status ${o.status==='SELESAI'?'ok':''}">${esc2(o.status||'-')}</span><div class="iqcm-meta">${esc2(o.name||'Pelanggan')} • ${rp2(o.total)}<br>${esc2(o.phone||'-')}<br>${ts(o.updatedAt||o.createdAt)}${o.courierRating?`<br>⭐ ${esc2(o.courierRating)}/5${o.courierReview?` • ${esc2(o.courierReview)}`:''}`:''}</div></div>`).join('')||'<div class="muted">Belum ada transaksi kurir.</div>';
       const acts=as.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
       e('iqcmActivity').innerHTML=acts.slice(0,30).map(a=>`<div class="iqcm-row"><b>${esc2(a.type||'AKTIVITAS')}</b><div class="iqcm-meta">${esc2(a.userName||'-')} • ${esc2(a.role||'-')}<br>${esc2(a.detail||'-')}<br>${ts(a.createdAt)}</div></div>`).join('')||'<div class="muted">Belum ada aktivitas.</div>';
