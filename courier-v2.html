@@ -1,15 +1,61 @@
-<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>IQIHLO ES TEH — Kurir</title><style>
-:root{--p:#ff9b21;--bg:#f7f8fa;--ink:#202124;--muted:#6b7280;--line:#e6e8ec;--ok:#138a4b}*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:system-ui;color:var(--ink)}header{background:#fff;border-bottom:1px solid var(--line);padding:15px 16px;position:sticky;top:0;z-index:5}.brand{font-weight:900;font-size:20px}.sub{font-size:12px;color:var(--muted)}main{max-width:720px;margin:auto;padding:14px 14px 40px}.panel,.order{background:#fff;border:1px solid var(--line);border-radius:18px;padding:14px}.grid{display:grid;gap:10px}.order h3{margin:0 0 5px}.muted{color:var(--muted);font-size:13px}.money{font-size:20px;font-weight:900}.badge{display:inline-block;border-radius:999px;padding:5px 9px;background:#fff0dc;font-weight:800;font-size:12px}.row{display:flex;gap:8px}.row>*{flex:1}input,button{font:inherit}input{width:100%;padding:12px;border:1px solid #d9dce1;border-radius:12px}button{border:0;border-radius:12px;padding:11px 13px;font-weight:800}.primary{background:var(--p);color:#111}.dark{background:#202124;color:#fff}.danger{background:#ffe5e5;color:#9b1c1c}.hidden{display:none!important}a{color:#b35d00;font-weight:800}
-</style></head><body><header><div class="brand">IQIHLO ES TEH • KURIR</div><div class="sub" id="who">Belum login</div></header><main>
-<section id="login" class="panel"><h2>Login Kurir</h2><input id="email" type="email" placeholder="Email kurir"><br><br><input id="pass" type="password" placeholder="Password Firebase"><br><br><button class="primary" onclick="login()">MASUK</button><p class="muted">Akun kurir harus dibuat di Firebase Authentication dan diberi dokumen users/{uid} dengan role KURIR.</p></section>
-<section id="app" class="hidden"><div class="row"><button class="dark" onclick="loadOrders()">↻ Refresh</button><button class="danger" onclick="logout()">Keluar</button></div><br><div id="list" class="grid"></div></section></main>
-<script src="https://www.gstatic.com/firebasejs/12.9.0/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/12.9.0/firebase-auth-compat.js"></script><script src="https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore-compat.js"></script><script>
-const firebaseConfig={apiKey:"AIzaSyCVIeE-CDyaNDTU9DuvxKMRPY4wH-6Rp-o",authDomain:"iqihlo-es-teh.firebaseapp.com",projectId:"iqihlo-es-teh",storageBucket:"iqihlo-es-teh.firebasestorage.app",messagingSenderId:"382120711455",appId:"1:382120711455:web:5281431a89a3cf2de08c2a",measurementId:"G-VGG6XWQ5GL"};firebase.initializeApp(firebaseConfig);const auth=firebase.auth(),db=firebase.firestore();let me=null;
-const rp=n=>new Intl.NumberFormat('id-ID',{style:'currency',currency:'IDR',maximumFractionDigits:0}).format(n);const esc=s=>String(s||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-async function login(){let e=email.value.trim(),p=pass.value;if(!e||!p)return alert('Email dan password wajib.');try{let c=await auth.signInWithEmailAndPassword(e,p);let u=await db.collection('users').doc(c.user.uid).get();if(!u.exists||String(u.data().role||'').toUpperCase()!=='KURIR'){await auth.signOut();return alert('Akun ini bukan akun KURIR.');}me={uid:c.user.uid,name:u.data().name||e};document.querySelector('#login').classList.add('hidden');document.querySelector('#app').classList.remove('hidden');document.querySelector('#who').textContent=me.name;loadOrders()}catch(e){alert('Login gagal: '+(e.message||e))}}
-async function loadOrders(){if(!me)return;let q=await db.collection('orders').where('status','in',['BARU','DIPROSES','DIANTAR']).orderBy('createdAt','desc').limit(30).get().catch(()=>null);if(!q){list.innerHTML='<div class="panel">Pesanan belum bisa dibaca. Periksa Firestore Rules/index.</div>';return}list.innerHTML=q.empty?'<div class="panel">Tidak ada pesanan aktif.</div>':q.docs.map(d=>card(d.id,d.data())).join('')}
-function card(id,o){let items=(o.items||[]).map(x=>`${esc(x.name)} × ${x.qty}`).join(', ');let action='';if(o.status==='BARU')action=`<button class="primary" onclick="claim('${id}')">AMBIL PESANAN</button>`;else if(o.status==='DIPROSES'&&o.courierUid===me.uid)action=`<button class="primary" onclick="status('${id}','DIANTAR')">BERANGKAT ANTAR</button>`;else if(o.status==='DIANTAR'&&o.courierUid===me.uid)action=`<button class="dark" onclick="status('${id}','SELESAI')">SUDAH DITERIMA PELANGGAN</button>`;return `<article class="order"><h3>${esc(o.name)} <span class="badge">${esc(o.status)}</span></h3><div class="muted">${esc(o.phone)}<br>${esc(o.address)}</div><p>${items}</p><div class="money">${rp(o.total||0)}</div><div class="muted">Pembayaran: ${esc(o.payment||'COD')} • Jarak: ${esc(o.distanceKm??'-')} km • Ongkir: ${rp(o.deliveryFee||0)}</div>${o.customerLat&&o.customerLng?`<br><a href="https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(o.customerLat+','+o.customerLng)}" target="_blank">📍 BUKA RUTE DI MAPS</a>`:''}<br>${action}</article>`}
-async function claim(id){await db.collection('orders').doc(id).update({status:'DIPROSES',courierUid:me.uid,courierName:me.name,updatedAt:firebase.firestore.FieldValue.serverTimestamp()});loadOrders()}
-async function status(id,s){await db.collection('orders').doc(id).update({status:s,updatedAt:firebase.firestore.FieldValue.serverTimestamp()});loadOrders()}
-async function logout(){await auth.signOut();me=null;location.reload()}
-</script></body></html>
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#ff9b21">
+<title>IQIHLO ES TEH — Kurir</title>
+<style>
+:root{--p:#ff9b21;--bg:#f6f7f9;--ink:#202124;--muted:#6b7280;--line:#e5e7eb;--ok:#138a4b;--red:#b42318}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:system-ui,-apple-system,Segoe UI,sans-serif;color:var(--ink)}
+button,input{font:inherit}button{cursor:pointer;touch-action:manipulation;border:0;border-radius:13px;padding:12px 14px;font-weight:850}
+.top{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--line);padding:14px 16px}
+.brand{font-weight:950;font-size:20px}.sub{font-size:12px;color:var(--muted);margin-top:2px}
+main{max-width:760px;margin:auto;padding:14px 14px 40px}.panel,.order,.stat{background:#fff;border:1px solid var(--line);border-radius:18px;padding:14px}
+.grid{display:grid;gap:10px}.row{display:flex;gap:8px}.row>*{flex:1}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}.stat b{display:block;font-size:20px}.stat small{color:var(--muted)}
+input{width:100%;padding:12px;border:1px solid #d9dce1;border-radius:12px;outline:0}input:focus{border-color:var(--p);box-shadow:0 0 0 3px #ff9b2120}
+.primary{background:var(--p);color:#111}.dark{background:#202124;color:#fff}.green{background:#138a4b;color:#fff}.danger{background:#ffe5e5;color:var(--red)}
+.hidden{display:none!important}.order h3{margin:0 0 6px;font-size:17px}.muted{color:var(--muted);font-size:13px;line-height:1.45}
+.money{font-size:20px;font-weight:950;margin:8px 0}.badge{display:inline-block;border-radius:999px;padding:5px 9px;background:#fff0dc;font-size:11px;font-weight:900;margin-left:5px}.badge.ok{background:#e8f7ef;color:var(--ok)}
+.items{background:#fafafa;border-radius:12px;padding:9px;margin:9px 0;line-height:1.5}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}.actions .wide{grid-column:1/-1}
+a{display:block;text-align:center;text-decoration:none;background:#eef5ff;color:#185abc;border-radius:12px;padding:11px;font-weight:850}
+.empty{text-align:center;padding:25px;color:var(--muted)}.notice{padding:10px 12px;background:#fff7e6;border:1px solid #f4d48f;border-radius:13px;font-size:12px;line-height:1.45;margin-bottom:10px}
+@media(max-width:430px){.stats{grid-template-columns:1fr 1fr}.stats .stat:last-child{grid-column:1/-1}}
+</style>
+</head>
+<body>
+<header class="top"><div class="brand">IQIHLO ES TEH • KURIR</div><div class="sub" id="who">Belum login</div></header>
+<main>
+<section id="login" class="panel">
+<h2 style="margin-top:0">Login Kurir</h2>
+<input id="email" type="email" autocomplete="username" placeholder="Email kurir">
+<br><br><input id="pass" type="password" autocomplete="current-password" placeholder="Password Firebase">
+<br><br><button class="primary" style="width:100%" onclick="login()">MASUK</button>
+<p class="muted">Akun kurir harus ada di Firebase Authentication dan dokumen <b>users/{uid}</b> harus memiliki role <b>KURIR</b>.</p>
+</section>
+<section id="app" class="hidden">
+<div class="notice">Pesanan baru akan muncul otomatis. Kurir hanya dapat mengambil pesanan yang masih berstatus <b>BARU</b> dan melanjutkan pesanan yang sudah menjadi tanggung jawabnya.</div>
+<div class="stats"><div class="stat"><small>Pesanan baru</small><b id="newCount">0</b></div><div class="stat"><small>Saya proses</small><b id="myCount">0</b></div><div class="stat"><small>Total antar</small><b id="deliverCount">0</b></div></div>
+<div class="row"><button class="dark" onclick="loadOrders()">↻ Refresh</button><button class="danger" onclick="logout()">Keluar</button></div>
+<br><div id="list" class="grid"></div>
+</section>
+</main>
+<script src="https://www.gstatic.com/firebasejs/12.9.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.9.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore-compat.js"></script>
+<script>
+const firebaseConfig={apiKey:"AIzaSyCVIeE-CDyaNDTU9DuvxKMRPY4wH-6Rp-o",authDomain:"iqihlo-es-teh.firebaseapp.com",projectId:"iqihlo-es-teh",storageBucket:"iqihlo-es-teh.firebasestorage.app",messagingSenderId:"382120711455",appId:"1:382120711455:web:5281431a89a3cf2de08c2a",measurementId:"G-VGG6XWQ5GL"};
+firebase.initializeApp(firebaseConfig);const auth=firebase.auth(),db=firebase.firestore();let me=null,refreshTimer=null;
+const rp=n=>new Intl.NumberFormat('id-ID',{style:'currency',currency:'IDR',maximumFractionDigits:0}).format(Number(n)||0);
+const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+async function login(){const e=email.value.trim(),p=pass.value;if(!e||!p)return alert('Email dan password wajib.');try{const c=await auth.signInWithEmailAndPassword(e,p);const u=await db.collection('users').doc(c.user.uid).get();if(!u.exists||String(u.data().role||'').toUpperCase()!=='KURIR'){await auth.signOut();return alert('Akun ini bukan akun KURIR.');}me={uid:c.user.uid,name:u.data().name||e};document.querySelector('#login').classList.add('hidden');document.querySelector('#app').classList.remove('hidden');document.querySelector('#who').textContent=me.name+' • ONLINE';await loadOrders();clearInterval(refreshTimer);refreshTimer=setInterval(loadOrders,20000)}catch(e){alert('Login gagal: '+(e.message||e))}}
+async function loadOrders(){if(!me)return;try{const q=await db.collection('orders').where('status','in',['BARU','DIPROSES','DIANTAR']).orderBy('createdAt','desc').limit(50).get();const docs=q.docs;const mine=docs.filter(d=>d.data().courierUid===me.uid);document.querySelector('#newCount').textContent=docs.filter(d=>d.data().status==='BARU').length;document.querySelector('#myCount').textContent=mine.filter(d=>d.data().status==='DIPROSES').length;document.querySelector('#deliverCount').textContent=mine.filter(d=>d.data().status==='DIANTAR').length;const visible=docs.filter(d=>d.data().status==='BARU'||d.data().courierUid===me.uid);list.innerHTML=visible.length?visible.map(d=>card(d.id,d.data())).join(''):'<div class="panel empty">Tidak ada pesanan aktif.</div>'}catch(e){list.innerHTML='<div class="panel">Pesanan belum bisa dibaca. Periksa Firestore Rules atau index.<br><small>'+esc(e.message||e)+'</small></div>'}}
+function card(id,o){const items=(o.items||[]).map(x=>`${esc(x.name)} × ${x.qty}`).join('<br>');let action='';if(o.status==='BARU')action=`<button class="primary wide" onclick="claim('${id}')">AMBIL PESANAN</button>`;else if(o.status==='DIPROSES'&&o.courierUid===me.uid)action=`<button class="primary wide" onclick="statusOrder('${id}','DIANTAR')">🚚 BERANGKAT ANTAR</button>`;else if(o.status==='DIANTAR'&&o.courierUid===me.uid)action=`<button class="green wide" onclick="statusOrder('${id}','SELESAI')">✓ SUDAH DITERIMA PELANGGAN</button>`;const maps=o.customerLat!=null&&o.customerLng!=null?`<a href="https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(o.customerLat+','+o.customerLng)}" target="_blank">📍 BUKA RUTE DI GOOGLE MAPS</a>`:'';const wa=o.phone?`<a href="https://wa.me/${normalizePhone(o.phone)}" target="_blank">💬 HUBUNGI PELANGGAN</a>`:'';return `<article class="order"><h3>${esc(o.name||'Pelanggan')} <span class="badge ${o.status==='DIANTAR'?'ok':''}">${esc(o.status)}</span></h3><div class="muted">${esc(o.phone||'-')}<br>${esc(o.address||'-')}</div><div class="items">${items||'-'}</div><div class="money">${rp(o.total||0)}</div><div class="muted">Pembayaran: ${esc(o.payment||'COD')} • Jarak: ${esc(o.distanceKm??'-')} km • Ongkir: ${rp(o.deliveryFee||0)}</div><div class="actions">${maps}${wa}${action}</div></article>`}
+function normalizePhone(v){let s=String(v||'').replace(/\D/g,'');if(s.startsWith('0'))s='62'+s.slice(1);if(!s.startsWith('62'))s='62'+s;return s}
+async function claim(id){if(!confirm('Ambil pesanan ini sebagai kurir Anda?'))return;try{await db.collection('orders').doc(id).update({status:'DIPROSES',courierUid:me.uid,courierName:me.name,updatedAt:firebase.firestore.FieldValue.serverTimestamp()});await loadOrders()}catch(e){alert('Gagal mengambil pesanan: '+(e.message||e))}}
+async function statusOrder(id,s){const text=s==='DIANTAR'?'Mulai antar pesanan ini?':'Pastikan pesanan sudah diterima pelanggan?';if(!confirm(text))return;try{await db.collection('orders').doc(id).update({status:s,updatedAt:firebase.firestore.FieldValue.serverTimestamp()});await loadOrders()}catch(e){alert('Gagal memperbarui status: '+(e.message||e))}}
+async function logout(){clearInterval(refreshTimer);await auth.signOut();me=null;location.reload()}
+</script>
+</body></html>
