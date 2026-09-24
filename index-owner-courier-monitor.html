@@ -989,6 +989,17 @@ body.iq-owner-focus #ownerDashboard{display:block !important}
 #iqCourierMonitor{margin-top:12px;border:1px solid #e8ddd1;border-radius:18px;background:#fffdf9;padding:13px;box-shadow:0 5px 18px rgba(72,45,28,.05)}
 .iqcm-head{display:flex;align-items:center;justify-content:space-between;gap:8px}.iqcm-head h3{margin:0;font-size:13px;color:#4b3425}.iqcm-head span{font-size:8px;color:#8b7d72}.iqcm-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin:10px 0}.iqcm-kpi{background:#fff;border:1px solid #eee5dc;border-radius:12px;padding:8px}.iqcm-kpi small{display:block;font-size:7px;color:#8b7d72}.iqcm-kpi b{display:block;font-size:13px;margin-top:3px;color:#4c2b18}.iqcm-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.iqcm-box{border:1px solid #eee5dc;border-radius:13px;background:#fff;padding:10px}.iqcm-box h4{margin:0 0 7px;font-size:10px;color:#4b3425}.iqcm-list{display:grid;gap:6px;max-height:270px;overflow:auto}.iqcm-row{padding:7px;border-radius:10px;background:#faf7f2;font-size:8px}.iqcm-row b{font-size:9px}.iqcm-meta{color:#817369;margin-top:2px;line-height:1.35}.iqcm-status{display:inline-block;padding:3px 6px;border-radius:999px;background:#fff0d4;font-size:7px;font-weight:900}.iqcm-status.ok{background:#dff3e4;color:#176b38}.iqcm-refresh{border:0;border-radius:9px;padding:6px 8px;background:#4c2b18;color:#fff;font-size:8px;font-weight:900}.iqcm-note{margin-top:8px;padding:8px;border-radius:10px;background:#fff7e6;border:1px solid #f0d8aa;font-size:8px;color:#6d5949}
 @media(max-width:650px){.iqcm-kpis{grid-template-columns:1fr 1fr}.iqcm-grid{grid-template-columns:1fr}}
+
+/* IQIHLO PLUS — AKTIVITAS DRIVER (tambahan aman, read-only) */
+#iqDriverActivity{margin-top:12px;border:1px solid #e8ddd1;border-radius:18px;background:#fffdf9;padding:13px;box-shadow:0 5px 18px rgba(72,45,28,.05)}
+.iqda-head{display:flex;align-items:center;justify-content:space-between;gap:8px}.iqda-head h3{margin:0;font-size:13px;color:#4b3425}.iqda-head span{font-size:8px;color:#8b7d72}
+.iqda-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin:10px 0}.iqda-kpi{background:#fff;border:1px solid #eee5dc;border-radius:12px;padding:8px}.iqda-kpi small{display:block;font-size:7px;color:#8b7d72}.iqda-kpi b{display:block;font-size:13px;margin-top:3px;color:#4c2b18}
+.iqda-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:10px}.iqda-box{border:1px solid #eee5dc;border-radius:13px;background:#fff;padding:10px}.iqda-box h4{margin:0 0 7px;font-size:10px;color:#4b3425}
+.iqda-list{display:grid;gap:6px;max-height:285px;overflow:auto}.iqda-row{padding:8px;border-radius:10px;background:#faf7f2;font-size:8px;border:1px solid #f0e8df}.iqda-row b{font-size:9px}.iqda-meta{color:#817369;margin-top:3px;line-height:1.4}
+.iqda-pill{display:inline-block;padding:3px 6px;border-radius:999px;background:#eee7df;font-size:7px;font-weight:900;margin-left:4px}.iqda-pill.online{background:#dff3e4;color:#176b38}.iqda-pill.busy{background:#fff0d4;color:#7a4d00}.iqda-pill.off{background:#f1eeee;color:#76685f}
+.iqda-actions{display:flex;gap:6px;margin-top:8px}.iqda-actions button{border:0;border-radius:9px;padding:7px 9px;background:#4c2b18;color:#fff;font-size:8px;font-weight:900}
+.iqda-note{margin-top:8px;padding:8px;border-radius:10px;background:#eef7ff;border:1px solid #cfe3f5;font-size:8px;color:#4b6576}
+@media(max-width:650px){.iqda-kpis{grid-template-columns:1fr 1fr}.iqda-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body><div id="loginScreen" class="login">
@@ -1022,6 +1033,25 @@ body.iq-owner-focus #ownerDashboard{display:block !important}
     <div class="iqcm-box"><h4>Aktivitas Terbaru</h4><div id="iqcmActivity" class="iqcm-list"><div class="muted">Memuat...</div></div></div>
   </div>
   <div id="iqcmNote" class="iqcm-note hidden"></div>
+</div>
+
+<!-- IQIHLO PLUS: aktivitas driver ditambahkan terpisah agar dashboard/fungsi lama tidak disentuh -->
+<div id="iqDriverActivity">
+  <div class="iqda-head">
+    <div><h3>🛵 AKTIVITAS DRIVER IQIHLOESTEH</h3><span>Realtime • hanya Owner • baca data saja</span></div>
+    <div class="iqda-actions"><button type="button" onclick="iqDriverLoad(true)">↻ Refresh</button></div>
+  </div>
+  <div class="iqda-kpis">
+    <div class="iqda-kpi"><small>Driver Online</small><b id="iqdaOnline">0</b></div>
+    <div class="iqda-kpi"><small>Sedang Proses</small><b id="iqdaProcess">0</b></div>
+    <div class="iqda-kpi"><small>Sedang Antar</small><b id="iqdaDeliver">0</b></div>
+    <div class="iqda-kpi"><small>Selesai Hari Ini</small><b id="iqdaDone">0</b></div>
+  </div>
+  <div class="iqda-grid">
+    <div class="iqda-box"><h4>Daftar Driver</h4><div id="iqdaDrivers" class="iqda-list"><div class="muted">Memuat...</div></div></div>
+    <div class="iqda-box"><h4>Aktivitas Driver Terbaru</h4><div id="iqdaActivity" class="iqda-list"><div class="muted">Memuat...</div></div></div>
+  </div>
+  <div id="iqdaNote" class="iqda-note hidden"></div>
 </div>
 
   <div class="dash-head">
@@ -4916,6 +4946,122 @@ window.addEventListener('beforeunload',()=>{try{if(session) updatePresence(true)
   const oldApply=window.applySession;
   if(typeof oldApply==='function'){window.applySession=function(){oldApply.apply(this,arguments);setTimeout(start,250)}}
   document.addEventListener('DOMContentLoaded',()=>setTimeout(start,1200));
+})();
+</script>
+
+
+<script>
+/* IQIHLO PLUS — DRIVER ACTIVITY
+   Read-only monitor. Tidak mengubah transaksi, status order, login, POS, printer,
+   dashboard lama, atau hak akses. Menggunakan data users/orders/activity yang sudah ada.
+*/
+(function(){
+  'use strict';
+  const q=id=>document.getElementById(id);
+  const esc=x=>{const d=document.createElement('div');d.textContent=x==null?'':String(x);return d.innerHTML};
+  const money=n=>'Rp'+Number(n||0).toLocaleString('id-ID');
+  const stamp=v=>{
+    try{
+      if(!v)return '-';
+      const d=v?.seconds?new Date(v.seconds*1000):(v?.toDate?v.toDate():new Date(v));
+      if(isNaN(d))return '-';
+      return d.toLocaleString('id-ID',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
+    }catch(e){return '-'}
+  };
+  const dayKey=v=>{
+    try{
+      const d=v?.seconds?new Date(v.seconds*1000):(v?.toDate?v.toDate():new Date(v));
+      if(isNaN(d))return '';
+      return d.toLocaleDateString('en-CA',{timeZone:'Asia/Jakarta'});
+    }catch(e){return ''}
+  };
+  const today=()=>new Date().toLocaleDateString('en-CA',{timeZone:'Asia/Jakarta'});
+  function set(id,v){if(q(id))q(id).textContent=v}
+
+  window.iqDriverLoad=async function(manual){
+    if(typeof session==='undefined'||session?.r!=='OWNER')return;
+    const cloud=window.IQIHLO_CLOUD;
+    if(!cloud?.db){if(manual)alert('Firebase Owner belum tersambung.');return}
+    try{
+      const [us,os,as]=await Promise.all([
+        cloud.db.collection('users').limit(200).get(),
+        cloud.db.collection('orders').limit(200).get(),
+        cloud.db.collection('activity').limit(200).get()
+      ]);
+
+      const drivers=us.docs.map(d=>({id:d.id,...d.data()})).filter(d=>String(d.role||'').toUpperCase()==='KURIR');
+      const orders=os.docs.map(d=>({id:d.id,...d.data()}));
+      const acts=as.docs.map(d=>({id:d.id,...d.data()}));
+
+      const activeByUid={};
+      orders.forEach(o=>{
+        if(!o.courierUid)return;
+        if(['DIPROSES','DIANTAR'].includes(String(o.status||''))){
+          activeByUid[o.courierUid]=activeByUid[o.courierUid]||[];
+          activeByUid[o.courierUid].push(o);
+        }
+      });
+
+      const now=Date.now();
+      const isFresh=d=>{const v=d.lastHeartbeatAt||d.lastOnlineAt;const ms=v?.seconds?Number(v.seconds)*1000:(v?.toDate?v.toDate().getTime():new Date(v||0).getTime());return d.online===true && ms>0 && (now-ms)<=90000};
+      const online=drivers.filter(isFresh).length;
+      const process=orders.filter(o=>o.status==='DIPROSES'&&o.courierUid).length;
+      const deliver=orders.filter(o=>o.status==='DIANTAR'&&o.courierUid).length;
+      const done=orders.filter(o=>o.status==='SELESAI'&&o.courierUid&&(dayKey(o.updatedAt||o.courierCompletedAt||o.createdAt)===today())).length;
+      set('iqdaOnline',online);set('iqdaProcess',process);set('iqdaDeliver',deliver);set('iqdaDone',done);
+
+      drivers.sort((a,b)=>{
+        const ao=activeByUid[a.id]?.length||0, bo=activeByUid[b.id]?.length||0;
+        return (b.online-a.online)||(bo-ao);
+      });
+
+      q('iqdaDrivers').innerHTML=drivers.map(d=>{
+        const active=activeByUid[d.id]||[];
+        const latest=acts.filter(a=>a.userUid===d.id||a.userUid===d.uid).sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0))[0];
+        const fresh=isFresh(d);
+        const status=fresh?'ONLINE':'OFFLINE';
+        const pill=fresh?'online':active.some(o=>o.status==='DIANTAR')?'busy':'off';
+        const task=active.length?active.map(o=>`#${esc(o.id.slice(-7).toUpperCase())} ${esc(o.status)}`).join(' • '):'Tidak ada pesanan aktif';
+        return `<div class="iqda-row">
+          <b>${esc(d.name||d.displayName||d.email||'Driver')}</b>
+          <span class="iqda-pill ${pill}">${status}</span>
+          ${active.length?`<span class="iqda-pill busy">${active.length} order</span>`:''}
+          <div class="iqda-meta">📦 ${task}<br>🕘 Terakhir aktif: ${stamp(d.lastHeartbeatAt||d.lastOnlineAt||d.lastOfflineAt)}${latest?`<br>⚡ ${esc(latest.type||'AKTIVITAS')} • ${esc(latest.detail||'-')} • ${stamp(latest.createdAt)}`:''}</div>
+        </div>`;
+      }).join('')||'<div class="muted">Belum ada akun driver/kurir.</div>';
+
+      const driverActs=acts.filter(a=>String(a.role||'').toUpperCase()==='KURIR')
+        .sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
+      q('iqdaActivity').innerHTML=driverActs.slice(0,40).map(a=>{
+        const oid=a.orderId?` • #${esc(String(a.orderId).slice(-7).toUpperCase())}`:'';
+        return `<div class="iqda-row"><b>${esc(a.userName||'Driver')}</b><span class="iqda-pill">${esc(a.type||'AKTIVITAS')}</span><div class="iqda-meta">${esc(a.detail||'-')}${oid}<br>${stamp(a.createdAt)}</div></div>`;
+      }).join('')||'<div class="muted">Belum ada aktivitas driver.</div>';
+
+      q('iqdaNote').classList.add('hidden');
+    }catch(err){
+      q('iqdaNote').textContent='Aktivitas driver belum dapat dibaca dari Firestore: '+(err.message||err);
+      q('iqdaNote').classList.remove('hidden');
+    }
+  };
+
+  const old=window.iqcmLoad;
+  window.iqcmLoad=async function(manual){
+    if(typeof old==='function')await old(manual);
+    await window.iqDriverLoad(manual);
+  };
+
+  function start(){
+    if(typeof session==='undefined'||session?.r!=='OWNER')return;
+    window.iqDriverLoad(false);
+  }
+  const oldApply=window.applySession;
+  if(typeof oldApply==='function'){
+    window.applySession=function(){
+      oldApply.apply(this,arguments);
+      setTimeout(start,300);
+    };
+  }
+  document.addEventListener('DOMContentLoaded',()=>setTimeout(start,1400));
 })();
 </script>
 
