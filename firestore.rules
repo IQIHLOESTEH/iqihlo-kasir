@@ -1,11 +1,89 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /users/{email} {
-      allow read, write: if request.auth != null;
+    function signedIn() { return request.auth != null; }
+
+    function hasUidProfile() {
+      return signedIn() && exists(/databases/$(database)/documents/users/$(request.auth.uid));
     }
-    match /app_data/{docId} {
-      allow read, write: if request.auth != null;
+    function hasEmailProfile() {
+      return signedIn() && request.auth.token.email != null
+        && exists(/databases/$(database)/documents/users/$(request.auth.token.email));
     }
+    function role() {
+      return hasUidProfile()
+        ? get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role
+        : (hasEmailProfile()
+          ? get(/databases/$(database)/documents/users/$(request.auth.token.email)).data.role
+          : null);
+    }
+    function isOwner() { return signedIn() && (role() == 'owner' || role() == 'OWNER'); }
+    function isAdmin() { return signedIn() && (role() == 'admin' || role() == 'ADMIN'); }
+    function isKasir() { return signedIn() && (role() == 'kasir' || role() == 'KASIR'); }
+    function isKurir() { return signedIn() && role() == 'KURIR'; }
+    function isStaff() { return isOwner() || isAdmin() || isKasir() || isKurir(); }
+
+    match /users/{userId} {
+      allow read: if signedIn() && (
+        userId == request.auth.uid ||
+        (request.auth.token.email != null && userId == request.auth.token.email) ||
+        isOwner() || isAdmin()
+      );
+      allow create: if signedIn() && (userId == request.auth.uid || isOwner() || isAdmin());
+      allow update: if signedIn() && (userId == request.auth.uid || isOwner() || isAdmin());
+      allow delete: if isOwner();
+    }
+
+    match /orders/{orderId} {
+      allow read: if isOwner() || isAdmin() || isKasir()
+        || (isKurir() && (resource.data.status == 'BARU' || resource.data.courierUid == request.auth.uid))
+        || (signedIn() && resource.data.customerUid == request.auth.uid);
+
+      allow create: if signedIn()
+        && request.resource.data.customerUid == request.auth.uid
+        && request.resource.data.status == 'BARU';
+
+      allow update, delete: if isOwner() || isAdmin() || isKasir();
+
+      allow update: if isKurir() && (
+        (resource.data.status == 'BARU' &&
+         resource.data.courierUid == null &&
+         request.resource.data.status == 'DIPROSES' &&
+         request.resource.data.courierUid == request.auth.uid) ||
+        (resource.data.courierUid == request.auth.uid &&
+         request.resource.data.courierUid == request.auth.uid &&
+         request.resource.data.customerUid == resource.data.customerUid &&
+         ((resource.data.status == 'DIPROSES' && request.resource.data.status == 'DIANTAR') ||
+          (resource.data.status == 'DIANTAR' && request.resource.data.status == 'SELESAI')))
+      );
+
+      allow update: if signedIn()
+        && resource.data.customerUid == request.auth.uid
+        && resource.data.status == 'SELESAI'
+        && request.resource.data.customerUid == resource.data.customerUid
+        && request.resource.data.courierUid == resource.data.courierUid
+        && request.resource.data.status == resource.data.status
+        && request.resource.data.courierRating is int
+        && request.resource.data.courierRating >= 1
+        && request.resource.data.courierRating <= 5
+        && !('courierRating' in resource.data)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['courierRating','courierReview','courierRatedAt']);
+    }
+
+    match /activity/{activityId} {
+      allow create: if isStaff() || (
+        signedIn() && request.resource.data.type == 'ORDER_NEW' &&
+        request.resource.data.userUid == request.auth.uid && request.resource.data.role == 'PELANGGAN'
+      );
+      allow read: if isOwner() || isAdmin();
+      allow update, delete: if isOwner();
+    }
+
+    // Semua data lama di app_data tetap dipertahankan; rules hanya mengatur akses.
+    match /app_data/{document=**} {
+      allow read, write: if signedIn();
+    }
+
+    match /{document=**} { allow read, write: if false; }
   }
 }
