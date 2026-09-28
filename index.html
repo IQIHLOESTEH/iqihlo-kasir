@@ -4963,9 +4963,16 @@ window.addEventListener('beforeunload',()=>{try{if(session) updatePresence(true)
       const snap=await db.collection('orders').limit(100).get();
       return {docs:snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>stamp(b)-stamp(a)),owner:true};
     }
-    // Single-field query: tidak membutuhkan composite index.
-    const snap=await db.collection('orders').where('kasirStatus','==','BARU').limit(50).get();
-    return {docs:snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>stamp(b)-stamp(a)),owner:false};
+    // Admin/Kasir membaca orders yang sudah ada.
+    // Penting: beberapa versi halaman pelanggan lama hanya menyimpan status:'BARU'
+    // tanpa field kasirStatus. Karena Firestore tidak mengembalikan dokumen yang
+    // tidak memiliki field saat memakai where('kasirStatus','==','BARU'), kita baca
+    // orders lalu filter di aplikasi. Firestore Rules mengizinkan Admin/Kasir membaca orders.
+    const snap=await db.collection('orders').limit(100).get();
+    const docs=snap.docs.map(d=>({id:d.id,...d.data()}))
+      .filter(o=>String(o.kasirStatus||'BARU').toUpperCase()==='BARU')
+      .sort((a,b)=>stamp(b)-stamp(a));
+    return {docs,owner:false};
   }
 
   window.iqOnlineLoad=async function(){
@@ -5026,8 +5033,12 @@ window.addEventListener('beforeunload',()=>{try{if(session) updatePresence(true)
           renderOrders(docs,true);showToggle();
         },e=>{console.error('Owner order listener failed:',e);renderError(e?.message||e)});
       }else{
-        newUnsub=db.collection('orders').where('kasirStatus','==','BARU').limit(50).onSnapshot(s=>{
-          const docs=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>stamp(b)-stamp(a));
+        // Jangan filter Firestore dengan kasirStatus karena order dari versi customer
+        // lama bisa tidak mempunyai field tersebut. Filter setelah snapshot diterima.
+        newUnsub=db.collection('orders').limit(100).onSnapshot(s=>{
+          const docs=s.docs.map(d=>({id:d.id,...d.data()}))
+            .filter(o=>String(o.kasirStatus||'BARU').toUpperCase()==='BARU')
+            .sort((a,b)=>stamp(b)-stamp(a));
           notifyNewOrders(docs);renderOrders(docs,false);showToggle();
         },e=>{console.error('Staff order listener failed:',e);renderError(e?.message||e)});
       }
