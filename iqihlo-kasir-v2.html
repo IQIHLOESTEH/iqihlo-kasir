@@ -746,9 +746,16 @@ button{
   display:block;
   object-fit:contain;
 }
+
+/* IQIHLO — ORDER ONLINE UNTUK KASIR/ADMIN/OWNER — tambahan aman, tidak mengganti POS lama */
+#iqOnlinePanel{position:fixed;right:12px;bottom:12px;z-index:80;width:min(390px,calc(100vw - 24px));max-height:72vh;overflow:auto;background:#fffdf9;border:1px solid #e8ddd1;border-radius:18px;box-shadow:0 14px 40px rgba(50,30,15,.18);padding:12px;display:none}
+#iqOnlinePanel.show{display:block}.iqon-head{display:flex;justify-content:space-between;align-items:center;gap:8px}.iqon-head b{font-size:12px;color:#4b3425}.iqon-count{background:#d94b3d;color:#fff;border-radius:999px;padding:4px 7px;font-size:8px;font-weight:950}.iqon-close{border:0;background:#eee7df;border-radius:9px;padding:6px 8px;font-weight:900}.iqon-list{display:grid;gap:7px;margin-top:9px}.iqon-row{border:1px solid #eee5dc;border-radius:12px;padding:9px;background:#fff;font-size:9px}.iqon-row b{font-size:10px}.iqon-meta{color:#817369;line-height:1.35;margin-top:3px}.iqon-actions{display:flex;gap:6px;margin-top:7px}.iqon-actions button{flex:1;border:0;border-radius:9px;padding:8px;font-size:8px;font-weight:900;cursor:pointer}.iqon-proc{background:#4c2b18;color:#fff}.iqon-info{background:#eee7df;color:#5b4a3e}.iqon-toggle{position:fixed;right:12px;bottom:12px;z-index:81;border:0;border-radius:999px;background:#4c2b18;color:#fff;padding:11px 13px;font-size:10px;font-weight:950;box-shadow:0 8px 24px #3a1b0d33;display:none}.iqon-toggle.show{display:block}
 </style>
 </head>
-<body><div id="loginScreen" class="login">
+<body>
+<!-- IQIHLO — Order Online: tambahan saja, mesin kasir lama tetap dipakai -->
+<div id="iqOnlinePanel"><div class="iqon-head"><div><b>🛎️ ORDER ONLINE</b> <span class="iqon-count" id="iqOnlineCount">0</span></div><button class="iqon-close" onclick="iqOnlineClose()">×</button></div><div class="muted" style="font-size:8px;margin-top:3px">Pesanan pelanggan masuk otomatis. Kasir dapat memproses tanpa mengganggu POS. Owner/Admin dapat memantau.</div><div id="iqOnlineList" class="iqon-list"></div></div><button id="iqOnlineToggle" class="iqon-toggle" onclick="iqOnlineOpen()">🛎️ Order Online <span id="iqOnlineBadge">0</span></button>
+<div id="loginScreen" class="login">
 <div class="login-card">
 <div class="login-logo">🍃</div><h2>IQIHLO ES TEH</h2><div class="tag">Lebih dari Sekedar Minuman</div>
 <label>Username</label><input id="loginUser" autocomplete="username" placeholder="Masukkan username">
@@ -3563,44 +3570,6 @@ async function toggleManagedAccount(index){
   }
   }
 
-  if(session?.r!=='OWNER'){
-    alert('Hanya Owner yang dapat mengaktifkan atau menonaktifkan akun.');
-    return;
-  }
-
-  const a=accounts[index];
-
-  if(!a){
-    alert('Akun tidak ditemukan.');
-    return;
-  }
-
-  if(a.u==='iqihloesteh' || a.r==='OWNER'){
-    alert('Akun Owner tidak dapat dinonaktifkan.');
-    return;
-  }
-
-  const statusBaru=a.active===false;
-
-  const konfirmasi=confirm(
-    statusBaru
-      ? 'Aktifkan akun '+a.u+'?'
-      : 'Nonaktifkan akun '+a.u+'?'
-  );
-
-  if(!konfirmasi)return;
-
-  a.active=statusBaru;
-
-  save(KEYS.accounts,accounts);
-
-  renderAccounts();
-
-  alert(
-    'Akun '+a.u+' sekarang '+
-    (a.active?'AKTIF':'NONAKTIF')+'.'
-  );
-}
 function changeOwnerPassword(){
 
  if(session?.r!=='OWNER'){
@@ -3910,5 +3879,144 @@ document.addEventListener(
 
 </script>
 
+
+<script>
+/* IQIHLO — ORDER ONLINE
+   Tambahan terpisah: tidak mengganti mesin kasir/POS lama.
+   OWNER + ADMIN = melihat semua order.
+   KASIR = melihat semua order + dapat memproses order BARU.
+*/
+(function(){
+ let unsub=null;
+ const $i=id=>document.getElementById(id);
+ const x=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+ const rp=n=>'Rp'+Number(n||0).toLocaleString('id-ID');
+
+ function role(){
+   return String(window.session?.r||'').toUpperCase();
+ }
+
+ function renderOrders(docs){
+   const list=$i('iqOnlineList');
+   if(!list)return;
+
+   const r=role();
+   docs.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
+
+   const baru=docs.filter(o=>String(o.kasirStatus||'BARU').toUpperCase()==='BARU').length;
+   $i('iqOnlineCount').textContent=baru;
+   $i('iqOnlineBadge').textContent=baru;
+
+   list.innerHTML=docs.length ? docs.map(o=>{
+     const st=String(o.kasirStatus||'BARU').toUpperCase();
+     const badge=st==='BARU'
+       ? '<span style="background:#ffe8e5;color:#b42318;border-radius:999px;padding:3px 6px;font-size:8px;font-weight:900">BARU</span>'
+       : '<span style="background:#e7f6ec;color:#18753d;border-radius:999px;padding:3px 6px;font-size:8px;font-weight:900">'+x(st)+'</span>';
+
+     const action=(r==='KASIR' && st==='BARU')
+       ? '<button class="iqon-proc" onclick="iqOnlineProcess(\''+x(o.id)+'\')">PROSES PESANAN</button>'
+       : '<button class="iqon-info" disabled>'+x(r==='KASIR'?'SUDAH DIPROSES':'MONITOR '+r)+'</button>';
+
+     return '<div class="iqon-row">'+
+       '<div style="display:flex;justify-content:space-between;gap:6px"><b>#'+x(o.id.slice(-8).toUpperCase())+' • '+x(o.name||'Pelanggan')+'</b>'+badge+'</div>'+
+       '<div class="iqon-meta">'+
+         x(o.phone||'-')+'<br>'+
+         x((o.items||[]).map(i=>(i.name||i.n||'Menu')+' × '+(i.qty??i.q??0)).join(', '))+'<br>'+
+         '<b>'+rp(o.total)+'</b> • '+x(o.payment||'COD')+'<br>'+
+         x(o.address||'-')+
+       '</div>'+
+       '<div class="iqon-actions">'+action+'</div>'+
+     '</div>';
+   }).join('') : '<div class="muted" style="font-size:9px;padding:10px">Belum ada pesanan online.</div>';
+ }
+
+ function showError(e){
+   const list=$i('iqOnlineList');
+   if(list)list.innerHTML='<div style="padding:10px;background:#fff0ef;border:1px solid #f0d1ce;border-radius:10px;color:#a52b25;font-size:9px"><b>ORDER ONLINE TIDAK DAPAT DIBACA</b><br>'+x(e?.message||e)+'</div>';
+ }
+
+ window.iqOnlineOpen=function(){
+   $i('iqOnlinePanel')?.classList.add('show');
+   $i('iqOnlineToggle')?.classList.remove('show');
+   iqOnlineLoad();
+ };
+
+ window.iqOnlineClose=function(){
+   $i('iqOnlinePanel')?.classList.remove('show');
+   if(['OWNER','ADMIN','KASIR'].includes(role()))$i('iqOnlineToggle')?.classList.add('show');
+ };
+
+ window.iqOnlineLoad=function(){
+   const r=role();
+   if(!['OWNER','ADMIN','KASIR'].includes(r))return;
+
+   const db=window.IQIHLO_CLOUD?.db;
+   if(!db){
+     showError(new Error('Koneksi Firebase belum siap.'));
+     return;
+   }
+
+   if(unsub){try{unsub()}catch(e){};unsub=null}
+
+   try{
+     /* Tidak memakai orderBy agar tidak membutuhkan index Firestore tambahan. */
+     unsub=db.collection('orders').limit(50).onSnapshot(snap=>{
+       const docs=snap.docs.map(d=>({id:d.id,...d.data()}));
+       renderOrders(docs);
+     },err=>showError(err));
+   }catch(e){
+     showError(e);
+   }
+ };
+
+ window.iqOnlineProcess=async function(id){
+   if(role()!=='KASIR'){
+     alert('Hanya Kasir yang memproses pesanan online.');
+     return;
+   }
+
+   if(!confirm('Proses pesanan online ini di Kasir?'))return;
+
+   try{
+     const db=window.IQIHLO_CLOUD?.db;
+     if(!db)throw new Error('Firebase belum siap.');
+
+     await db.collection('orders').doc(id).update({
+       kasirStatus:'DIPROSES',
+       kasirUid:window.IQIHLO_CLOUD.user?.uid||null,
+       kasirName:window.session?.u||'Kasir',
+       kasirProcessedAt:firebase.firestore.FieldValue.serverTimestamp(),
+       updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+     });
+
+     alert('Pesanan berhasil masuk proses Kasir.');
+   }catch(e){
+     alert('Gagal memproses order: '+(e?.message||e));
+   }
+ };
+
+ function start(){
+   const r=role();
+   if(!['OWNER','ADMIN','KASIR'].includes(r))return;
+
+   /* Tombol selalu terlihat supaya masalah koneksi/order tidak tersembunyi. */
+   $i('iqOnlineToggle')?.classList.add('show');
+   iqOnlineLoad();
+ }
+
+ const old=window.applySession;
+ if(typeof old==='function'){
+   window.applySession=function(){
+     old.apply(this,arguments);
+     setTimeout(start,250);
+   };
+ }
+
+ document.addEventListener('DOMContentLoaded',()=>{
+   setTimeout(start,1500);
+   setTimeout(start,4000);
+ });
+})();
+</script>
 </body>
 </html>
