@@ -985,13 +985,25 @@ body.iq-owner-focus #ownerDashboard{display:block !important}
 @media(max-width:520px){#iqOwnerInsightGrid{grid-template-columns:1fr}.iq-pulse-top{align-items:flex-start}}
 
 
-/* IQIHLO — ORDER ONLINE UNTUK KASIR/ADMIN/OWNER */
-#iqOnlinePanel{position:fixed;right:12px;bottom:12px;z-index:80;width:min(390px,calc(100vw - 24px));max-height:72vh;overflow:auto;background:#fffdf9;border:1px solid #e8ddd1;border-radius:18px;box-shadow:0 14px 40px rgba(50,30,15,.18);padding:12px;display:none}
-#iqOnlinePanel.show{display:block}.iqon-head{display:flex;justify-content:space-between;align-items:center;gap:8px}.iqon-head b{font-size:12px;color:#4b3425}.iqon-count{background:#d94b3d;color:#fff;border-radius:999px;padding:4px 7px;font-size:8px;font-weight:950}.iqon-close{border:0;background:#eee7df;border-radius:9px;padding:6px 8px;font-weight:900}.iqon-list{display:grid;gap:7px;margin-top:9px}.iqon-row{border:1px solid #eee5dc;border-radius:12px;padding:9px;background:#fff;font-size:9px}.iqon-row b{font-size:10px}.iqon-meta{color:#817369;line-height:1.35;margin-top:3px}.iqon-actions{display:flex;gap:6px;margin-top:7px}.iqon-actions button{flex:1;border:0;border-radius:9px;padding:8px;font-size:8px;font-weight:900;cursor:pointer}.iqon-proc{background:#4c2b18;color:#fff}.iqon-ready{background:#dff3e4;color:#176b38}.iqon-toggle{position:fixed;right:12px;bottom:12px;z-index:81;border:0;border-radius:999px;background:#4c2b18;color:#fff;padding:11px 13px;font-size:10px;font-weight:950;box-shadow:0 8px 24px #3a1b0d33;display:none}.iqon-toggle.show{display:block}
+/* =========================================================
+   IQIHLO — ORDER ONLINE TERINTEGRASI (AMAN, TAMBAHAN SAJA)
+   Admin/Kasir: melihat & menerima pesanan baru.
+   Owner: melihat seluruh pesanan, tanpa tombol menerima.
+   Tidak mengganti mesin POS lama.
+========================================================= */
+#iqOnlinePanel{position:fixed;right:12px;bottom:12px;z-index:180;width:min(420px,calc(100vw - 24px));max-height:78vh;overflow:auto;background:#fffdf9;border:1px solid #e8ddd1;border-radius:18px;box-shadow:0 14px 40px rgba(50,30,15,.18);padding:12px;display:none}
+#iqOnlinePanel.show{display:block}
+.iqon-head{display:flex;justify-content:space-between;align-items:center;gap:8px}.iqon-head b{font-size:12px;color:#4b3425}.iqon-count{background:#d94b3d;color:#fff;border-radius:999px;padding:4px 7px;font-size:8px;font-weight:950}.iqon-close{border:0;background:#eee7df;border-radius:9px;padding:6px 8px;font-weight:900}.iqon-list{display:grid;gap:7px;margin-top:9px}.iqon-row{border:1px solid #eee5dc;border-radius:12px;padding:9px;background:#fff;font-size:9px}.iqon-row b{font-size:10px}.iqon-meta{color:#817369;line-height:1.4;margin-top:3px}.iqon-status{display:inline-block;margin-top:5px;padding:3px 6px;border-radius:999px;background:#f1e8df;color:#5b4030;font-size:8px;font-weight:900}.iqon-status.new{background:#fff0d5;color:#a56600}.iqon-status.proc{background:#dff3e4;color:#176b38}.iqon-actions{display:flex;gap:6px;margin-top:7px}.iqon-actions button{flex:1;border:0;border-radius:9px;padding:9px;font-size:8px;font-weight:900;cursor:pointer}.iqon-proc{background:#4c2b18;color:#fff}.iqon-view{background:#eee7df;color:#5b4a3e}.iqon-toggle{position:fixed;right:12px;bottom:12px;z-index:181;border:0;border-radius:999px;background:#4c2b18;color:#fff;padding:11px 13px;font-size:10px;font-weight:950;box-shadow:0 8px 24px #3a1b0d33;display:none}.iqon-toggle.show{display:block}.iqon-empty{padding:12px;text-align:center;color:#8a7b70;font-size:9px}.iqon-error{padding:10px;border-radius:10px;background:#fff0ef;color:#a8322a;font-size:9px}
+@media(max-width:520px){#iqOnlinePanel{right:8px;bottom:8px;width:calc(100vw - 16px);max-height:80vh}.iqon-toggle{right:8px;bottom:8px}}
+
 </style>
 </head>
-<body>
-<div id="iqOnlinePanel"><div class="iqon-head"><div><b>🛎️ ORDER ONLINE</b><span class="iqon-count" id="iqOnlineCount">0</span></div><button class="iqon-close" onclick="iqOnlineClose()">×</button></div><div class="muted" style="font-size:8px;margin-top:3px">Pesanan pelanggan masuk otomatis. Kasir dapat memproses tanpa mengganggu POS.</div><div id="iqOnlineList" class="iqon-list"></div></div><button id="iqOnlineToggle" class="iqon-toggle" onclick="iqOnlineOpen()">🛎️ Order Online <span id="iqOnlineBadge">0</span></button>
+<body><div id="iqOnlinePanel">
+  <div class="iqon-head"><div><b id="iqOnlineTitle">🛎️ PESANAN ONLINE</b> <span class="iqon-count" id="iqOnlineCount">0</span></div><button class="iqon-close" onclick="iqOnlineClose()">×</button></div>
+  <div id="iqOnlineHint" class="muted" style="font-size:8px;margin-top:3px">Pesanan pelanggan tersinkron otomatis dari Firebase.</div>
+  <div id="iqOnlineList" class="iqon-list"></div>
+</div>
+<button id="iqOnlineToggle" class="iqon-toggle" onclick="iqOnlineOpen()">🛎️ Pesanan Online <span id="iqOnlineBadge">0</span></button>
 <div id="loginScreen" class="login">
 <div class="login-card">
 <div class="login-logo">🍃</div><h2>IQIHLO ES TEH</h2><div class="tag">Lebih dari Sekedar Minuman</div>
@@ -2217,52 +2229,100 @@ async function loginSystem(){
 
  $('loginMsg').textContent='Menghubungkan ke database...';
 
+ // LOGIN DILINDUNGI:
+ // 1) Jangan membuat profil users sebelum username/password tervalidasi.
+ // 2) Kegagalan sinkronisasi Firestore tidak boleh membatalkan login yang sah.
+ // 3) Profil UID staff dibuat SETELAH akun ditemukan dan aktif, khusus untuk
+ //    kebutuhan Firestore Rules pada koleksi orders.
  try{
-  // Semua perangkat memakai Firebase Authentication agar bisa membaca
-  // status akun yang sama dari Firestore. Owner memakai email/password;
-  // kasir/admin memakai sesi anonim lalu divalidasi terhadap akun cloud.
-  if(u==='iqihloesteh'){
-   await window.IQIHLO_CLOUD.signIn('iqihloesteh@gmail.com',p);
-  }else{
-   if(!window.IQIHLO_CLOUD?.auth?.currentUser){
-    await window.IQIHLO_CLOUD.signInAnonymous();
-   }
+  if(!window.IQIHLO_CLOUD?.auth || !window.IQIHLO_CLOUD?.db){
+   throw new Error('Firebase SDK belum siap.');
   }
 
-  await refreshCloudAccounts();
+  let cloudAuthDone=false;
 
+  if(u==='iqihloesteh'){
+   // Owner selalu memakai Firebase Email/Password.
+   await window.IQIHLO_CLOUD.signIn('iqihloesteh@gmail.com',p);
+   cloudAuthDone=true;
+  }else{
+   // Staff memakai Anonymous Auth. Ini hanya autentikasi perangkat ke Firebase;
+   // username/password aplikasi tetap divalidasi terhadap accounts di bawah.
+   if(!window.IQIHLO_CLOUD.auth.currentUser){
+    await window.IQIHLO_CLOUD.signInAnonymous();
+   }
+   cloudAuthDone=true;
+  }
+
+  // Ambil akun cloud, tetapi jangan jadikan kegagalan sync sebagai kegagalan login.
+  try{
+   await refreshCloudAccounts();
+  }catch(syncErr){
+   console.warn('Account cloud refresh dilewati:',syncErr);
+  }
+
+  // Validasi username/password SETELAH data cloud dicoba dimuat.
   const a=accounts.find(x=>x.u===u&&x.p===p);
   if(!a){
    $('loginMsg').textContent='Username atau password salah.';
-   if(u==='iqihloesteh') await window.IQIHLO_CLOUD.signOut();
+   try{ if(cloudAuthDone) await window.IQIHLO_CLOUD.signOut(); }catch(_e){}
    return;
   }
+
   if(a.active===false){
    $('loginMsg').textContent='Akun ini sedang dinonaktifkan oleh Owner.';
-   if(u==='iqihloesteh') await window.IQIHLO_CLOUD.signOut();
+   try{ if(cloudAuthDone) await window.IQIHLO_CLOUD.signOut(); }catch(_e){}
    return;
   }
 
-   // Pastikan akun ADMIN/KASIR mempunyai profil UID di Firestore.
-   // Rules orders menggunakan users/{uid} untuk menentukan role.
-   const cloudUser=window.IQIHLO_CLOUD?.auth?.currentUser;
+  // Baru setelah akun valid, daftarkan UID Anonymous staff ke users/{uid}.
+  // Kegagalan penulisan profil TIDAK membatalkan login. Ini mencegah fitur
+  // Pesanan Online merusak jalur login utama.
+  if(u!=='iqihloesteh'){
+   const cloudUser=window.IQIHLO_CLOUD.auth.currentUser;
    const cloudRole=String(a.r||'').toUpperCase();
-   if(cloudUser && ['ADMIN','KASIR'].includes(cloudRole)){
-    await window.IQIHLO_CLOUD.db.collection('users').doc(cloudUser.uid).set({
-      role:cloudRole, username:u, active:true,
+   if(cloudUser && (cloudRole==='KASIR'||cloudRole==='ADMIN')){
+    try{
+     await window.IQIHLO_CLOUD.db.collection('users').doc(cloudUser.uid).set({
+      role:cloudRole.toLowerCase(),
+      username:u,
+      active:true,
       updatedAt:firebase.firestore.FieldValue.serverTimestamp()
-    },{merge:true});
+     },{merge:true});
+    }catch(profileErr){
+     console.error('Staff UID profile sync failed:',profileErr);
+     // Login tetap diteruskan. Pesanan Online akan menampilkan error izin
+     // bila Rules belum mengenali UID, tetapi POS/login tidak ikut rusak.
+    }
    }
+  }
 
   session={...a,active:true};
-  if(!sessionStorage.getItem('iqihlo_shift_start')) sessionStorage.setItem('iqihlo_shift_start',new Date().toISOString());
+  if(!sessionStorage.getItem('iqihlo_shift_start')){
+   sessionStorage.setItem('iqihlo_shift_start',new Date().toISOString());
+  }
   sessionStorage.setItem('iqihlo_session',JSON.stringify(session));
   $('loginMsg').textContent='';
-  await connectFirebaseForCurrentSession();
+
+  // Sinkronisasi lanjutan tidak boleh menghalangi masuk ke aplikasi.
+  try{ await connectFirebaseForCurrentSession(); }
+  catch(syncErr){ console.warn('Post-login sync dilewati:',syncErr); }
+
   applySession();
  }catch(e){
   console.error('Firebase login failed:',e);
-  $('loginMsg').textContent='Database Firebase belum siap untuk login perangkat ini. Pastikan Authentication > Sign-in method > Anonymous sudah diaktifkan.';
+  const code=String(e?.code||'');
+  if(code==='auth/wrong-password'||code==='auth/invalid-credential'||code==='auth/user-not-found'){
+   $('loginMsg').textContent='Username/password Owner tidak cocok dengan Firebase Authentication.';
+  }else if(code==='auth/operation-not-allowed'){
+   $('loginMsg').textContent='Provider login Firebase belum diaktifkan.';
+  }else if(code==='auth/too-many-requests'){
+   $('loginMsg').textContent='Terlalu banyak percobaan login. Tunggu sebentar lalu coba lagi.';
+  }else if(code==='auth/network-request-failed'){
+   $('loginMsg').textContent='Koneksi Firebase gagal. Periksa internet lalu coba lagi.';
+  }else{
+   $('loginMsg').textContent='Login gagal: '+(e?.message||code||'kesalahan Firebase');
+  }
  }
 }
 
@@ -2433,7 +2493,8 @@ function openMenu(){
       <span>Permintaan Void</span>
     </button>
 
-    <button class="menu-side-btn" onclick="iqOnlineOpen()">
+    <button class="menu-side-btn"
+      onclick="iqOnlineOpen()">
       <span class="mi">🛎️</span>
       <span>Pesanan Online <b id="menuOnlineBadge" style="background:#d22;color:#fff;border-radius:99px;padding:2px 6px;font-size:10px">0</b></span>
     </button>
@@ -4885,26 +4946,119 @@ window.addEventListener('beforeunload',()=>{try{if(session) updatePresence(true)
 </script>
 
 <script>
-/* IQIHLO — ORDER ONLINE (tambahan terisolasi) */
+/* =========================================================
+   IQIHLO — ORDER ONLINE TERINTEGRASI
+   Hanya membaca/memperbarui koleksi orders. POS lama tidak disentuh.
+========================================================= */
 (function(){
- let unsub=null,started=false;
- const $=id=>document.getElementById(id), role=()=>String(window.session?.r||'').toUpperCase(), db=()=>window.IQIHLO_CLOUD?.db||null;
- const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
- const stamp=o=>o?.createdAt?.seconds||0, rp=n=>'Rp'+Number(n||0).toLocaleString('id-ID');
- function badge(n){['iqOnlineCount','iqOnlineBadge','menuOnlineBadge'].forEach(id=>{const e=$(id);if(e)e.textContent=n});}
- function render(docs,owner){
-  badge(docs.length); const list=$('iqOnlineList'); if(!list)return;
-  if(!docs.length){list.innerHTML='<div class="muted" style="font-size:9px;padding:10px">Belum ada pesanan online baru.</div>';return;}
-  list.innerHTML=docs.map(o=>{const items=(Array.isArray(o.items)?o.items:[]).map(i=>esc((i.name||'Item')+' × '+(i.qty||0))).join(', ')||'-';const st=String(o.kasirStatus||'BARU').toUpperCase();const act=!owner&&st==='BARU'?`<button class="iqon-proc" onclick="iqOnlineAccept('${esc(o.id)}')">✓ TERIMA PESANAN</button>`:'';return `<div class="iqon-row"><b>#${esc(o.id.slice(-8).toUpperCase())} • ${esc(o.name||'Pelanggan')}</b><div class="iqon-meta">${esc(o.phone||'-')}<br>${items}<br><b>${rp(o.total)}</b> • ${esc(o.payment||'COD')}<br>${esc(o.address||'-')}</div><div class="iqon-actions">${act}</div></div>`}).join('');
- }
- window.iqOnlineOpen=()=>{$('iqOnlinePanel')?.classList.add('show');$('iqOnlineToggle')?.classList.remove('show');window.iqOnlineLoad()};
- window.iqOnlineClose=()=>{$('iqOnlinePanel')?.classList.remove('show')};
- window.iqOnlineLoad=async()=>{if(!window.session)return;const r=role(),d=db();if(!d||!['OWNER','ADMIN','KASIR'].includes(r))return;try{const s=await d.collection('orders').limit(100).get();let docs=s.docs.map(q=>({id:q.id,...q.data()}));if(r!=='OWNER')docs=docs.filter(o=>String(o.kasirStatus||'BARU').toUpperCase()==='BARU');docs.sort((a,b)=>stamp(b)-stamp(a));render(docs,r==='OWNER')}catch(e){console.error('Order online load',e)}};
- window.iqOnlineAccept=async id=>{if(!['ADMIN','KASIR'].includes(role()))return alert('Hanya Admin/Kasir yang dapat menerima pesanan.');const d=db();if(!d)return;if(!confirm('Terima pesanan online ini?'))return;try{const ref=d.collection('orders').doc(id);await d.runTransaction(async tx=>{const s=await tx.get(ref);if(!s.exists)throw Error('Pesanan tidak ditemukan.');const o=s.data()||{};if(String(o.kasirStatus||'BARU').toUpperCase()!=='BARU')throw Error('Pesanan sudah diterima petugas lain.');tx.update(ref,{kasirStatus:'DIPROSES',kasirUid:window.IQIHLO_CLOUD?.user?.uid||null,kasirName:window.session?.u||role(),kasirProcessedAt:firebase.firestore.FieldValue.serverTimestamp(),updatedAt:firebase.firestore.FieldValue.serverTimestamp()})});alert('Pesanan berhasil diterima.');await window.iqOnlineLoad()}catch(e){alert('Gagal menerima pesanan: '+(e.message||e))}};
- function stop(){if(unsub){try{unsub()}catch(e){}unsub=null}started=false}
- function start(){const r=role(),d=db();if(!window.session||!d||!['OWNER','ADMIN','KASIR'].includes(r)||started)return;started=true;unsub=d.collection('orders').limit(100).onSnapshot(s=>{let docs=s.docs.map(q=>({id:q.id,...q.data()}));if(r!=='OWNER')docs=docs.filter(o=>String(o.kasirStatus||'BARU').toUpperCase()==='BARU');docs.sort((a,b)=>stamp(b)-stamp(a));render(docs,r==='OWNER')},e=>console.error('Order online listener',e))}
- const old=window.applySession;if(typeof old==='function')window.applySession=function(){old.apply(this,arguments);stop();setTimeout(start,500);setTimeout(window.iqOnlineLoad,1000)};
- document.addEventListener('DOMContentLoaded',()=>setTimeout(start,1200));window.addEventListener('beforeunload',stop);
+  let newUnsub=null, allUnsub=null, started=false;
+  const $i=id=>document.getElementById(id);
+  const x=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+  const rp=n=>'Rp'+Number(n||0).toLocaleString('id-ID');
+  const role=()=>String(window.session?.r||'').toUpperCase();
+  const cloud=()=>window.IQIHLO_CLOUD?.db||null;
+  const stamp=o=>o?.createdAt?.seconds ? o.createdAt.seconds : (o?.createdAt?.toMillis ? o.createdAt.toMillis()/1000 : 0);
+
+  function closeToggle(){const t=$i('iqOnlineToggle');if(t)t.classList.remove('show')}
+  function showToggle(){const t=$i('iqOnlineToggle');if(t)t.classList.add('show')}
+  window.iqOnlineOpen=function(){const p=$i('iqOnlinePanel');if(p)p.classList.add('show');closeToggle();iqOnlineLoad()};
+  window.iqOnlineClose=function(){const p=$i('iqOnlinePanel');if(p)p.classList.remove('show');showToggle()};
+
+  function renderOrders(docs,isOwner){
+    const list=$i('iqOnlineList'),count=$i('iqOnlineCount'),badge=$i('iqOnlineBadge');
+    if(count)count.textContent=String(docs.length);
+    if(badge)badge.textContent=String(docs.length);
+    const menuBadge=$i('menuOnlineBadge');
+    if(menuBadge)menuBadge.textContent=String(docs.length);
+    if(!docs.length){if(list)list.innerHTML='<div class="iqon-empty">Belum ada pesanan online.</div>';return;}
+    if(list)list.innerHTML=docs.map(o=>{
+      const items=(Array.isArray(o.items)?o.items:[]).map(i=>x((i.name||'Item')+' × '+(i.qty||0))).join(', ')||'-';
+      const st=String(o.kasirStatus||'BARU').toUpperCase();
+      const statusCls=st==='BARU'?'new':'proc';
+      const statusText=st==='BARU'?'PESANAN BARU':'SUDAH DITERIMA';
+      const action=!isOwner&&st==='BARU'?`<button class="iqon-proc" onclick="iqOnlineAccept('${x(o.id)}')">✓ TERIMA PESANAN</button>`:'';
+      return `<div class="iqon-row"><b>#${x(o.id.slice(-8).toUpperCase())} • ${x(o.name||'Pelanggan')}</b><div class="iqon-meta">${x(o.phone||'-')}<br>${items}<br><b>${rp(o.total)}</b> • ${x(o.payment||'COD')}<br>${x(o.address||'-')}</div><span class="iqon-status ${statusCls}">${statusText}</span>${st!=='BARU'&&o.kasirName?` <span class="iqon-status proc">${x(o.kasirName)}</span>`:''}<div class="iqon-actions">${action}</div></div>`;
+    }).join('');
+  }
+
+  function renderError(message){const list=$i('iqOnlineList');if(list)list.innerHTML=`<div class="iqon-error">Pesanan online belum dapat dibaca.<br><small>${x(message||'Periksa akses Firestore Rules.')}</small></div>`}
+
+  window.iqOnlineLoad=async function(){
+    if(!window.session)return;
+    const r=role(),db=cloud();
+    if(!db||!['OWNER','ADMIN','KASIR'].includes(r))return;
+    try{
+      if(r==='OWNER'){
+        const snap=await db.collection('orders').limit(100).get();
+        const docs=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>stamp(b)-stamp(a));
+        renderOrders(docs,true);
+      }else{
+        // Jangan bergantung pada field kasirStatus untuk query Firestore.
+        // Order lama mungkin belum memiliki field tersebut. Staff sudah diberi
+        // akses read oleh Rules, jadi baca orders lalu normalisasi BARU di client.
+        const snap=await db.collection('orders').limit(100).get();
+        const docs=snap.docs.map(d=>({id:d.id,...d.data()}))
+          .filter(o=>String(o.kasirStatus||'BARU').toUpperCase()==='BARU')
+          .sort((a,b)=>stamp(b)-stamp(a));
+        renderOrders(docs,false);
+        showToggle();
+      }
+    }catch(e){renderError(e?.message||e)}
+  };
+
+  window.iqOnlineAccept=async function(id){
+    if(!['ADMIN','KASIR'].includes(role()))return alert('Hanya Admin atau Kasir yang dapat menerima pesanan.');
+    const db=cloud();if(!db||!id)return;
+    if(!confirm('Terima pesanan online ini?'))return;
+    try{
+      const ref=db.collection('orders').doc(id);
+      await db.runTransaction(async tx=>{
+        const snap=await tx.get(ref);
+        if(!snap.exists)throw new Error('Pesanan sudah tidak tersedia.');
+        const o=snap.data()||{};
+        if(String(o.kasirStatus||'BARU').toUpperCase()!=='BARU')throw new Error('Pesanan sudah diterima oleh petugas lain.');
+        tx.update(ref,{kasirStatus:'DIPROSES',kasirUid:window.IQIHLO_CLOUD?.user?.uid||null,kasirName:window.session?.u||role(),kasirProcessedAt:firebase.firestore.FieldValue.serverTimestamp(),updatedAt:firebase.firestore.FieldValue.serverTimestamp()});
+      });
+      try{await db.collection('activity').add({type:'ORDER_ACCEPTED',orderId:id,userUid:window.IQIHLO_CLOUD?.user?.uid||null,userName:window.session?.u||role(),role:role(),detail:'Pesanan online diterima oleh '+role(),createdAt:firebase.firestore.FieldValue.serverTimestamp()});}catch(e){}
+      alert('Pesanan berhasil diterima.');
+      await iqOnlineLoad();
+    }catch(e){alert('Gagal menerima pesanan: '+(e?.message||e))}
+  };
+
+  function stop(){if(newUnsub){try{newUnsub()}catch(e){}newUnsub=null}if(allUnsub){try{allUnsub()}catch(e){}allUnsub=null};started=false}
+  function start(){
+    const r=role(),db=cloud();
+    if(!window.session||!db||!['OWNER','ADMIN','KASIR'].includes(r))return;
+    if(started)return;
+    started=true;
+    const title=$i('iqOnlineTitle'),hint=$i('iqOnlineHint');
+    if(title)title.textContent=r==='OWNER'?'📋 PESANAN ONLINE — OWNER':'🛎️ PESANAN ONLINE';
+    if(hint)hint.textContent=r==='OWNER'?'Owner dapat melihat seluruh pesanan dan status penerimaannya.':'Pesanan baru pelanggan masuk otomatis. Hanya Admin/Kasir yang dapat menerima.';
+    try{
+      if(r==='OWNER'){
+        allUnsub=db.collection('orders').limit(100).onSnapshot(s=>{const docs=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>stamp(b)-stamp(a));renderOrders(docs,true);},e=>renderError(e?.message||e));
+      }else{
+        // Jangan memakai query where(kasirStatus == BARU). Pesanan pelanggan
+        // lama/versi sebelumnya bisa hanya memiliki status:'BARU' tanpa
+        // kasirStatus. Ambil orders yang memang boleh dibaca oleh Rules,
+        // lalu normalisasi status di client. Ini membuat order baru tetap
+        // muncul tanpa mengubah struktur dokumen pelanggan.
+        newUnsub=db.collection('orders').limit(100).onSnapshot(s=>{
+          const docs=s.docs.map(d=>({id:d.id,...d.data()}))
+            .filter(o=>String(o.kasirStatus||'BARU').toUpperCase()==='BARU')
+            .sort((a,b)=>stamp(b)-stamp(a));
+          renderOrders(docs,false);
+          showToggle();
+        },e=>renderError(e?.message||e));
+      }
+    }catch(e){renderError(e?.message||e)}
+  }
+
+  function sync(){setTimeout(start,300);setTimeout(iqOnlineLoad,700)}
+  const oldApply=window.applySession;
+  if(typeof oldApply==='function'){window.applySession=function(){oldApply.apply(this,arguments);stop();sync()};}
+  document.addEventListener('DOMContentLoaded',()=>setTimeout(start,1000));
+  window.addEventListener('beforeunload',stop);
 })();
 </script>
 </body>
