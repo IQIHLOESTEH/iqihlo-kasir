@@ -88,6 +88,7 @@ const firebaseConfig={apiKey:"AIzaSyCVIeE-CDyaNDTU9DuvxKMRPY4wH-6Rp-o",authDomai
 firebase.initializeApp(firebaseConfig);const auth=firebase.auth(),db=firebase.firestore();
 const FALLBACK=[['Es Teh',3000,'Es Teh'],['Es Jeruk Peras',5000,'Es Teh'],['Mocacino',5000,'Kopi Susu'],['Vanilla Latte',5000,'Kopi Susu'],['Coolant',5000,'Nutrisari'],['Chococino',5000,'Kopi Susu'],['Carebian Nut',5000,'Nutrisari'],['Mangga',4000,'Nutrisari'],['Jeruk Peras',4000,'Es Jeruk Peras'],['Cincau',4000,'Susu'],['Milky Orange',4000,'Nutrisari'],['Putih',5000,'Susu'],['Coklat',5000,'Susu'],['Matcha',5000,'Susu'],['Milo',5000,'Susu'],['Teh Tarik Maxtea',5000,'Teh Tarik Maxtea'],['Tora Bika Creamy',5000,'Kopi Susu'],['Indocafe',5000,'Kopi Susu'],['White Coffee',5000,'Kopi Susu'],['Kopi Kapal Api',3000,'Kopi Hitam'],['Kopi ABC',3000,'Kopi Hitam'],['Creamy',5000,'Goodday Latte'],['Butterscotch',5000,'Goodday Latte'],['Original',5000,'Goodday Latte'],['Air Putih Es',2000,'Air Putih'],['Air Putih Panas',2000,'Air Putih']];
 let menus=FALLBACK.map(x=>({n:x[0],p:x[1],c:x[2]})),cart={},uid=null,category='Semua',deliverySettings={storeLat:null,storeLng:null,maxKm:8,zones:[{maxKm:2,fee:3000},{maxKm:4,fee:5000},{maxKm:6,fee:8000},{maxKm:8,fee:10000}]},customerCoords=null;
+try{const saved=JSON.parse(localStorage.getItem('iqihlo_customer_coords_v1')||'null');if(saved&&Number.isFinite(Number(saved.lat))&&Number.isFinite(Number(saved.lng)))customerCoords={lat:Number(saved.lat),lng:Number(saved.lng)}}catch(e){}
 const rp=n=>new Intl.NumberFormat('id-ID',{style:'currency',currency:'IDR',maximumFractionDigits:0}).format(Number(n)||0);
 const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 function cats(){const list=['Semua',...Array.from(new Set(menus.map(m=>m.c).filter(Boolean)))];document.querySelector('#cats').innerHTML=list.map(c=>`<button class="cat ${c===category?'active':''}" onclick="setCat(${JSON.stringify(c)})">${esc(c)}</button>`).join('')}
@@ -133,44 +134,41 @@ function updateCheckout(){
  return {items,sub,fee,km}
 }
 function useLocation(){
- if(!navigator.geolocation)return alert('Perangkat ini tidak menyediakan layanan lokasi.');
- const status=document.querySelector('#locationStatus');
- status.textContent='Mengambil lokasi perangkat…';
- const success=pos=>{
-   customerCoords={lat:Number(pos.coords.latitude),lng:Number(pos.coords.longitude)};
-   status.textContent='Lokasi berhasil diambil. Ongkir dihitung dari lokasi ini.';
+ const st=document.querySelector('#locationStatus');
+ if(!navigator.geolocation){st.textContent='Browser ini tidak menyediakan akses lokasi. Gunakan Chrome/Browser terbaru di HP.';return alert('Browser tidak mendukung lokasi.')}
+ if(!window.isSecureContext && location.protocol!=='https:' && location.hostname!=='localhost' && location.hostname!=='127.0.0.1'){
+   st.innerHTML='<b>Lokasi belum bisa digunakan dari file Download.</b><br>Buka web IQIHLO ES TEH melalui alamat HTTPS agar izin GPS Android dapat bekerja.';
+   return alert('GPS tidak bisa digunakan saat web dibuka langsung dari file Download. Web harus dibuka melalui HTTPS.');
+ }
+ st.textContent='Mengambil lokasi… pastikan GPS aktif dan tekan Izinkan jika muncul permintaan.';
+ const opts={enableHighAccuracy:true,timeout:20000,maximumAge:0};
+ navigator.geolocation.getCurrentPosition(pos=>{
+   const lat=Number(pos.coords.latitude),lng=Number(pos.coords.longitude);
+   if(!Number.isFinite(lat)||!Number.isFinite(lng)){st.textContent='Koordinat lokasi tidak valid.';return}
+   customerCoords={lat,lng};
+   try{localStorage.setItem('iqihlo_customer_coords_v1',JSON.stringify(customerCoords))}catch(e){}
+   st.innerHTML='<b>✓ Lokasi berhasil diambil.</b><br>Koordinat tersimpan dan ongkir dihitung otomatis.';
    updateCheckout();
- };
- const fail=err=>{
-   const code=Number(err&&err.code||0);
-   if(code===1){
-     status.textContent='Izin lokasi ditolak. Aktifkan izin Lokasi untuk aplikasi ini lalu tekan Lokasi lagi.';
-     alert('Izin lokasi ditolak. Aktifkan izin Lokasi aplikasi, lalu coba lagi.');
-     return;
-   }
-   if(code===2||code===3){
-     status.textContent='GPS belum mendapatkan posisi. Mencoba mode lokasi standar…';
-     navigator.geolocation.getCurrentPosition(success,finalFail,{enableHighAccuracy:false,timeout:15000,maximumAge:300000});
-     return;
-   }
-   finalFail(err);
- };
- const finalFail=err=>{
-   status.textContent='Lokasi tidak dapat diambil. Pastikan GPS aktif dan izin lokasi diberikan.';
-   alert('Lokasi tidak berhasil diambil. Jika aplikasi dibuka sebagai APK/WebView, izin Lokasi harus diaktifkan untuk aplikasi tersebut.');
- };
- navigator.geolocation.getCurrentPosition(success,fail,{enableHighAccuracy:true,timeout:12000,maximumAge:60000});
+ },err=>{
+   let msg='Lokasi tidak dapat diambil.';
+   if(err.code===1)msg='Izin lokasi ditolak. Aktifkan izin Lokasi untuk Chrome di Setelan Android.';
+   else if(err.code===2)msg='Lokasi belum tersedia. Aktifkan GPS/Lokasi dan coba lagi.';
+   else if(err.code===3)msg='Pengambilan lokasi terlalu lama. Aktifkan GPS dan coba lagi.';
+   st.textContent=msg;
+   alert(msg);
+ },opts)
 }
 async function checkout(){
  const x=updateCheckout();if(!x.items.length)return alert('Keranjang kosong.');
  const name=document.querySelector('#name').value.trim(),phone=document.querySelector('#phone').value.trim(),address=document.querySelector('#address').value.trim(),payment=document.querySelector('#payment').value;
  if(!name||!phone||!address)return alert('Nama, nomor HP, dan alamat wajib diisi.');
- if(!customerCoords||deliverySettings.storeLat==null||deliverySettings.storeLng==null)return alert('Tekan tombol 📍 Lokasi satu kali terlebih dahulu. Setelah berhasil, lokasi tidak akan diminta ulang saat mengirim pesanan.');
+ if(!customerCoords||deliverySettings.storeLat==null||deliverySettings.storeLng==null)return alert('Lokasi belum tersedia. Tekan tombol 📍 Lokasi terlebih dahulu.');
  if(x.fee===null)return alert('Alamat berada di luar jangkauan delivery.');
- const ref=await db.collection('orders').add({customerUid:uid,name,phone,address,payment,items:x.items,subtotal:x.sub,deliveryFee:x.fee,distanceKm:Number(x.km.toFixed(2)),total:x.sub+x.fee,customerLat:customerCoords.lat,customerLng:customerCoords.lng,status:'BARU',courierUid:null,courierName:null,createdAt:firebase.firestore.FieldValue.serverTimestamp(),updatedAt:firebase.firestore.FieldValue.serverTimestamp()});
+ const ref=await db.collection('orders').add({customerUid:uid,name,phone,address,payment,items:x.items,subtotal:x.sub,deliveryFee:x.fee,distanceKm:Number(x.km.toFixed(2)),total:x.sub+x.fee,customerLat:customerCoords.lat,customerLng:customerCoords.lng,status:'BARU',kasirStatus:'BARU',kasirUid:null,kasirName:null,courierUid:null,courierName:null,createdAt:firebase.firestore.FieldValue.serverTimestamp(),updatedAt:firebase.firestore.FieldValue.serverTimestamp()});
  cart={};render();closeCheckout();alert('Pesanan berhasil dikirim. Nomor: '+ref.id.slice(-8).toUpperCase());loadOrders()
 }
-async function loadOrders(){if(!uid)return;const el=document.querySelector('#orders');try{const snap=await db.collection('orders').where('customerUid','==',uid).orderBy('createdAt','desc').limit(10).get();document.querySelector('#orderCount').textContent=snap.size+' pesanan';el.innerHTML=snap.empty?'<div class="empty">Belum ada pesanan.</div>':snap.docs.map(d=>{const o=d.data();return `<div class="order"><span class="badge">${esc(o.status||'BARU')}</span><br><b>${esc(d.id.slice(-8).toUpperCase())}</b> • ${rp(o.total||0)}<br><span class="muted">${esc(o.distanceKm??'-')} km • ongkir ${rp(o.deliveryFee||0)}</span></div>`}).join('')}catch(e){el.innerHTML='<div class="empty">Riwayat pesanan belum dapat dimuat.</div>'}}
+let ordersUnsub=null;
+function loadOrders(){if(!uid)return;const el=document.querySelector('#orders');if(ordersUnsub)ordersUnsub();ordersUnsub=db.collection('orders').where('customerUid','==',uid).limit(20).onSnapshot(snap=>{const docs=snap.docs.slice().sort((a,b)=>(b.data().createdAt?.seconds||0)-(a.data().createdAt?.seconds||0)).slice(0,10);document.querySelector('#orderCount').textContent=docs.length+' pesanan';el.innerHTML=docs.length?docs.map(d=>{const o=d.data();const courier=o.courierName?`<br><span class="muted">Kurir: ${esc(o.courierName)}</span>`:'';return `<div class="order"><span class="badge">${esc(o.status||'BARU')}</span><br><b>${esc(d.id.slice(-8).toUpperCase())}</b> • ${rp(o.total||0)}<br><span class="muted">${esc(o.distanceKm??'-')} km • ongkir ${rp(o.deliveryFee||0)}</span>${courier}</div>`}).join(''):'<div class="empty">Belum ada pesanan.</div>'},e=>{console.error(e);el.innerHTML='<div class="empty">Riwayat pesanan belum dapat dimuat.</div>'})}
 auth.signInAnonymously().then(c=>{uid=c.user.uid;Promise.all([syncMenus(),syncDelivery(),loadOrders()])}).catch(e=>console.error(e));
 cats();render();
 </script>
