@@ -1756,6 +1756,22 @@ async function connectFirebaseForCurrentSession(){
     }
    }
   }
+  /*
+     STAFF WEB LOGIN memakai Firebase Anonymous Authentication.
+     Firestore Rules mengidentifikasi hak akses staff melalui users/{uid}.
+     Setelah username/password aplikasi tervalidasi, daftarkan UID anonim
+     ke dokumen users agar Admin/Kasir benar-benar dapat membaca orders.
+     Ini hanya untuk akun STAFF; Owner tetap memakai akun Firebase email.
+  */
+  if(session && ['ADMIN','KASIR'].includes(String(session.r||'').toUpperCase()) && window.IQIHLO_CLOUD.user){
+    const staffUid=window.IQIHLO_CLOUD.user.uid;
+    await window.IQIHLO_CLOUD.db.collection('users').doc(staffUid).set({
+      role:String(session.r).toLowerCase(),
+      username:String(session.u||''),
+      active:true,
+      updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+    },{merge:true});
+  }
   await window.IQIHLO_CLOUD.sync();
   await refreshCloudAccounts();
  }catch(e){
