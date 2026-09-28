@@ -1740,9 +1740,29 @@ function applyCloudData(data){
 
 window.IQIHLO_APPLY_CLOUD=applyCloudData;
 
+async function ensureStaffFirestoreAccess(){
+  const cloud=window.IQIHLO_CLOUD;
+  if(!cloud?.db) throw new Error('Firebase Firestore belum siap.');
+  if(!cloud.auth?.currentUser){
+    if(!cloud.signInAnonymous) throw new Error('Firebase Authentication belum siap.');
+    await cloud.signInAnonymous();
+  }
+  cloud.user=cloud.auth.currentUser;
+  const r=String(session?.r||'').toUpperCase();
+  if(!['ADMIN','KASIR'].includes(r)) return;
+  const uid=cloud.user.uid;
+  const ref=cloud.db.collection('users').doc(uid);
+  await ref.set({role:r.toLowerCase(),username:String(session?.u||''),active:true,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
+  const verify=await ref.get();
+  const data=verify.exists?(verify.data()||{}):{};
+  if(String(data.role||'').toLowerCase()!==r.toLowerCase()) throw new Error('Role Firebase staff belum terdaftar sebagai '+r+'.');
+}
+
 async function connectFirebaseForCurrentSession(){
- if(!window.IQIHLO_CLOUD || !window.IQIHLO_CLOUD.user)return;
+ if(!window.IQIHLO_CLOUD)return;
  try{
+  if(!window.IQIHLO_CLOUD.user && window.IQIHLO_CLOUD.auth?.currentUser) window.IQIHLO_CLOUD.user=window.IQIHLO_CLOUD.auth.currentUser;
+  if(session && ['ADMIN','KASIR'].includes(String(session.r||'').toUpperCase())) await ensureStaffFirestoreAccess();
   const email=window.IQIHLO_CLOUD.user.email;
   if(email){
    const snap=await window.IQIHLO_CLOUD.db.collection('users').doc(email).get();
@@ -1755,22 +1775,6 @@ async function connectFirebaseForCurrentSession(){
      a.email=email;
     }
    }
-  }
-  /*
-     STAFF WEB LOGIN memakai Firebase Anonymous Authentication.
-     Firestore Rules mengidentifikasi hak akses staff melalui users/{uid}.
-     Setelah username/password aplikasi tervalidasi, daftarkan UID anonim
-     ke dokumen users agar Admin/Kasir benar-benar dapat membaca orders.
-     Ini hanya untuk akun STAFF; Owner tetap memakai akun Firebase email.
-  */
-  if(session && ['ADMIN','KASIR'].includes(String(session.r||'').toUpperCase()) && window.IQIHLO_CLOUD.user){
-    const staffUid=window.IQIHLO_CLOUD.user.uid;
-    await window.IQIHLO_CLOUD.db.collection('users').doc(staffUid).set({
-      role:String(session.r).toLowerCase(),
-      username:String(session.u||''),
-      active:true,
-      updatedAt:firebase.firestore.FieldValue.serverTimestamp()
-    },{merge:true});
   }
   await window.IQIHLO_CLOUD.sync();
   await refreshCloudAccounts();
@@ -4975,6 +4979,7 @@ window.addEventListener('beforeunload',()=>{try{if(session) updatePresence(true)
     const db=cloud();
     if(!db)throw new Error('Firebase Firestore belum siap.');
     const r=role();
+    if(['ADMIN','KASIR'].includes(r)) await ensureStaffFirestoreAccess();
     if(r==='OWNER'){
       const snap=await db.collection('orders').limit(100).get();
       return {docs:snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>stamp(b)-stamp(a)),owner:true};
@@ -5049,14 +5054,16 @@ window.addEventListener('beforeunload',()=>{try{if(session) updatePresence(true)
           renderOrders(docs,true);showToggle();
         },e=>{console.error('Owner order listener failed:',e);renderError(e?.message||e)});
       }else{
-        // Jangan filter Firestore dengan kasirStatus karena order dari versi customer
-        // lama bisa tidak mempunyai field tersebut. Filter setelah snapshot diterima.
-        newUnsub=db.collection('orders').limit(100).onSnapshot(s=>{
-          const docs=s.docs.map(d=>({id:d.id,...d.data()}))
-            .filter(o=>String(o.kasirStatus||'BARU').toUpperCase()==='BARU')
-            .sort((a,b)=>stamp(b)-stamp(a));
-          notifyNewOrders(docs);renderOrders(docs,false);showToggle();
-        },e=>{console.error('Staff order listener failed:',e);renderError(e?.message||e)});
+        // Bootstrap akses staff terlebih dahulu. Jika Firebase menolak akses, tampilkan
+        // error nyata di panel, jangan diam-diam menampilkan angka 0.
+        ensureStaffFirestoreAccess().then(()=>{
+          newUnsub=db.collection('orders').limit(100).onSnapshot(s=>{
+            const docs=s.docs.map(d=>({id:d.id,...d.data()}))
+              .filter(o=>String(o.kasirStatus||'BARU').toUpperCase()==='BARU')
+              .sort((a,b)=>stamp(b)-stamp(a));
+            notifyNewOrders(docs);renderOrders(docs,false);showToggle();
+          },e=>{console.error('Staff order listener failed:',e);renderError(e?.message||e)});
+        }).catch(e=>{console.error('Staff Firebase bootstrap failed:',e);renderError(e?.message||e)});
       }
     }catch(e){console.error('IQIHLO online order listener setup failed:',e);renderError(e?.message||e)}
     retryTimer=setInterval(()=>{if(window.session&&isStaff())iqOnlineLoad()},10000);
