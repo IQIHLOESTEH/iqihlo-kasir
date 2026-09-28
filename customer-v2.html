@@ -36,7 +36,7 @@ main{padding:14px 14px 0}
 .deliverybox{background:#fff7e5;border:1px solid #f5d596;border-radius:15px;padding:11px;font-size:13px;line-height:1.5}.deliverybox b{font-size:15px}
 .cart{position:fixed;left:50%;transform:translateX(-50%);bottom:10px;width:min(736px,calc(100% - 20px));z-index:70;background:#181715;color:#fff;border-radius:21px;padding:10px 11px 10px 14px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 15px 45px #0004}
 .cart small{color:#c9c3bd}.cart strong{display:block;font-size:21px;margin-top:1px}.cart button{border:0;background:linear-gradient(135deg,#ffd044,#ff9c00);color:#1b1815;border-radius:15px;padding:13px 16px;font-weight:950}
-.modal{position:fixed;inset:0;background:#0008;z-index:100;display:flex;align-items:flex-end;justify-content:center}.sheet{width:min(760px,100%);max-height:90vh;overflow:auto;background:#fffaf4;border-radius:26px 26px 0 0;padding:18px 16px 26px}.sheethead{display:flex;justify-content:space-between;align-items:center}.sheet h2{margin:0}.close{width:38px;height:38px;border:0;border-radius:12px;background:#eee5dc;font-size:20px}.summary{background:#fff;border:1px solid var(--line);border-radius:17px;padding:12px;margin:12px 0}.sumline{display:flex;justify-content:space-between;padding:4px 0}.grand{font-size:20px;font-weight:950;border-top:1px dashed #ddd0c2;margin-top:7px;padding-top:9px}.pay{width:100%;border:1px solid #ded0c1;background:#fff;border-radius:13px;padding:12px}.primary{width:100%;margin-top:10px;border:0;background:#1b1815;color:#fff;border-radius:15px;padding:14px;font-weight:950}.orders{display:grid;gap:9px}.order{background:#fff;border:1px solid var(--line);border-radius:16px;padding:12px}.badge{display:inline-block;border-radius:999px;padding:5px 9px;background:#fff0d4;font-size:11px;font-weight:900}.muted{color:var(--muted)}
+.modal{position:fixed;inset:0;background:#0008;z-index:100;display:flex;align-items:flex-end;justify-content:center}.sheet{width:min(760px,100%);max-height:90vh;overflow:auto;background:#fffaf4;border-radius:26px 26px 0 0;padding:18px 16px 26px}.sheethead{display:flex;justify-content:space-between;align-items:center}.sheet h2{margin:0}.close{width:38px;height:38px;border:0;border-radius:12px;background:#eee5dc;font-size:20px}.summary{background:#fff;border:1px solid var(--line);border-radius:17px;padding:12px;margin:12px 0}.sumline{display:flex;justify-content:space-between;padding:4px 0}.grand{font-size:20px;font-weight:950;border-top:1px dashed #ddd0c2;margin-top:7px;padding-top:9px}.pay{width:100%;border:1px solid #ded0c1;background:#fff;border-radius:13px;padding:12px}.primary{width:100%;margin-top:10px;border:0;background:#1b1815;color:#fff;border-radius:15px;padding:14px;font-weight:950}.orders{display:grid;gap:9px}.order{background:#fff;border:1px solid var(--line);border-radius:16px;padding:12px}.badge{display:inline-block;border-radius:999px;padding:5px 9px;background:#fff0d4;font-size:11px;font-weight:900}.order .badge{color:#8a5a00}.order:has(.badge:nth-child(1)){ }.muted{color:var(--muted)}
 .hidden{display:none!important}
 @media(min-width:650px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}.pic{height:145px}}
 </style>
@@ -188,7 +188,26 @@ async function checkout(){
  }
 }
 let ordersUnsub=null;
-function loadOrders(){if(!uid)return;const el=document.querySelector('#orders');if(ordersUnsub)ordersUnsub();ordersUnsub=db.collection('orders').where('customerUid','==',uid).limit(20).onSnapshot(snap=>{const docs=snap.docs.slice().sort((a,b)=>(b.data().createdAt?.seconds||0)-(a.data().createdAt?.seconds||0)).slice(0,10);document.querySelector('#orderCount').textContent=docs.length+' pesanan';el.innerHTML=docs.length?docs.map(d=>{const o=d.data();const courier=o.courierName?`<br><span class="muted">Kurir: ${esc(o.courierName)}</span>`:'';return `<div class="order"><span class="badge">${esc(o.status||'BARU')}</span><br><b>${esc(d.id.slice(-8).toUpperCase())}</b> • ${rp(o.total||0)}<br><span class="muted">${esc(o.distanceKm??'-')} km • ongkir ${rp(o.deliveryFee||0)}</span>${courier}</div>`}).join(''):'<div class="empty">Belum ada pesanan.</div>'},e=>{console.error(e);el.innerHTML='<div class="empty">Riwayat pesanan belum dapat dimuat.</div>'})}
+function customerStatus(o){
+ const s=String(o?.status||'BARU').toUpperCase(),k=String(o?.kasirStatus||'BARU').toUpperCase();
+ if(s==='SELESAI')return ['SELESAI','Pesanan sudah diterima.'];
+ if(s==='DIANTAR')return ['SEDANG DIANTAR','Pesanan sedang menuju alamat Anda.'];
+ if(k==='DIPROSES'||s==='DIPROSES')return ['SEDANG DISIAPKAN','Pesanan sudah diterima Kasir/Admin dan sedang diproses.'];
+ return ['MENUNGGU KASIR','Pesanan sudah masuk dan menunggu diterima Kasir/Admin.'];
+}
+function loadOrders(){
+ if(!uid)return;const el=document.querySelector('#orders');if(ordersUnsub)ordersUnsub();
+ ordersUnsub=db.collection('orders').where('customerUid','==',uid).limit(20).onSnapshot(snap=>{
+  const docs=snap.docs.slice().sort((a,b)=>(b.data().createdAt?.seconds||0)-(a.data().createdAt?.seconds||0)).slice(0,10);
+  document.querySelector('#orderCount').textContent=docs.length+' pesanan';
+  el.innerHTML=docs.length?docs.map(d=>{
+   const o=d.data();const [label,note]=customerStatus(o);
+   const courier=o.courierName?`<br><span class="muted">Kurir: ${esc(o.courierName)}</span>`:'';
+   const who=o.deliveryBy?`<br><span class="muted">Pengantar: ${esc(o.deliveryBy)}</span>`:'';
+   return `<div class="order"><span class="badge">${esc(label)}</span><br><b>${esc(d.id.slice(-8).toUpperCase())}</b> • ${rp(o.total||0)}<br><span class="muted">${esc(note)}</span><br><span class="muted">${esc(o.distanceKm??'-')} km • ongkir ${rp(o.deliveryFee||0)}</span>${courier}${who}</div>`
+  }).join(''):'<div class="empty">Belum ada pesanan.</div>'
+ },e=>{console.error(e);el.innerHTML='<div class="empty">Pesanan belum dapat dimuat. Periksa koneksi Firebase.</div>'})
+}
 auth.signInAnonymously().then(c=>{uid=c.user.uid;Promise.all([syncMenus(),syncDelivery(),loadOrders()])}).catch(e=>console.error(e));
 cats();render();
 </script>
