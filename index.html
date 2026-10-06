@@ -1541,11 +1541,28 @@ Scan barcode produk, lalu stok produk tersebut otomatis bertambah 1.
       async signInAnonymous(){ return auth.signInAnonymously(); },
       async signOut(){ return auth.signOut(); },
       async save(key,value){
-        if(!this.ready || this.applying || !this.dataKeys.includes(key)) return false;
+        if(!this.user || this.applying || !this.dataKeys.includes(key)) return false;
         try {
           await db.collection('app_data').doc(key).set({data:value,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
           return true;
         } catch(e){ console.error('Firebase save failed:',key,e); return false; }
+      },
+      async appendTransaction(record){
+        if(!this.user || !this.db || !record) return false;
+        try {
+          const ref=db.collection('app_data').doc('iqihlo_tx_v7');
+          await db.runTransaction(async transaction=>{
+            const snap=await transaction.get(ref);
+            const current=snap.exists && Array.isArray(snap.data()?.data) ? snap.data().data : [];
+            if(current.some(x=>x && String(x.id)===String(record.id))) return;
+            const next=[...current,record];
+            transaction.set(ref,{data:next,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
+          });
+          return true;
+        } catch(e){
+          console.error('Firebase transaction append failed:',e);
+          return false;
+        }
       },
       async sync(){
         if(!this.user) return;
@@ -1719,10 +1736,11 @@ function applyCloudData(data){
  if(window.IQIHLO_CLOUD)window.IQIHLO_CLOUD.applying=true;
 
  try{
+  let transactionDataChanged=false;
   Object.entries(data).forEach(([key,value])=>{
    if(key===KEYS.accounts && Array.isArray(value)) handleCloudAccounts(value);
    if(key===KEYS.menus && Array.isArray(value)) menus=value;
-   if(key===KEYS.tx && Array.isArray(value)) tx=value;
+   if(key===KEYS.tx && Array.isArray(value)){ tx=value; transactionDataChanged=true; }
    if(key===KEYS.employees && Array.isArray(value)) employees=value;
    if(key===KEYS.att && Array.isArray(value)) att=value;
    if(key===KEYS.stock && value && typeof value==='object') stock=value;
@@ -1748,6 +1766,9 @@ function applyCloudData(data){
   renderStats();
   renderAttendanceSelf();
   renderAttendanceDashboard();
+  if(transactionDataChanged){
+   try{renderDashboard();}catch(e){console.error('renderDashboard cloud tx:',e);}
+  }
  }finally{
   if(window.IQIHLO_CLOUD)window.IQIHLO_CLOUD.applying=!!oldApplying;
  }
@@ -3204,7 +3225,11 @@ function checkout(){
  try{renderReport();}catch(e){console.error('renderReport:',e);}
 
  try{
-  if(window.IQIHLO_CLOUD&&typeof window.IQIHLO_CLOUD.save==='function'){
+  if(window.IQIHLO_CLOUD&&typeof window.IQIHLO_CLOUD.appendTransaction==='function'){
+   window.IQIHLO_CLOUD.appendTransaction(rec).then(ok=>{
+    if(!ok) console.error('Transaksi tersimpan lokal tetapi gagal disinkronkan ke Firebase:',rec.id);
+   });
+  }else if(window.IQIHLO_CLOUD&&typeof window.IQIHLO_CLOUD.save==='function'){
    window.IQIHLO_CLOUD.save(KEYS.tx,tx);
   }
  }catch(e){
