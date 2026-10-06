@@ -996,6 +996,13 @@ body.iq-owner-focus #ownerDashboard{display:block !important}
 .iqon-head{display:flex;justify-content:space-between;align-items:center;gap:8px}.iqon-head b{font-size:12px;color:#4b3425}.iqon-count{background:#d94b3d;color:#fff;border-radius:999px;padding:4px 7px;font-size:8px;font-weight:950}.iqon-close{border:0;background:#eee7df;border-radius:9px;padding:6px 8px;font-weight:900}.iqon-list{display:grid;gap:7px;margin-top:9px}.iqon-row{border:1px solid #eee5dc;border-radius:12px;padding:9px;background:#fff;font-size:9px}.iqon-row b{font-size:10px}.iqon-meta{color:#817369;line-height:1.4;margin-top:3px}.iqon-status{display:inline-block;margin-top:5px;padding:3px 6px;border-radius:999px;background:#f1e8df;color:#5b4030;font-size:8px;font-weight:900}.iqon-status.new{background:#fff0d5;color:#a56600}.iqon-status.proc{background:#dff3e4;color:#176b38}.iqon-status.delivery{background:#e5efff;color:#245b9a}.iqon-status.done{background:#e5f7e8;color:#17743b}.iqon-actions{display:flex;gap:6px;margin-top:7px}.iqon-actions button{flex:1;border:0;border-radius:9px;padding:9px;font-size:8px;font-weight:900;cursor:pointer}.iqon-proc{background:#4c2b18;color:#fff}.iqon-view{background:#eee7df;color:#5b4a3e}.iqon-toggle{position:fixed;right:12px;bottom:12px;z-index:181;border:0;border-radius:999px;background:#4c2b18;color:#fff;padding:11px 13px;font-size:10px;font-weight:950;box-shadow:0 8px 24px #3a1b0d33;display:none}.iqon-toggle.show{display:block}.iqon-empty{padding:12px;text-align:center;color:#8a7b70;font-size:9px}.iqon-error{padding:10px;border-radius:10px;background:#fff0ef;color:#a8322a;font-size:9px}
 @media(max-width:520px){#iqOnlinePanel{right:8px;bottom:8px;width:calc(100vw - 16px);max-height:80vh}.iqon-toggle{right:8px;bottom:8px}}
 
+
+/* =========================================================
+   IQIHLO OWNER ACCESS LOCK — 06/10/2026
+   Owner: dashboard + monitoring transaksi saja.
+========================================================= */
+/* Owner tetap memiliki tombol Menu/Profil; hanya panel KAS yang dihilangkan dari dashboard. */
+body.iq-owner-focus #ownerCashPanel{display:none !important;}
 </style>
 </head>
 <body><div id="iqOnlinePanel">
@@ -1086,6 +1093,11 @@ body.iq-owner-focus #ownerDashboard{display:block !important}
     </div>
   </div>
 
+  <div id="ownerLiveTransactions" class="dash-panel" style="margin-top:10px">
+    <div class="dp-head"><h3>Transaksi Kasir & Admin — REAL-TIME</h3><span class="muted" id="ownerLiveTxStatus">Menunggu sinkronisasi</span></div>
+    <div id="ownerLiveTxList" class="dash-activity"></div>
+  </div>
+
   <div class="dash-lower">
     <div class="dash-panel">
       <div class="dp-head"><h3>Menu Terlaris</h3><span class="muted">Hari ini</span></div>
@@ -1105,7 +1117,7 @@ body.iq-owner-focus #ownerDashboard{display:block !important}
 
 
   <div class="dash-bottom">
-    <div class="dash-panel">
+    <div id="ownerShiftPanel" class="dash-panel">
       <div class="dp-head"><h3>Shift Aktif</h3><span class="shift-status"><i class="shift-dot"></i><span id="dashShiftStatus">Aktif</span></span></div>
       <div class="shift-grid">
         <div class="shift-row"><span>Kasir utama</span><b id="dashShiftUser">-</b></div>
@@ -1121,7 +1133,7 @@ body.iq-owner-focus #ownerDashboard{display:block !important}
       <div id="dashPresence" class="presence-list"></div>
     </div>
 
-    <div class="dash-panel">
+    <div id="ownerCashPanel" class="dash-panel">
       <div class="dp-head"><h3>Kas Masuk / Keluar</h3><span class="muted">Hari ini</span></div>
       <div class="cash-summary">
         <div class="cash-box"><span>Kas Masuk</span><b id="dashCashIn">Rp0</b></div>
@@ -1527,10 +1539,11 @@ Scan barcode produk, lalu stok produk tersebut otomatis bertambah 1.
       async signInAnonymous(){ return auth.signInAnonymously(); },
       async signOut(){ return auth.signOut(); },
       async save(key,value){
-        if(!this.ready || this.applying || !this.dataKeys.includes(key)) return;
+        if(!this.ready || this.applying || !this.dataKeys.includes(key)) return false;
         try {
           await db.collection('app_data').doc(key).set({data:value,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
-        } catch(e){ console.error('Firebase save failed:',key,e); }
+          return true;
+        } catch(e){ console.error('Firebase save failed:',key,e); return false; }
       },
       async sync(){
         if(!this.user) return;
@@ -2377,17 +2390,14 @@ function exitApp(){
 ========================= */
 
 function applyRole(){
- const r=session?.r||'KASIR';
-
- document.querySelectorAll('.admin-only').forEach(e=>{
-  e.style.display=(r==='OWNER'||r==='ADMIN')?'block':'none';
- });
-
- document.querySelectorAll('.owner-only').forEach(e=>{
-  e.style.display=r==='OWNER'?'block':'none';
- });
-
- document.body.classList.toggle('iq-owner-focus',r==='OWNER');
+ const r=String(session?.r||'KASIR').toUpperCase();
+ const isOwner=r==='OWNER';
+ document.querySelectorAll('.admin-only').forEach(e=>{e.style.display=(isOwner||r==='ADMIN')?'block':'none';});
+ document.querySelectorAll('.owner-only').forEach(e=>{e.style.display=isOwner?'block':'none';});
+ document.body.classList.toggle('iq-owner-focus',isOwner);
+ const menuBtn=document.querySelector('.topmenu');
+ const profileBtn=$('topProfile');
+ [menuBtn,profileBtn].forEach(el=>{if(!el)return;el.style.display='';el.setAttribute('aria-hidden','false');el.tabIndex=0;});
 }
 
 function openMenu(){
@@ -2556,6 +2566,7 @@ function goHomeFromMenu(){
 
 function goFeatureFromMenu(keyword){
 
+  if(String(session?.r||'').toUpperCase()==='OWNER') return;
   closeMenu();
   if(session?.r==='OWNER') document.body.classList.remove('iq-owner-focus');
 
@@ -2642,7 +2653,7 @@ function goFeatureFromMenu(keyword){
 
 function openSettingsFromMenu(){
 
-  if(!session) return;
+  if(!session || String(session.r||'').toUpperCase()==='OWNER') return;
 
   if(session.r === 'KASIR'){
     alert(
@@ -2671,7 +2682,7 @@ function closeMenu(){
 }
 
 function openSettings(){
- if(!session)return;
+ if(!session || String(session.r||'').toUpperCase()==='OWNER')return;
 
  if(session.r==='KASIR'){
   alert('Pengaturan hanya dapat digunakan oleh Admin atau Owner.');
@@ -3140,6 +3151,8 @@ function checkout(){
   id:Date.now(),
   date:new Date().toISOString(),
   user:session?.u||'Kasir',
+  role:String(session?.r||'KASIR').toUpperCase(),
+  source:'IQIHLOESTEH-POS',
   customer,
   payment,
   total,
@@ -3547,11 +3560,21 @@ function renderDashboardEnhancement(){
   $('iqTopProfitLike').innerHTML=top.length?top.map(([n,v],i)=>`<div class="iq-top-row"><span>${i+1}. ${esc(n)}</span><b>${rupiah(v.total)}</b></div>`).join(''):'<div class="iq-mini-muted">Belum ada data penjualan.</div>';
 }
 
+function renderOwnerLiveTransactions(){
+  if(String(session?.r||'').toUpperCase()!=='OWNER')return;
+  const list=$('ownerLiveTxList'),status=$('ownerLiveTxStatus');
+  if(!list)return;
+  const rows=(Array.isArray(tx)?tx:[]).slice().sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,20);
+  if(status)status.textContent=rows.length?('Sinkron • '+rows.length+' transaksi terakhir'):'Belum ada transaksi';
+  list.innerHTML=rows.map(r=>`<div class="dash-act"><i></i><div><b>${esc(r.user||'Kasir')} • ${esc(r.role||'KASIR')}</b> melakukan transaksi ${rupiah(r.total||0)}<br><small>${esc(r.payment||'Cash')} • ${esc(r.customer||'Umum')}</small></div><small>${new Date(r.date).toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit',second:'2-digit'})}</small></div>`).join('') || '<div class="muted">Belum ada transaksi dari Kasir/Admin.</div>';
+}
+
 function renderDashboard(){
   const dash=$('ownerDashboard');
   if(!dash||!session)return;
 
   renderDashboardClock();
+  renderOwnerLiveTransactions();
   renderDashboardFinance();
   renderAttendanceDashboard();
 
