@@ -969,7 +969,6 @@ button{
    Tidak mengganti mesin login, cetak, kasir, Firebase, stok,
    barcode, absen, backup/restore, void, atau fitur lama.
 ========================================================= */
-body.iq-owner-focus .content{display:none !important}
 body.iq-owner-focus #ownerDashboard{display:block !important}
 .iq-owner-focus-note{margin:0 0 12px;padding:9px 12px;border:1px solid #e8ddd1;border-radius:12px;background:linear-gradient(135deg,#fffaf4,#f3f8ef);color:#5f5147;font-size:10px}
 #iqOwnerPulse{margin-top:12px;display:grid;grid-template-columns:1.25fr .75fr;gap:10px}
@@ -1003,6 +1002,9 @@ body.iq-owner-focus #ownerDashboard{display:block !important}
 ========================================================= */
 /* Owner tetap memiliki tombol Menu/Profil; hanya panel KAS yang dihilangkan dari dashboard. */
 body.iq-owner-focus #ownerCashPanel{display:none !important;}
+body.iq-owner-focus #ownerShiftPanel .shift-opening-edit{display:none !important;}
+body.iq-owner-focus #dashShiftOpeningRow,
+body.iq-owner-focus #dashShiftExpectedRow{display:none !important;}
 </style>
 </head>
 <body><div id="iqOnlinePanel">
@@ -1122,13 +1124,13 @@ body.iq-owner-focus #ownerCashPanel{display:none !important;}
       <div class="shift-grid">
         <div class="shift-row"><span>Kasir utama</span><b id="dashShiftUser">-</b></div>
         <div class="shift-row"><span>Mulai</span><b id="dashShiftStart">-</b></div>
-        <div class="shift-row"><span>Kas awal</span><b id="dashShiftOpening">Rp0</b></div>
+        <div id="dashShiftOpeningRow" class="shift-row"><span>Kas awal</span><b id="dashShiftOpening">Rp0</b></div>
         <div class="shift-opening-edit">
           <input id="dashShiftOpeningInput" type="number" min="0" step="1000" inputmode="numeric" placeholder="Masukkan kas awal" aria-label="Kas awal">
           <button type="button" onclick="setShiftOpening()">Simpan Kas Awal</button>
         </div>
         <div class="shift-row"><span>Penjualan</span><b id="dashShiftSales">Rp0</b></div>
-        <div class="shift-row"><span>Kas seharusnya</span><b id="dashShiftExpected">Rp0</b></div>
+        <div id="dashShiftExpectedRow" class="shift-row"><span>Kas seharusnya</span><b id="dashShiftExpected">Rp0</b></div>
       </div>
       <div id="dashPresence" class="presence-list"></div>
     </div>
@@ -2566,7 +2568,6 @@ function goHomeFromMenu(){
 
 function goFeatureFromMenu(keyword){
 
-  if(String(session?.r||'').toUpperCase()==='OWNER') return;
   closeMenu();
   if(session?.r==='OWNER') document.body.classList.remove('iq-owner-focus');
 
@@ -2653,7 +2654,7 @@ function goFeatureFromMenu(keyword){
 
 function openSettingsFromMenu(){
 
-  if(!session || String(session.r||'').toUpperCase()==='OWNER') return;
+  if(!session) return;
 
   if(session.r === 'KASIR'){
     alert(
@@ -2682,7 +2683,7 @@ function closeMenu(){
 }
 
 function openSettings(){
- if(!session || String(session.r||'').toUpperCase()==='OWNER')return;
+ if(!session)return;
 
  if(session.r==='KASIR'){
   alert('Pengaturan hanya dapat digunakan oleh Admin atau Owner.');
