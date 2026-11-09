@@ -1069,6 +1069,24 @@ button:active{transform:translateY(1px)}
  .menus{grid-template-columns:repeat(3,minmax(0,1fr))}
  .finance-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
+/* HEADER FIX: beri ruang khusus untuk tombol menu garis tiga */
+.topbar{position:sticky;isolation:isolate}
+.topbar .brand{padding-left:52px!important;margin-left:0!important;min-width:0;flex:1 1 auto}
+.topbar .brand h1,.topbar .brand small{overflow:visible;white-space:nowrap}
+.topbar .userbox{position:static;flex:0 0 auto;min-width:0}
+.topbar .topmenu{left:12px;right:auto;z-index:2}
+@media(max-width:620px){
+  .topbar .brand{padding-left:46px!important}
+  .topbar .brand h1{font-size:clamp(12px,3.6vw,15px)}
+  .topbar .brand small{font-size:8px}
+  .topbar .userbox{gap:4px}
+}
+@media(max-width:360px){
+  .topbar .brand{padding-left:44px!important}
+  .topbar .brand h1{font-size:11px}
+  .topbar .brand small{font-size:7px}
+}
+
 /* Mobile */
 @media(max-width:620px){
  .topbar{min-height:60px;padding:8px 10px;gap:5px}
