@@ -2711,7 +2711,17 @@ function hideFeatures(){
   }
 
   document.querySelectorAll('.features .details')
-    .forEach(d => d.open = false);
+    .forEach(d => { d.open = false; d.style.display = ''; });
+}
+
+/* Tampilkan hanya panel yang dipanggil dari menu garis tiga.
+   Panel fitur lain tidak memenuhi halaman utama. */
+function showOnlyFeature(target){
+  document.querySelectorAll('.features .details').forEach(d=>{
+    const active = d === target;
+    d.style.display = active ? '' : 'none';
+    d.open = active;
+  });
 }
 
 
@@ -2740,14 +2750,14 @@ function goFeatureFromMenu(keyword){
   if(keyword === 'ABSEN'){
     features.classList.add('show-feature');
     const panel=document.getElementById('attendanceSelfPanel');
-    if(panel){panel.open=true;panel.scrollIntoView({behavior:'smooth',block:'start'});renderAttendanceSelf();}
+    if(panel){showOnlyFeature(panel);panel.scrollIntoView({behavior:'smooth',block:'start'});renderAttendanceSelf();}
     return;
   }
 
   if(keyword === 'VOID'){
     features.classList.add('show-feature');
     const panel=document.getElementById('voidSelfPanel');
-    if(panel){panel.open=true;panel.scrollIntoView({behavior:'smooth',block:'start'});renderMyVoidRequests();}
+    if(panel){showOnlyFeature(panel);panel.scrollIntoView({behavior:'smooth',block:'start'});renderMyVoidRequests();}
     return;
   }
 
@@ -2777,7 +2787,7 @@ function goFeatureFromMenu(keyword){
     return;
   }
 
-  target.open = true;
+  showOnlyFeature(target);
 
   target.scrollIntoView({
     behavior:'smooth',
